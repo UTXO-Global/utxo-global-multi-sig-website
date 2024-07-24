@@ -114,7 +114,7 @@ body {
   content: "Success";
   font-size: 24px;
   font-weight: 500;
-  color: #09c148;
+  color: #00BF6D;
 }
 
 .Toastify__toast--error .Toastify__toast-body::before {
@@ -190,5 +190,28 @@ body {
 }
 
 .Toastify__close-button {
-  color: #0D0D0D !important;
+  color: #0d0d0d !important;
+}
+
+/* Ant */
+.ant-select {
+  height: unset !important;
+}
+.ant-select-selector {
+  border: none !important;
+  padding: 12px !important;
+  box-shadow: unset !important;
+}
+
+.ant-select-selection-item {
+  font-size: 24px !important;
+  line-height: 28px !important;
+  font-weight: 500 !important;
+  color: #0d0d0d !important;
+}
+
+.ant-modal-content {
+  padding: 0 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
 }

@@ -44,6 +44,7 @@ const Button: React.FC<ButtonProps> = ({
             kind === "secondary",
           "bg-light-100 border-light-100 text-dark-100 hover:enabled:text-dark-100 hover:enabled:bg-grey-100 hover:enabled:border-grey-100":
             kind === "light",
+          "bg-[#D1D1D1] cursor-not-allowed border-[#D1D1D1] text-grey-500": !!disabled && kind === "primary",
           "cursor-progress": !!loading,
           "w-full": fullWidth,
         }
