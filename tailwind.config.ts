@@ -9,6 +9,20 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    container: {
+      // you can configure the container to be centered
+      center: true,
+
+      // or have default horizontal padding
+      padding: {
+        DEFAULT: "24px",
+      },
+
+      // default breakpoints but with 40px removed
+      screens: {
+        xl: "1440px",
+      },
+    },
     extend: {
       colors: {
         orange: {
@@ -17,16 +31,16 @@ const config: Config = {
         dark: {
           100: "#0D0D0D",
           200: "#141414",
-          300: "#2C2C2C"
+          300: "#2C2C2C",
         },
         light: {
           100: "#FFFFFF",
         },
         grey: {
           100: "#F4F4F4",
-          200: "#787575",
-          300: "#ABA8A1",
-          400: "#BDBDBD",
+          200: "#EBECEC",
+          300: '#F5F5F5',
+          400: '#787575'
         },
         success: {
           100: "#09C148",

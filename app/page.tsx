@@ -2,7 +2,7 @@
 
 export default function Home() { 
   return (
-    <main>
+    <main className="bg-grey-300">
       UTXO Global Multi-Sig
     </main>
   );

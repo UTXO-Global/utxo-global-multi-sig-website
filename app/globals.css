@@ -60,50 +60,6 @@ body {
   color: #0d0d0d;
 }
 
-.utxo-global-container {
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-right: 16px;
-  padding-left: 16px;
-}
-
-@media (min-width: 640px) {
-  .utxo-global-container {
-    padding-right: 16px;
-    padding-left: 16px;
-  }
-}
-
-@media (min-width: 768px) {
-  .utxo-global-container {
-    padding-right: 20px;
-    padding-left: 20px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .utxo-global-container {
-    padding-right: 40px;
-    padding-left: 40px;
-  }
-}
-
-@media (min-width: 1280px) {
-  .utxo-global-container {
-    padding-right: 80px;
-    padding-left: 80px;
-  }
-}
-
-@media (min-width: 1440px) {
-  .utxo-global-container {
-    max-width: 1440px;
-    padding-right: 80px;
-    padding-left: 80px;
-  }
-}
-
 /* Animate */
 .animate-shake:hover {
   animation: shake 1.2s;

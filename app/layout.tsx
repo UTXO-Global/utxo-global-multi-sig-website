@@ -5,6 +5,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { ConfigProvider } from "antd";
 
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+
 import {
   SITE_DESCRIPTION,
   SITE_TITLE,
@@ -12,6 +15,7 @@ import {
   SITE_IMAGE_URL,
   GA_TRACKING_ID,
 } from "@/configs/common";
+
 
 export const metadata: Metadata = {
   title: SITE_TITLE,
@@ -58,8 +62,9 @@ export default function RootLayout({
             },
           }}
         >
-         
+          <Header />
           {children}
+          <Footer />
           <ToastContainer
             autoClose={5000}
             closeOnClick
