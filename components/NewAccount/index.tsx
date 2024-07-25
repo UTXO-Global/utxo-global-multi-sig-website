@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 
@@ -21,12 +21,19 @@ const NewAccount = () => {
         <LineStep step={step} />
         <div className="mt-8">
           {step === 1 ? <Step01 onNext={() => setStep(2)} /> : null}
-          {step === 2 ? <Step02 onNext={() => setStep(3)} /> : null}
-          {step === 3 ? <Step03 onNext={() => setStep(3)} /> : null}
+          {step === 2 ? (
+            <Step02 onNext={() => setStep(3)} onCancel={() => setStep(1)} />
+          ) : null}
+          {step === 3 ? (
+            <Step03
+              onNext={() => setIsCreated(true)}
+              onCancel={() => setStep(2)}
+            />
+          ) : null}
         </div>
       </div>
       <Success
-        isModalOpen={true}
+        isModalOpen={isCreated}
         setIsModalOpen={(val) => setIsCreated(val)}
       />
     </div>

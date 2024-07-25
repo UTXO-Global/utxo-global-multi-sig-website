@@ -5,7 +5,13 @@ import IcnCopy from "@/public/icons/icn-copy.svg";
 import IcnExternalLink from "@/public/icons/icn-external-link.svg";
 import Button from "@/components/Common/Button";
 
-const Step03 = ({ onNext }: { onNext: () => void }) => {
+const Step03 = ({
+  onNext,
+  onCancel,
+}: {
+  onNext: () => void;
+  onCancel: () => void;
+}) => {
   return (
     <div>
       <h6 className="text-[24px] leading-[28px] font-medium text-center px-16 text-orange-100">
@@ -78,16 +84,18 @@ const Step03 = ({ onNext }: { onNext: () => void }) => {
 
           <div className="flex gap-[100px] items-center py-[20px]">
             <div className="w-[114px] text-[18px] leading-[24px] font-medium text-grey-400">
-            Threshold
+              Threshold
             </div>
             <div className="flex-1 text-base text-dark-100 font-medium flex gap-[10px] items-center">
-            2 out of 2 signers
+              2 out of 2 signers
             </div>
           </div>
         </div>
       </div>
       <div className="pt-8 px-16 grid grid-cols-2 gap-4">
-        <Button kind="secondary">Back</Button>
+        <Button kind="secondary" onClick={() => onCancel()}>
+          Back
+        </Button>
         <Button onClick={() => onNext()}>Next</Button>
       </div>
     </div>

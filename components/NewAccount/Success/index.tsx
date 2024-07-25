@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import { Modal } from "antd";
 
+import Button from "@/components/Common/Button";
 import IcnChecked from "@/public/icons/icn-checked.svg";
-import IcnCopy from "@/public/icons/icn-copy.svg";
 
 const Success = ({
   isModalOpen,
@@ -44,18 +44,13 @@ const Success = ({
             Start your journey to the smart account security now Use your
             address to receive funds on Nervos{" "}
           </p>
-          <div className="my-8 rounded-lg bg-grey-300 px-4 py-3 flex gap-5">
+          <div className="my-8 rounded-lg bg-grey-300 px-4 py-3 flex gap-5 items-center">
             <img src="/images/account.png" alt="account" className="w-10" />
-            <div>
+            <div className="flex-1">
               <p className="text-base font-medium text-dark-100">CKB Account</p>
-              <div className="flex gap-4 items-center">
-                <p className="text-[18px] leading-[24px] text-dark-100">
-                  ckt1qzda0cr08m85u...4damf0j73qvr6t5
-                </p>
-                <IcnCopy className="cursor-pointer w-4" />
-              </div>
             </div>
           </div>
+          <Button className="" fullWidth onClick={handleCancel}>Let’s Go</Button>
         </div>
       </Modal>
     </>

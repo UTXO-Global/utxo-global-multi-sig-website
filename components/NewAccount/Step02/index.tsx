@@ -5,7 +5,13 @@ import IcnInfoOutline from "@/public/icons/icn-info-outline.svg";
 import IcnTrash from "@/public/icons/icn-trash.svg";
 import Button from "@/components/Common/Button";
 
-const Step02 = ({ onNext }: { onNext: () => void }) => {
+const Step02 = ({
+  onNext,
+  onCancel,
+}: {
+  onNext: () => void;
+  onCancel: () => void;
+}) => {
   return (
     <div>
       <h6 className="text-[24px] leading-[28px] font-medium text-center px-16 text-orange-100">
@@ -27,13 +33,22 @@ const Step02 = ({ onNext }: { onNext: () => void }) => {
               />
             </div>
             <div className="flex-1">
-              <p className="text-base text-grey-500">Signer</p>
-              <div className="mt-2 rounded-lg border border-grey-200 px-4 py-[11px] flex items-center gap-2">
-                <img src="/images/account.png" alt="account" className="w-10" />
-                <p className="text-[18px] leading-[24px] text-dark-100 truncate">
-                  <span className="text-grey-500">Pud:</span>{" "}
-                  ckt1qzda0cr08m8f7xulejywt49kt...
-                </p>
+              <p className="text-base text-grey-500 mb-2">Signer</p>
+              <div className="flex gap-4 items-center">
+                <div className="flex-1 rounded-lg border border-grey-200 px-4 py-[11px] flex items-center gap-2">
+                  <img
+                    src="/images/account.png"
+                    alt="account"
+                    className="w-10"
+                  />
+                  <p className="text-[18px] leading-[24px] text-dark-100 truncate">
+                    <span className="text-grey-500">Pud:</span>{" "}
+                    ckt1qzda0cr08m8f7xulejywt49kt...
+                  </p>
+                </div>
+                <div className="p-2 hover:bg-grey-200 rounded-full cursor-pointer visible opacity-0">
+                  <IcnTrash className="w-6" />
+                </div>
               </div>
             </div>
           </div>
@@ -50,14 +65,20 @@ const Step02 = ({ onNext }: { onNext: () => void }) => {
               />
             </div>
             <div className="flex-1">
-              <p className="text-base text-grey-500">Signer</p>
-              <div className="mt-2 rounded-lg border border-grey-200 px-4 py-[11px] flex items-center gap-2 relative">
-                <img src="/images/account.png" alt="account" className="w-10" />
-                <p className="text-[18px] leading-[24px] text-dark-100 truncate">
-                  <span className="text-grey-500">Pud:</span>{" "}
-                  ckt1qzda0cr08m8f7xulejywt49kt...
-                </p>
-                <div className="p-2 absolute top-1/2 -translate-y-1/2 right-0 translate-x-[calc(100%+8px)] hover:bg-grey-200 rounded-lg cursor-pointer">
+              <p className="text-base text-grey-500 mb-2">Signer</p>
+              <div className="flex gap-4 items-center">
+                <div className="flex-1 rounded-lg border border-grey-200 px-4 py-[11px] flex items-center gap-2 relative">
+                  <img
+                    src="/images/account.png"
+                    alt="account"
+                    className="w-10"
+                  />
+                  <p className="text-[18px] leading-[24px] text-dark-100 truncate">
+                    <span className="text-grey-500">Pud:</span>{" "}
+                    ckt1qzda0cr08m8f7xulejywt49kt...
+                  </p>
+                </div>
+                <div className="p-2 hover:bg-grey-200 rounded-full cursor-pointer">
                   <IcnTrash className="w-6" />
                 </div>
               </div>
@@ -111,7 +132,9 @@ const Step02 = ({ onNext }: { onNext: () => void }) => {
         </div>
       </div>
       <div className="pt-8 px-16 grid grid-cols-2 gap-4">
-        <Button kind="secondary">Back</Button>
+        <Button kind="secondary" onClick={() => onCancel()}>
+          Back
+        </Button>
         <Button onClick={() => onNext()}>Next</Button>
       </div>
     </div>
