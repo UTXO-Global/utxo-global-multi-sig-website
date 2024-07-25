@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build:staging": "dotenv -e .env.staging next build",
+    "build:prod": "dotenv -e .env.prod next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -17,7 +18,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-toastify": "^10.0.5",
-    "tailwind-merge": "^2.2.1"
+    "tailwind-merge": "^2.2.1",
+    "dotenv-cli": "^7.3.0"
   },
   "devDependencies": {
     "@types/aos": "^3.0.7",
