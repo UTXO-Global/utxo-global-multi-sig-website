@@ -16,7 +16,6 @@ import {
   GA_TRACKING_ID,
 } from "@/configs/common";
 
-
 export const metadata: Metadata = {
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,
@@ -42,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-       <Script
+      <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
       />
       <Script id="google-analytics">
@@ -59,6 +58,13 @@ export default function RootLayout({
           theme={{
             token: {
               fontFamily: `"Satoshi", sans-serif`,
+            },
+            components: {
+              Select: {
+                selectorBg: "#F5F5F5",
+                borderRadius: 8,
+                optionSelectedBg: "#EBECEC"
+              },
             },
           }}
         >

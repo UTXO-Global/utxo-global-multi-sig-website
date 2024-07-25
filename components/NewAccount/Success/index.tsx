@@ -1,0 +1,60 @@
+/* eslint-disable @next/next/no-img-element */
+import { Modal } from "antd";
+
+import Button from "@/components/Common/Button";
+import IcnChecked from "@/public/icons/icn-checked.svg";
+
+const Success = ({
+  isModalOpen,
+  setIsModalOpen,
+}: {
+  isModalOpen: boolean;
+  setIsModalOpen: (val: boolean) => void;
+}) => {
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  return (
+    <>
+      <Modal
+        open={isModalOpen}
+        centered={true}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={false}
+        width={564}
+      >
+        <div className="bg-light-100 rounded-[16px] p-[60px]">
+          <div className="w-[90px] h-[90px] flex justify-center items-center bg-[#EDFBEF] rounded-full mx-auto">
+            <IcnChecked className="w-[50px] fill-success-100" />
+          </div>
+          <p className="text-[20px] leading-[28px] font-bold text-dark-100 text-center mt-8">
+            Your Account Is All Set!
+          </p>
+          <p className="text-[16px] leading-[20px] text-grey-400 text-center mt-2">
+            Start your journey to the smart account security now Use your
+            address to receive funds on Nervos{" "}
+          </p>
+          <div className="my-8 rounded-lg bg-grey-300 px-4 py-3 flex gap-5 items-center">
+            <img src="/images/account.png" alt="account" className="w-10" />
+            <div className="flex-1">
+              <p className="text-base font-medium text-dark-100">CKB Account</p>
+            </div>
+          </div>
+          <Button className="" fullWidth onClick={handleCancel}>Let’s Go</Button>
+        </div>
+      </Modal>
+    </>
+  );
+};
+
+export default Success;
