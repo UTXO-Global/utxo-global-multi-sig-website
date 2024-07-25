@@ -12,7 +12,7 @@ export interface ButtonProps {
   disabled?: boolean;
   onClick?: MouseEventHandler;
   fullWidth?: boolean;
-  kind?: "primary" | "secondary" | "light";
+  kind?: "primary" | "secondary" | "light" | "danger-outline";
   size?: "medium" | "small";
   type?: "button" | "submit" | "reset";
 }
@@ -37,14 +37,17 @@ const Button: React.FC<ButtonProps> = ({
         className,
         {
           "font-medium px-6 py-[11px] text-base": size === "medium",
-          "font-medium px-3 py-[5px] text-base": size === "small",
+          "font-medium px-3 py-[9px] text-[14px] leading-[20px]": size === "small",
           "bg-dark-100 border-dark-100 text-white hover:enabled:text-white hover:enabled:bg-dark-300 hover:enabled:border-dark-300":
             kind === "primary",
           "bg-transparent border-dark-100 text-dark-100 hover:enabled:text-white hover:enabled:bg-dark-100 hover:enabled:border-dark-100":
             kind === "secondary",
           "bg-light-100 border-light-100 text-dark-100 hover:enabled:text-dark-100 hover:enabled:bg-grey-100 hover:enabled:border-grey-100":
             kind === "light",
-          "bg-[#D1D1D1] cursor-not-allowed border-[#D1D1D1] text-grey-500": !!disabled && kind === "primary",
+          "bg-error-100/20 border-error-100 text-error-100 hover:enabled:text-light-100 hover:enabled:bg-error-100 hover:enabled:border-error-100":
+            kind === "danger-outline",
+          "bg-[#D1D1D1] cursor-not-allowed border-[#D1D1D1] text-grey-500":
+            !!disabled && kind === "primary",
           "cursor-progress": !!loading,
           "w-full": fullWidth,
         }

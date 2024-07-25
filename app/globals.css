@@ -114,7 +114,7 @@ body {
   content: "Success";
   font-size: 24px;
   font-weight: 500;
-  color: #00BF6D;
+  color: #00bf6d;
 }
 
 .Toastify__toast--error .Toastify__toast-body::before {
@@ -214,4 +214,9 @@ body {
   padding: 0 !important;
   background-color: transparent !important;
   box-shadow: none !important;
+}
+
+.ant-popover-inner {
+  padding: 0 !important;
+  background-color: transparent !important;
 }

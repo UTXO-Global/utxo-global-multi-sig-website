@@ -7,7 +7,13 @@ import IcnInfoOutline from "@/public/icons/icn-info-outline.svg";
 
 import { MAIN_SITE_URL } from "@/configs/common";
 
-const Step01 = ({ onNext }: { onNext: () => void }) => {
+const Step01 = ({
+  onNext,
+  onCancel,
+}: {
+  onNext: () => void;
+  onCancel: () => void;
+}) => {
   const [nameVal, setNameVal] = useState<string>("");
 
   const onChangeName = (e: any) => {
@@ -62,7 +68,9 @@ const Step01 = ({ onNext }: { onNext: () => void }) => {
       </div>
 
       <div className="pt-8 px-16 grid grid-cols-2 gap-4">
-        <Button kind="secondary">Cancel</Button>
+        <Button kind="secondary" onClick={onCancel}>
+          Cancel
+        </Button>
         <Button disabled={nameVal === ""} onClick={() => onNext()}>
           Next
         </Button>
