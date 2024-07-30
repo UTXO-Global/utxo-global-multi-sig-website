@@ -40,7 +40,6 @@ const Step01 = ({
                 value={nameVal}
                 onChange={onChangeName}
               />
-              <IcnInfoOutline className="w-6" />
             </div>
             <div className="rounded-lg border border-grey-200 px-4 py-[15px]">
               <SwitchNetwork iconClassname="w-8 h-8" />

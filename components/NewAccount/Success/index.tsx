@@ -3,6 +3,7 @@ import { Modal } from "antd";
 
 import Button from "@/components/Common/Button";
 import IcnChecked from "@/public/icons/icn-checked.svg";
+import IcnCopy from "@/public/icons/icn-copy.svg";
 
 const Success = ({
   isModalOpen,
@@ -48,6 +49,10 @@ const Success = ({
             <img src="/images/account.png" alt="account" className="w-10" />
             <div className="flex-1">
               <p className="text-base font-medium text-dark-100">CKB Account</p>
+              <div className="flex gap-4 items-center">
+                <p className="text-[18px] leading-[24px] truncate w-[300px]">ckt1qzda0cr08m85hc8jlnfp3zerete...6j5lda</p>
+                <IcnCopy className="w-4 cursor-pointer" />
+              </div>
             </div>
           </div>
           <Button className="" fullWidth onClick={handleCancel}>Let’s Go</Button>

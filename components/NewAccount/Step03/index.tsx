@@ -1,6 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import { Select } from "antd";
-
 import IcnCopy from "@/public/icons/icn-copy.svg";
 import IcnExternalLink from "@/public/icons/icn-external-link.svg";
 import Button from "@/components/Common/Button";
@@ -96,7 +94,7 @@ const Step03 = ({
         <Button kind="secondary" onClick={() => onCancel()}>
           Back
         </Button>
-        <Button onClick={() => onNext()}>Next</Button>
+        <Button onClick={() => onNext()}>Create</Button>
       </div>
     </div>
   );

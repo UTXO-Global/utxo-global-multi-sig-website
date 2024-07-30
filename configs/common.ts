@@ -1,5 +1,5 @@
-export const SITE_TITLE = "";
-export const SITE_DESCRIPTION = "";
+export const SITE_TITLE = "UTXO Global Multi-Sig";
+export const SITE_DESCRIPTION = "Safeguard your UTXO assets with many private keys adding an extra layer of security.";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "";
 export const MAIN_SITE_URL = process.env.NEXT_PUBLIC_MAIN_SITE_URL || "";
 export const SITE_IMAGE_URL =

@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
-import { Select } from "antd";
+import { useState } from "react";
+import { Select, Tooltip } from "antd";
 
 import IcnInfoOutline from "@/public/icons/icn-info-outline.svg";
 import IcnTrash from "@/public/icons/icn-trash.svg";
@@ -12,6 +13,27 @@ const Step02 = ({
   onNext: () => void;
   onCancel: () => void;
 }) => {
+  const [ownerName, setOwnerName] = useState<string>("Owner");
+  const [signers, setSigners] = useState<any[]>([]);
+
+  const onChangeOwnerName = (e: any) => {
+    setOwnerName(e.target.value);
+  };
+
+  const addSigner = () => {
+    setSigners([
+      ...signers,
+      {
+        name: "",
+        address: "",
+      },
+    ]);
+  };
+
+  const deleteSigner = (index: number) => {
+    setSigners(signers.filter((z, i) => i !== index));
+  };
+
   return (
     <div>
       <h6 className="text-[24px] leading-[28px] font-medium text-center px-16 text-orange-100">
@@ -30,6 +52,8 @@ const Step02 = ({
                 type="text"
                 className="outline-none border border-grey-200 rounded-lg px-4 py-[19px] mt-2 w-full"
                 placeholder="Enter the name"
+                onChange={onChangeOwnerName}
+                value={ownerName}
               />
             </div>
             <div className="flex-1">
@@ -55,36 +79,45 @@ const Step02 = ({
           <p className="text-[14px] leading-[18px] text-grey-500 mt-1">
             Your connected wallet
           </p>
-          <div className="flex gap-6 mt-2">
-            <div className="w-[244px]">
-              <p className="text-base text-grey-500">Signer Name</p>
-              <input
-                type="text"
-                className="outline-none border border-grey-200 rounded-lg px-4 py-[19px] mt-2 w-full"
-                placeholder="Enter the name"
-              />
-            </div>
-            <div className="flex-1">
-              <p className="text-base text-grey-500 mb-2">Signer</p>
-              <div className="flex gap-4 items-center">
-                <div className="flex-1 rounded-lg border border-grey-200 px-4 py-[11px] flex items-center gap-2 relative">
-                  <img
-                    src="/images/account.png"
-                    alt="account"
-                    className="w-10"
-                  />
-                  <p className="text-[18px] leading-[24px] text-dark-100 truncate">
-                    <span className="text-grey-500">Pud:</span>{" "}
-                    ckt1qzda0cr08m8f7xulejywt49kt...
-                  </p>
-                </div>
-                <div className="p-2 hover:bg-grey-200 rounded-full cursor-pointer">
-                  <IcnTrash className="w-6" />
+          {signers.map((z, i) => (
+            <div key={i} className="flex gap-6 mt-2">
+              <div className="w-[244px]">
+                <p className="text-base text-grey-500">Signer Name</p>
+                <input
+                  type="text"
+                  className="outline-none border border-grey-200 rounded-lg px-4 py-[19px] mt-2 w-full"
+                  placeholder="Enter the name"
+                />
+              </div>
+              <div className="flex-1">
+                <p className="text-base text-grey-500 mb-2">Signer</p>
+                <div className="flex gap-4 items-center">
+                  <div className="flex-1 rounded-lg border border-grey-200 px-4 py-[11px] flex items-center gap-2 relative">
+                    <img
+                      src="/images/account.png"
+                      alt="account"
+                      className="w-10"
+                    />
+                    <p className="text-[18px] leading-[24px] text-dark-100 truncate">
+                      <span className="text-grey-500">Pud:</span>{" "}
+                      ckt1qzda0cr08m8f7xulejywt49kt...
+                    </p>
+                  </div>
+                  <div
+                    className="p-2 hover:bg-grey-200 rounded-full cursor-pointer"
+                    onClick={() => deleteSigner(i)}
+                  >
+                    <IcnTrash className="w-6" />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <button className="rounded-lg mt-6 border-none outline-none bg-grey-300 hover:bg-grey-200 transition-colors text-orange-100 text-[16px] leading-[20px] font-medium px-4 py-3">
+          ))}
+
+          <button
+            className="rounded-lg mt-6 border-none outline-none bg-grey-300 hover:bg-grey-200 transition-colors text-orange-100 text-[16px] leading-[20px] font-medium px-4 py-3"
+            onClick={addSigner}
+          >
             + Add New Signer
           </button>
         </div>
@@ -93,7 +126,9 @@ const Step02 = ({
             <p className="text-[24px] leading-[28px] font-medium text-dark-100">
               Threshold
             </p>
-            <IcnInfoOutline className="w-5 stroke-grey-400" />
+            <Tooltip title="The threshold of a Multi-Sign Account specifies how many signers need to confirm a Account transaction before it can be executed.">
+              <IcnInfoOutline className="w-5 stroke-grey-400 cursor-pointer" />
+            </Tooltip>
           </div>
           <p className="mt-1 text-[16px] leading-[20px] text-dark-100">
             Any transaction requires the confirmation of:
@@ -119,14 +154,13 @@ const Step02 = ({
                   />
                 </svg>
               }
-              options={[
-                { value: "1", label: "1" },
-                { value: "2", label: "2" },
-                { value: "3", label: "3" },
-              ]}
+              options={Array(signers.length + 1)
+                .fill(0)
+                .map((z, i) => ({ value: i + 1, label: i + 1 }))}
             />
             <p className="text-[18px] leading-[24px] font-medium text-dark-100">
-              out of 1 signer
+              out of {signers.length + 1}{" "}
+              {signers.length > 0 ? "signers" : "signer"}
             </p>
           </div>
         </div>
