@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import Button from "../Common/Button";
 import Account from "./Account";
 import InvitationAccount from "./InvitationAccount";
@@ -18,11 +20,19 @@ const ListAccounts = ({ onCreateAccount }: { onCreateAccount: () => void }) => {
           Accounts <span className="text-grey-400">(2)</span>
         </p>
         <div className="mt-[10px] grid gap-2">
-          <Account />
-          <Account />
-          <Account />
-          <Account />
-          <Account />
+          <Link href="/dashboard/assets">
+            <Account />
+          </Link>
+
+          <Link href="/dashboard/assets">
+            <Account />
+          </Link>
+          <Link href="/dashboard/assets">
+            <Account />
+          </Link>
+          <Link href="/dashboard/assets">
+            <Account />
+          </Link>
         </div>
       </div>
       <div className="px-6 py-5 rounded-lg bg-light-100">
