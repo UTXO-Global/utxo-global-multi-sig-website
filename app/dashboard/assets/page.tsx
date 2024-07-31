@@ -3,7 +3,7 @@ import IcnExternalLink from "@/public/icons/icn-external-link.svg";
 
 const Assets = () => {
   return (
-    <main className="min-h-screen">
+    <main className="h-full overflow-y-auto">
       <div className="px-6 pt-4 bg-light-100 flex justify-start">
         <div className="px-6 pt-3 pb-4 border-b-2 border-dark-100 text-[16px] leading-[20px] font-bold text-dark-100">
           Tokens

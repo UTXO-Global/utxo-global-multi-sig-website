@@ -220,3 +220,7 @@ body {
   padding: 0 !important;
   background-color: transparent !important;
 }
+
+.ant-switch.ant-switch-checked {
+  background: #0d0d0d !important;
+}

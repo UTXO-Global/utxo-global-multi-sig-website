@@ -9,8 +9,8 @@ import IcnDocs from "@/public/icons/icn-docs.svg";
 
 const Footer = () => {
   return (
-    <footer className="py-2 border-t border-grey-200">
-      <div className="container flex justify-between relative">
+    <footer className="py-2 px-6 border-t border-grey-200 fixed bottom-0 left-0 z-[2] w-full bg-light-100">
+      <div className="flex justify-between relative">
         <div className="py-3 flex gap-6">
           <Link href="#" className="text-[14px] leading-[140%] text-grey-400">
             Feature Request

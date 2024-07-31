@@ -1,13 +1,20 @@
 /* eslint-disable @next/next/no-img-element */
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import Button from "../Common/Button";
 
+import cn from "@/utils/cn";
 import IcnQrBold from "@/public/icons/icn-qr-bold.svg";
 import IcnCopyBold from "@/public/icons/icn-copy-bold.svg";
 import IcnExternalLinkBold from "@/public/icons/icn-external-link-bold.svg";
 
 const LeftMenu = () => {
+  const pathname = usePathname();
   return (
-    <div className="w-[230px] bg-light-100 border-r border-grey-200 h-[calc(100vh-69.71px-61px)]">
+    <div className="w-[230px] bg-light-100 border-r border-grey-200">
       <div className="p-4 grid gap-4 border-b border-grey-200">
         <div className="flex items-center gap-3">
           <div className="relative">
@@ -43,12 +50,22 @@ const LeftMenu = () => {
             <IcnExternalLinkBold className="w-4" />
           </div>
         </div>
-        <Button className="" size="small" fullWidth>
-          New Transaction
-        </Button>
+        <Link href="/dashboard/new-transaction">
+          <Button className="" size="small" fullWidth>
+            New Transaction
+          </Button>
+        </Link>
       </div>
       <div className="px-4 py-2 grid gap-1 text-[14px] leading-[20px] font-medium text-dark-100">
-        <div className="rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer hover:bg-grey-300 transition-colors">
+        <Link
+          href="/dashboard/assets/"
+          className={cn(
+            `rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer transition-all hover:pl-8`,
+            {
+              "bg-grey-300 hover:pl-4": pathname === "/dashboard/assets/",
+            }
+          )}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -68,8 +85,15 @@ const LeftMenu = () => {
             />
           </svg>
           <span>Assets</span>
-        </div>
-        <div className="rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer hover:bg-grey-300 transition-colors">
+        </Link>
+        <div
+          className={cn(
+            `rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer transition-all hover:pl-8`,
+            {
+              "bg-grey-300": false,
+            }
+          )}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -92,7 +116,14 @@ const LeftMenu = () => {
           </svg>
           <span>Transactions</span>
         </div>
-        <div className="rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer hover:bg-grey-300 transition-colors">
+        <div
+          className={cn(
+            `rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer transition-all hover:pl-8`,
+            {
+              "bg-grey-300": false,
+            }
+          )}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -100,7 +131,7 @@ const LeftMenu = () => {
             viewBox="0 0 16 16"
             fill="none"
           >
-            <g clip-path="url(#clip0_443_1759)">
+            <g clipPath="url(#clip0_443_1759)">
               <path
                 d="M11.3155 4.93496V6.49381M11.3143 3.04353C11.2956 3.04353 11.2771 3.03982 11.2599 3.03263C11.2426 3.02544 11.2269 3.0149 11.2137 3.00162C11.2006 2.98834 11.1901 2.97258 11.1831 2.95525C11.176 2.93793 11.1725 2.91938 11.1726 2.90067C11.1726 2.82067 11.2366 2.75781 11.3143 2.75781M11.3166 3.04353C11.3543 3.04323 11.3904 3.02804 11.4169 3.00128C11.4435 2.97452 11.4583 2.93836 11.4583 2.90067C11.4585 2.88196 11.4549 2.86341 11.4479 2.84609C11.4408 2.82876 11.4304 2.813 11.4172 2.79972C11.4041 2.78644 11.3884 2.7759 11.3711 2.76871C11.3539 2.76151 11.3353 2.75781 11.3166 2.75781M0.979492 14.703H14.7018M2.27321 7.80581C2.27321 8.09682 2.33052 8.38498 2.44189 8.65384C2.55325 8.9227 2.71648 9.16699 2.92226 9.37276C3.12803 9.57854 3.37232 9.74177 3.64118 9.85313C3.91004 9.96449 4.1982 10.0218 4.48921 10.0218C4.78022 10.0218 5.06838 9.96449 5.33723 9.85313C5.60609 9.74177 5.85038 9.57854 6.05615 9.37276C6.26193 9.16699 6.42516 8.9227 6.53652 8.65384C6.64789 8.38498 6.70521 8.09682 6.70521 7.80581C6.70521 7.5148 6.64789 7.22664 6.53652 6.95779C6.42516 6.68893 6.26193 6.44464 6.05615 6.23886C5.85038 6.03309 5.60609 5.86986 5.33723 5.7585C5.06838 5.64713 4.78022 5.58981 4.48921 5.58981C4.1982 5.58981 3.91004 5.64713 3.64118 5.7585C3.37232 5.86986 3.12803 6.03309 2.92226 6.23886C2.71648 6.44464 2.55325 6.68893 2.44189 6.95779C2.33052 7.22664 2.27321 7.5148 2.27321 7.80581Z"
                 stroke="black"

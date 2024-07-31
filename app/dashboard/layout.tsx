@@ -7,7 +7,7 @@ export default function DashboardLayout({
 }) {
   return (
     <>
-      <div className="flex">
+      <div className="flex h-[calc(100vh-69.71px-61px)] overflow-y-auto bg-grey-300">
         <LeftMenu />
         <div className="bg-grey-300 flex-1">{children}</div>
       </div>

@@ -8,7 +8,13 @@ import cn from "@/utils/cn";
 
 import IcnChevron from "@/public/icons/icn-chevron.svg";
 
-const SwitchNetwork = ({ iconClassname }: { iconClassname?: string }) => {
+const SwitchNetwork = ({
+  iconClassname,
+  customEl,
+}: {
+  iconClassname?: string;
+  customEl?: React.ReactNode;
+}) => {
   const [network, setNetwork] = useState<string>("Pudge Testnet");
   const [open, setOpen] = useState(false);
 
@@ -68,9 +74,12 @@ const SwitchNetwork = ({ iconClassname }: { iconClassname?: string }) => {
             alt="nervos"
             className={cn(`w-6 h-6`, iconClassname)}
           />
-          <p className="text-[14px] leading-[24px] font-medium text-dark-100">
-            {network}
-          </p>
+          <div>
+            <p className="text-[14px] leading-[24px] font-medium text-dark-100">
+              {network}
+            </p>
+            {customEl}
+          </div>
         </div>
         <IcnChevron className="w-4" />
       </div>

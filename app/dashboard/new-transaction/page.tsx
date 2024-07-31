@@ -1,21 +1,26 @@
 /* eslint-disable @next/next/no-img-element */
-import Button from "@/components/Common/Button";
+"use client";
+
+import { useState } from "react";
+
+import cn from "@/utils/cn";
+import CreateTx from "@/components/NewTx/CreateTx";
+import ConfirmTx from "@/components/NewTx/ConfirmTx";
 
 const NewTransaction = () => {
+  const [step, setStep] = useState<number>(1);
+
   return (
-    <main className="min-h-screen">
-      <div className="pt-[28px] pb-[62px] flex flex-col items-center max-w-[700px] mx-auto bg-light-100 mt-[76px] rounded-lg overflow-hidden relative">
-      <div className="w-full h-1 bg-[#D9D9D9] absolute top-0 left-0"></div>
-        <div className="w-1/3 h-1 bg-orange-100 absolute top-0 left-0"></div>
-        <img
-          src="/images/new-transaction.png"
-          alt="new transaction"
-          className="w-20"
-        />
-        <p className="text-[20px] leading-[28px] font-medium text-dark-100 mt-4 mb-6">
-          New Transaction
-        </p>
-        <Button>Send Tokens</Button>
+    <main className="h-full overflow-y-auto">
+      <div className="py-6 max-w-[633px] mx-auto bg-light-100 mt-[76px] rounded-lg overflow-hidden relative">
+        <div className="w-full h-1 bg-[#D9D9D9] absolute top-0 left-0"></div>
+        <div
+          className={cn(`w-2/3 h-1 bg-orange-100 absolute top-0 left-0`, {
+            "w-full": step === 2,
+          })}
+        ></div>
+        {step === 1 ? <CreateTx onNext={() => setStep(2)} /> : null}
+        {step === 2 ? <ConfirmTx onBack={() => setStep(1)} /> : null}
       </div>
     </main>
   );
