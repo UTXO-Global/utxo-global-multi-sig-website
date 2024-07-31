@@ -45,6 +45,7 @@ const config: Config = {
         },
         success: {
           100: "#00BF6D",
+          200: '#09C183'
         },
         info: {
           100: "#004CE8",

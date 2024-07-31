@@ -86,11 +86,12 @@ const LeftMenu = () => {
           </svg>
           <span>Assets</span>
         </Link>
-        <div
+        <Link
+          href="/dashboard/transactions/"
           className={cn(
             `rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer transition-all hover:pl-8`,
             {
-              "bg-grey-300": false,
+              "bg-grey-300 hover:pl-4": pathname === "/dashboard/transactions/",
             }
           )}
         >
@@ -115,7 +116,7 @@ const LeftMenu = () => {
             />
           </svg>
           <span>Transactions</span>
-        </div>
+        </Link>
         <div
           className={cn(
             `rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer transition-all hover:pl-8`,

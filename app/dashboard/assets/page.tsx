@@ -9,7 +9,7 @@ const Assets = () => {
           Tokens
         </div>
       </div>
-      <div className="p-4">
+      <div className="py-4 px-6">
         <div className="rounded-lg bg-light-100 overflow-hidden">
           <div className="text-[16px] leading-[40px] text-grey-400 font-medium px-6 py-2 border-b border-grey-300 flex">
             <div className="w-[60%]">Asset</div>
