@@ -5,9 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import Button from "../Common/Button";
+import ReceiveTokens from "../ReceiveTokens";
 
 import cn from "@/utils/cn";
-import IcnQrBold from "@/public/icons/icn-qr-bold.svg";
 import IcnCopyBold from "@/public/icons/icn-copy-bold.svg";
 import IcnExternalLinkBold from "@/public/icons/icn-external-link-bold.svg";
 
@@ -40,9 +40,7 @@ const LeftMenu = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <div className="w-8 aspect-square rounded-[4px] bg-grey-300 flex justify-center items-center cursor-pointer">
-            <IcnQrBold className="w-4" />
-          </div>
+          <ReceiveTokens />
           <div className="w-8 aspect-square rounded-[4px] bg-grey-300 flex justify-center items-center cursor-pointer">
             <IcnCopyBold className="w-4" />
           </div>
