@@ -5,8 +5,17 @@ import { useState } from "react";
 import { Popover } from "antd";
 
 import cn from "@/utils/cn";
+import { CkbNetwork } from "@/types/common";
 
 import IcnChevron from "@/public/icons/icn-chevron.svg";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { selectStorage } from "@/redux/features/storage/reducer";
+import { setNetwork } from "@/redux/features/storage/action";
+
+const NETWORK_NAME = {
+  nervos_testnet: "Pudge Testnet",
+  nervos: "Mirana Mainnet",
+};
 
 const SwitchNetwork = ({
   iconClassname,
@@ -15,11 +24,17 @@ const SwitchNetwork = ({
   iconClassname?: string;
   customEl?: React.ReactNode;
 }) => {
-  const [network, setNetwork] = useState<string>("Pudge Testnet");
   const [open, setOpen] = useState(false);
+
+  const dispatch = useAppDispatch();
+  const { network } = useAppSelector(selectStorage);
 
   const hide = () => {
     setOpen(false);
+  };
+
+  const changeNetwork = (network: CkbNetwork) => {
+    dispatch(setNetwork(network));
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -30,7 +45,7 @@ const SwitchNetwork = ({
       <div
         className="px-4 py-[10px] flex gap-2 hover:bg-grey-300 transition-colors items-center cursor-pointer"
         onClick={() => {
-          setNetwork("Mirana Mainnet");
+          changeNetwork(CkbNetwork.MiranaMainnet);
           hide();
         }}
       >
@@ -44,7 +59,7 @@ const SwitchNetwork = ({
       <div
         className="px-4 py-[10px] flex gap-2 hover:bg-grey-300 transition-colors items-center cursor-pointer"
         onClick={() => {
-          setNetwork("Pudge Testnet");
+          changeNetwork(CkbNetwork.PudgeTestnet);
           hide();
         }}
       >
@@ -76,7 +91,7 @@ const SwitchNetwork = ({
           />
           <div>
             <p className="text-[14px] leading-[24px] font-medium text-dark-100">
-              {network}
+              {NETWORK_NAME[network]}
             </p>
             {customEl}
           </div>

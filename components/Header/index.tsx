@@ -3,6 +3,8 @@
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 
+import useLogin from "@/hooks/useLogin";
+
 import SwitchNetwork from "../SwitchNetwork";
 
 const PAGE_TITLE: { [key: string]: string } = {
@@ -12,6 +14,8 @@ const PAGE_TITLE: { [key: string]: string } = {
 };
 
 const Header = () => {
+  useLogin();
+  
   const pathname = usePathname();
 
   const isDashboardLayout = useMemo(() => {

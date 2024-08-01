@@ -5,6 +5,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { ConfigProvider } from "antd";
 
+import { ReduxProvider } from "@/redux/Provider";
+import CCCProvider from "@/providers/ccc";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -63,25 +66,29 @@ export default function RootLayout({
               Select: {
                 selectorBg: "#F5F5F5",
                 borderRadius: 8,
-                optionSelectedBg: "#EBECEC"
+                optionSelectedBg: "#EBECEC",
               },
             },
           }}
         >
-          <Header />
-          {children}
-          <Footer />
-          <ToastContainer
-            autoClose={5000}
-            closeOnClick
-            draggable={false}
-            hideProgressBar={true}
-            newestOnTop={false}
-            pauseOnFocusLoss={false}
-            pauseOnHover={false}
-            position="top-right"
-            rtl={false}
-          />
+          <ReduxProvider>
+            <CCCProvider>
+              <Header />
+              {children}
+              <Footer />
+              <ToastContainer
+                autoClose={5000}
+                closeOnClick
+                draggable={false}
+                hideProgressBar={true}
+                newestOnTop={false}
+                pauseOnFocusLoss={false}
+                pauseOnHover={false}
+                position="top-right"
+                rtl={false}
+              />
+            </CCCProvider>
+          </ReduxProvider>
         </ConfigProvider>
       </body>
     </html>
