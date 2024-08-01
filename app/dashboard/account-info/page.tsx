@@ -44,7 +44,7 @@ const AccountInfo = () => {
               <div className="flex gap-4 items-center">
                 <img src="/images/account.png" alt="account" className="w-10" />
                 <div>
-                  <p className="text-[16px] leading-[20px] font-medium">k4k4r0t</p>
+                  <p className="text-[16px] leading-[20px] font-medium">yangiv</p>
                   <div className="flex items-center">
                     <p className="text-[14px] leading-[18px] text-grey-400">
                       ckt1qzda0cr08m85hc8jlnfp3zer7xulejyw...x8sr05
