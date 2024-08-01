@@ -115,11 +115,12 @@ const LeftMenu = () => {
           </svg>
           <span>Transactions</span>
         </Link>
-        <div
+        <Link
+          href="/dashboard/account-info"
           className={cn(
             `rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer transition-all hover:pl-8`,
             {
-              "bg-grey-300": false,
+              "bg-grey-300": pathname === "/dashboard/account-info/",
             }
           )}
         >
@@ -153,7 +154,7 @@ const LeftMenu = () => {
             </defs>
           </svg>
           <span>Account Info</span>
-        </div>
+        </Link>
       </div>
     </div>
   );
