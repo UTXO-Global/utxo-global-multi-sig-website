@@ -14,10 +14,10 @@ export default function DashboardLayout({
   const router = useRouter();
   const { isLoggedIn } = useAuthenticate();
 
-  useEffect(() => {
-    if (isLoggedIn) return;
-    router.push("/");
-  }, [isLoggedIn]);
+  // useEffect(() => {
+  //   if (isLoggedIn) return;
+  //   router.push("/");
+  // }, [isLoggedIn]);
   
   return (
     <>
