@@ -5,6 +5,7 @@ import { useMemo } from "react";
 
 import useLogin from "@/hooks/useLogin";
 
+import AccountModal from "../AccountModal";
 import SwitchNetwork from "../SwitchNetwork";
 
 const PAGE_TITLE: { [key: string]: string } = {
@@ -16,7 +17,7 @@ const PAGE_TITLE: { [key: string]: string } = {
 
 const Header = () => {
   useLogin();
-  
+
   const pathname = usePathname();
 
   const isDashboardLayout = useMemo(() => {
@@ -26,6 +27,8 @@ const Header = () => {
   const pageTitle = useMemo(() => {
     return PAGE_TITLE[pathname];
   }, [pathname]);
+
+  
 
   return (
     <header className="bg-light-100 border-b border-grey-200 sticky top-0 z-[2]">
@@ -38,13 +41,20 @@ const Header = () => {
             <p className="text-[24px] leading-[28px] font-bold text-dark-100">
               {pageTitle}
             </p>
-            <SwitchNetwork />
+            <div className="flex">
+              <AccountModal />
+
+              <SwitchNetwork />
+            </div>
           </div>
         </div>
       ) : (
         <div className="px-6 py-4 flex justify-between">
           <img src="/logo.png" alt="utxo global" className="w-[80px]" />
-          <SwitchNetwork />
+          <div className="flex">
+            <AccountModal />
+            <SwitchNetwork />
+          </div>
         </div>
       )}
     </header>

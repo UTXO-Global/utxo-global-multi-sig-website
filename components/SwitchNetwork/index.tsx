@@ -11,8 +11,9 @@ import IcnChevron from "@/public/icons/icn-chevron.svg";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { selectStorage } from "@/redux/features/storage/reducer";
 import { setNetwork } from "@/redux/features/storage/action";
+import { NETWORK } from "@/configs/common";
 
-const NETWORK_NAME = {
+const NETWORK_NAME: { [key: string]: string } = {
   nervos_testnet: "Pudge Testnet",
   nervos: "Mirana Mainnet",
 };
@@ -42,7 +43,7 @@ const SwitchNetwork = ({
   };
   const content = (
     <div className="py-1 bg-light-100 text-[14px] leading-[20px] rounded-lg overflow-hidden font-medium text-dark-100">
-      <div
+      {/* <div
         className="px-4 py-[10px] flex gap-2 hover:bg-grey-300 transition-colors items-center cursor-pointer"
         onClick={() => {
           changeNetwork(CkbNetwork.MiranaMainnet);
@@ -55,7 +56,7 @@ const SwitchNetwork = ({
           className="w-6 rounded-full"
         />
         <p>Mirana Mainnet</p>
-      </div>
+      </div> */}
       <div
         className="px-4 py-[10px] flex gap-2 hover:bg-grey-300 transition-colors items-center cursor-pointer"
         onClick={() => {
@@ -91,7 +92,7 @@ const SwitchNetwork = ({
           />
           <div>
             <p className="text-[14px] leading-[24px] font-medium text-dark-100">
-              {NETWORK_NAME[network]}
+              {NETWORK_NAME[NETWORK]}
             </p>
             {customEl}
           </div>

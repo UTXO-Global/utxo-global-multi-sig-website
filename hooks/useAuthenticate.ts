@@ -7,25 +7,28 @@ import { useAppSelector } from "@/redux/hook";
 import { isAddressEqual } from "@/utils/helpers";
 
 const useAuthenticate = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   const signer = ccc.useSigner();
   const { addressLogged, token } = useAppSelector(selectStorage);
 
-  const _checkIsLoggedIn = useCallback(async () => {
-    // if (!signer || !addressLogged) return false;
-    if (!signer) return false;
-    const address = await signer.getInternalAddress();
-    if (!address) return false;
-    setIsLoggedIn(true)
-    // setIsLoggedIn(
-    //   token && isAddressEqual(address, addressLogged) ? true : false
-    // );
-  }, [signer]);
+  // const _checkIsLoggedIn = useCallback(async () => {
+  //   if (!signer || !addressLogged) return setIsLoggedIn(false);
+  //   const address = await signer.getInternalAddress();
+  //   if (!address) return setIsLoggedIn(false);
+  //   setIsLoggedIn(
+  //     token && isAddressEqual(address, addressLogged) ? true : false
+  //   );
+  // }, [addressLogged, signer, token]);
 
-  useEffect(() => {
-    _checkIsLoggedIn();
-  }, [_checkIsLoggedIn]);
+  // useEffect(() => {
+  //   _checkIsLoggedIn();
+  // }, [_checkIsLoggedIn]);
+
+  const isLoggedIn = useMemo(() => {
+    if (!signer) return false;
+    return !!token;
+  },[signer, token]);
 
   return { isLoggedIn };
 };

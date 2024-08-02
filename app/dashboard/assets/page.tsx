@@ -21,7 +21,7 @@ const Assets = () => {
               <div className="flex items-center w-[60%] justify-start">
                 <img src="/images/nervos.png" alt="ckb" className="w-8" />
                 <p className="text-[14px] leading-[24px] text-dark-100 font-medium ml-2">
-                  CKB
+                  Nervos
                 </p>
                 <IcnExternalLink className="w-4 ml-4 cursor-pointer" />
               </div>
