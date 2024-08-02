@@ -223,7 +223,7 @@ const Transaction = ({
                       </div>
                     </div>
                   </div>
-                ) : (
+                ) : status === "unsuccess" ? (
                   <div className="flex gap-2 items-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -246,7 +246,7 @@ const Transaction = ({
                       </div>
                     </div>
                   </div>
-                )}
+                ) : null}
               </div>
             </div>
             {status === "success" ? (
