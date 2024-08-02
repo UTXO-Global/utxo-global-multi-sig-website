@@ -41,7 +41,7 @@ const Transactions = () => {
         {tab === "queue" ? (
           <>
             <Transaction status="pending" isConfirm={true} />
-            <Transaction status="pending" isConfirm={true} />
+            <Transaction status="pending" />
           </>
         ) : (
           <>
