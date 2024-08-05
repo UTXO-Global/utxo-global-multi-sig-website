@@ -24,7 +24,7 @@ const NewAccount = () => {
       const { data } = await api.post("/multi-sig/new-account", {
         name: accountName,
         threshold,
-        signers: signers.map((z) => z.address),
+        signers: signers,
       });
       setAccountCreated(data);
     } catch (e) {
