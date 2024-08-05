@@ -10,7 +10,7 @@ import IcnSpinner from "@/public/icons/icn-spinner.svg";
 import useListAccounts from "@/hooks/useListAccounts";
 
 const ListAccounts = () => {
-  const { isLoading, accounts } = useListAccounts();
+  const { isLoading, accounts, load } = useListAccounts();
 
   return (
     <div className="grid gap-6">
@@ -39,7 +39,9 @@ const ListAccounts = () => {
               {`You don't have any account yet`}
             </div>
           ) : (
-            accounts.map((z, i) => <Account key={i} account={z} />)
+            accounts.map((z, i) => (
+              <Account key={i} account={z} refresh={load} />
+            ))
           )}
         </div>
       </div>

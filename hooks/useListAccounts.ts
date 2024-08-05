@@ -25,6 +25,7 @@ const useListAccounts = () => {
   return {
     isLoading,
     accounts,
+    load,
   };
 };
 

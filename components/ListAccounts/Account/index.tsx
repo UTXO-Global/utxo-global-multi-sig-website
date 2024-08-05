@@ -1,26 +1,59 @@
 /* eslint-disable @next/next/no-img-element */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Modal } from "antd";
+import { toast } from "react-toastify";
 
 import Button from "@/components/Common/Button";
 import IcnPencil from "@/public/icons/icn-pencil.svg";
 import IcnTimesCircle from "@/public/icons/icn-times-circle.svg";
 
-import { shortAddress } from "@/utils/helpers";
+import { isValidName, shortAddress } from "@/utils/helpers";
 import { MultiSigAccountType } from "@/types/account";
 import { NETWORK } from "@/configs/common";
 import { NETWORK_NAME } from "@/configs/network";
+
+import api from "@/utils/api";
+import cn from "@/utils/cn";
 
 const EditName = ({
   isModalOpen,
   setIsModalOpen,
   account,
+  refresh,
 }: {
   isModalOpen: boolean;
   setIsModalOpen: (val: boolean) => void;
   account: MultiSigAccountType;
+  refresh: () => void;
 }) => {
+  const [nameVal, setNameVal] = useState<string>(account.name);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean>(false);
+  const [isSubmit, setIsSubmit] = useState<boolean>(false);
+
+  const editName = async () => {
+    setIsSubmit(true);
+    if (isError) return;
+    setIsLoading(true);
+    try {
+      const { data } = await api.put("/multi-sig/accounts", {
+        name: nameVal,
+        multi_sig_address: account.multi_sig_address,
+      });
+      toast.success("Updated!");
+      await refresh();
+      handleOk();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onChaneNameVal = (e: any) => {
+    setNameVal(e.target.value);
+  };
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -32,6 +65,14 @@ const EditName = ({
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
+  const handleReset = () => {
+    setNameVal(account.name);
+  };
+
+  useEffect(() => {
+    setIsError(!isValidName(nameVal));
+  }, [nameVal]);
 
   return (
     <>
@@ -47,22 +88,51 @@ const EditName = ({
           <h6 className="text-[20px] leading-[28px] text-dark-100 font-bold text-center">
             Edit Name
           </h6>
-          <div className="p-4 bg-grey-300 rounded-lg flex gap-4 items-center mt-8">
+          <div
+            className={cn(
+              `p-4 bg-grey-300 rounded-lg flex gap-4 items-center mt-8`,
+              {
+                "border-error-100 border py-[14px]": isSubmit && isError,
+              }
+            )}
+          >
             <input
               type="text"
-              className="border-none outline-none bg-transparent flex-1 text-base"
+              className="border-none outline-none bg-transparent flex-1 text-base placeholder:text-grey-400 text-dark-100"
               placeholder={account.name}
+              onChange={onChaneNameVal}
+              value={nameVal}
             />
-            <IcnTimesCircle className="w-4 cursor-pointer" />
+            <IcnTimesCircle
+              className="w-4 cursor-pointer"
+              onClick={handleReset}
+            />
           </div>
+          {isSubmit && isError ? (
+            <p className="text-sm text-error-100 mt-1">
+              Account name can only contain letters, numbers, _ and must be
+              between 4 and 16 characters.
+            </p>
+          ) : null}
+
           <div className="p-4 rounded-lg bg-grey-300 text-[16px] leading-[20px] text-dark-100 mt-4">
             {shortAddress(account.multi_sig_address, 10)}
           </div>
           <div className="mt-6 grid grid-cols-2 gap-6">
-            <Button kind="secondary" fullWidth onClick={handleCancel}>
+            <Button
+              kind="secondary"
+              fullWidth
+              onClick={handleCancel}
+              disabled={isLoading}
+            >
               Cancel
             </Button>
-            <Button fullWidth onClick={handleCancel}>
+            <Button
+              fullWidth
+              onClick={editName}
+              disabled={(isSubmit && isError) || isLoading}
+              loading={isLoading}
+            >
               Save
             </Button>
           </div>
@@ -72,7 +142,13 @@ const EditName = ({
   );
 };
 
-const Account = ({ account }: { account: MultiSigAccountType }) => {
+const Account = ({
+  account,
+  refresh,
+}: {
+  account: MultiSigAccountType;
+  refresh: () => void;
+}) => {
   const [isShowEditName, setIsShowEditName] = useState<boolean>(false);
 
   return (
@@ -110,15 +186,15 @@ const Account = ({ account }: { account: MultiSigAccountType }) => {
             {NETWORK_NAME[NETWORK]}
           </p>
         </div>
-        {/* TODO: edit account name */}
-        {/* <IcnPencil
+        <IcnPencil
           className="w-4 fill-grey-400 cursor-pointer"
           onClick={(e: any) => {
             setIsShowEditName(true);
             e.stopPropagation();
           }}
-        /> */}
+        />
         <EditName
+          refresh={refresh}
           account={account}
           isModalOpen={isShowEditName}
           setIsModalOpen={(val) => setIsShowEditName(val)}
