@@ -13,14 +13,14 @@ import { reset } from "@/redux/features/storage/action";
 import useAuthenticate from "@/hooks/useAuthenticate";
 import { shortAddress, formatNumber } from "@/utils/helpers";
 
+import useSignerInfo from "@/hooks/useSignerInfo";
+
 const AccountModal = () => {
   const [open, setOpen] = useState(false);
-  const [address, setAddress] = useState<string>("");
-  const [balance, setBalance] = useState(ccc.Zero);
+  const { address, balance } = useSignerInfo();
 
   const { isLoggedIn } = useAuthenticate();
   const { disconnect } = ccc.useCcc();
-  const signer = ccc.useSigner();
 
   const dispatch = useAppDispatch();
 
@@ -37,19 +37,6 @@ const AccountModal = () => {
     dispatch(reset());
     hide();
   };
-
-  useEffect(() => {
-    if (!signer) {
-      setAddress("");
-      setBalance(ccc.Zero);
-      return;
-    }
-
-    (async () => {
-      setAddress(await signer.getRecommendedAddress());
-      setBalance(await signer.getBalance());
-    })();
-  }, [signer]);
 
   const content = (
     <div className="py-1 bg-light-100 text-[14px] leading-[20px] rounded-lg overflow-hidden font-medium text-dark-100 w-[150px]">

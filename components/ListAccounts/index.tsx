@@ -4,16 +4,16 @@ import Button from "../Common/Button";
 import Account from "./Account";
 import InvitationAccount from "./InvitationAccount";
 
-const ListAccounts = ({ onCreateAccount }: { onCreateAccount: () => void }) => {
+const ListAccounts = () => {
   return (
     <div className="grid gap-6">
       <div className="flex justify-between items-center">
         <h3 className="text-[24px] leading-[28px] font-bold text-dark-100">
           Multi Sign Accounts
         </h3>
-        <Button size="small" onClick={onCreateAccount}>
-          Create Account
-        </Button>
+        <Link href="/new-account">
+          <Button size="small">Create Account</Button>
+        </Link>
       </div>
       <div className="px-6 py-5 rounded-lg bg-light-100">
         <p className="text-[20px] leading-[28px] font-medium text-dark-100">

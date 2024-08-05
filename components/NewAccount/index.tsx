@@ -8,9 +8,29 @@ import Step02 from "./Step02";
 import Step03 from "./Step03";
 import Success from "./Success";
 
-const NewAccount = ({ onCancel }: { onCancel: () => void }) => {
+import { MultiSigAccountType, SignerType } from "@/types/account";
+import api from "@/utils/api";
+
+const NewAccount = () => {
   const [step, setStep] = useState<number>(1);
-  const [isCreated, setIsCreated] = useState<boolean>(false);
+  const [accountName, setAccountName] = useState<string>("");
+  const [threshold, setThreshold] = useState<number>(1);
+  const [signers, setSigners] = useState<SignerType[]>([]);
+  const [accountCreated, setAccountCreated] =
+    useState<MultiSigAccountType | null>(null);
+
+  const create = async () => {
+    try {
+      const { data } = await api.post("/multi-sig/new-account", {
+        name: accountName,
+        threshold,
+        signers: signers.map((z) => z.address),
+      });
+      setAccountCreated(data);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <div>
@@ -21,22 +41,37 @@ const NewAccount = ({ onCancel }: { onCancel: () => void }) => {
         <LineStep step={step} />
         <div className="mt-8">
           {step === 1 ? (
-            <Step01 onNext={() => setStep(2)} onCancel={onCancel} />
+            <Step01
+              onNext={() => setStep(2)}
+              accountName={accountName}
+              setAccountName={setAccountName}
+            />
           ) : null}
           {step === 2 ? (
-            <Step02 onNext={() => setStep(3)} onCancel={() => setStep(1)} />
+            <Step02
+              threshold={threshold}
+              setThreshold={setThreshold}
+              onNext={() => setStep(3)}
+              onCancel={() => setStep(1)}
+              signers={signers}
+              setSigners={setSigners}
+            />
           ) : null}
           {step === 3 ? (
             <Step03
-              onNext={() => setIsCreated(true)}
+              accountName={accountName}
+              signers={signers}
+              threshold={threshold}
+              onCreate={() => create()}
               onCancel={() => setStep(2)}
             />
           ) : null}
         </div>
       </div>
       <Success
-        isModalOpen={isCreated}
-        setIsModalOpen={(val) => setIsCreated(val)}
+        account={accountCreated as any}
+        isModalOpen={!!accountCreated}
+        setIsModalOpen={(val) => {}}
       />
     </div>
   );

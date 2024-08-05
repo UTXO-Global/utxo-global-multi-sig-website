@@ -1,26 +1,61 @@
 /* eslint-disable @next/next/no-img-element */
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Select, Tooltip } from "antd";
+import { ccc } from "@ckb-ccc/connector-react";
 
 import IcnInfoOutline from "@/public/icons/icn-info-outline.svg";
 import IcnTrash from "@/public/icons/icn-trash.svg";
 import Button from "@/components/Common/Button";
+import { SignerType } from "@/types/account";
+import useSignerInfo from "@/hooks/useSignerInfo";
+import { isValidCKBAddress, shortAddress, isValidName } from "@/utils/helpers";
+import cn from "@/utils/cn";
+import { SHORT_NETWORK_NAME } from "@/configs/network";
+import { NETWORK } from "@/configs/common";
 
 const Step02 = ({
   onNext,
   onCancel,
+  signers,
+  setSigners,
+  threshold,
+  setThreshold,
 }: {
   onNext: () => void;
   onCancel: () => void;
+  signers: SignerType[];
+  setSigners: (val: SignerType[]) => void;
+  threshold: number;
+  setThreshold: (val: number) => void;
 }) => {
-  const [ownerName, setOwnerName] = useState<string>("Owner");
-  const [signers, setSigners] = useState<any[]>([]);
+  const { address, balance } = useSignerInfo();
+  const [errors, setErrors] = useState<any[]>([]);
+  const [isSubmit, setIsSubmit] = useState<boolean>(false);
 
-  const onChangeOwnerName = (e: any) => {
-    setOwnerName(e.target.value);
+  const isValidSigners = useMemo(() => {
+    return errors.every((z) => z.name && z.address);
+  }, [errors]);
+
+  const onChangeSignerName = (e: any, index: number) => {
+    setSigners(
+      signers.map((z, i) => {
+        if (index !== i) return z;
+        return { ...z, name: e.target.value };
+      })
+    );
+  };
+
+  const onChangeSignerAddress = (e: any, index: number) => {
+    setSigners(
+      signers.map((z, i) => {
+        if (index !== i) return z;
+        return { ...z, address: e.target.value };
+      })
+    );
   };
 
   const addSigner = () => {
+    setErrors([...errors, { name: true, address: true }]);
     setSigners([
       ...signers,
       {
@@ -34,6 +69,33 @@ const Step02 = ({
     setSigners(signers.filter((z, i) => i !== index));
   };
 
+  const validate = useCallback(() => {
+    const regex = /^[a-zA-Z]{4,16}$/;
+    setErrors(
+      signers.map((z, i) => ({
+        name: isValidName(z.name),
+        address: isValidCKBAddress(z.address, NETWORK),
+      }))
+    );
+  }, [signers]);
+
+  const createSigners = () => {
+    setIsSubmit(true);
+    if (isValidSigners) onNext();
+  };
+
+  useEffect(() => {
+    validate();
+  }, [validate]);
+
+  useEffect(() => {
+    if (signers.length === 0) {
+      setSigners([{ name: "Owner", address }]);
+    } else {
+      setSigners(signers.map((z, i) => (i === 0 ? { ...z, address } : z)));
+    }
+  }, [address]);
+
   return (
     <div>
       <h6 className="text-[24px] leading-[28px] font-medium text-center px-16 text-orange-100">
@@ -45,72 +107,73 @@ const Step02 = ({
       </p>
       <div className="mt-6 pt-5 border-t border-grey-200 px-16">
         <div className="pb-8 border-b border-grey-200">
-          <div className="flex gap-6">
-            <div className="w-[244px]">
-              <p className="text-base text-grey-500">Signer Name</p>
-              <input
-                type="text"
-                className="outline-none border border-grey-200 rounded-lg px-4 py-[19px] mt-2 w-full"
-                placeholder="Enter the name"
-                onChange={onChangeOwnerName}
-                value={ownerName}
-              />
-            </div>
-            <div className="flex-1">
-              <p className="text-base text-grey-500 mb-2">Signer</p>
-              <div className="flex gap-4 items-center">
-                <div className="flex-1 rounded-lg border border-grey-200 px-4 py-[11px] flex items-center gap-2">
-                  <img
-                    src="/images/account.png"
-                    alt="account"
-                    className="w-10"
-                  />
-                  <p className="text-[18px] leading-[24px] text-dark-100 truncate">
-                    <span className="text-grey-500">Pud:</span>{" "}
-                    ckt1qzda0cr08m8f7xulejywt49kt...
-                  </p>
-                </div>
-                <div className="p-2 hover:bg-grey-200 rounded-full cursor-pointer visible opacity-0">
-                  <IcnTrash className="w-6" />
-                </div>
-              </div>
-            </div>
-          </div>
-          <p className="text-[14px] leading-[18px] text-grey-500 mt-1">
-            Your connected wallet
-          </p>
           {signers.map((z, i) => (
-            <div key={i} className="flex gap-6 mt-2">
-              <div className="w-[244px]">
-                <p className="text-base text-grey-500">Signer Name</p>
-                <input
-                  type="text"
-                  className="outline-none border border-grey-200 rounded-lg px-4 py-[19px] mt-2 w-full"
-                  placeholder="Enter the name"
-                />
-              </div>
-              <div className="flex-1">
-                <p className="text-base text-grey-500 mb-2">Signer</p>
-                <div className="flex gap-4 items-center">
-                  <div className="flex-1 rounded-lg border border-grey-200 px-4 py-[11px] flex items-center gap-2 relative">
-                    <img
-                      src="/images/account.png"
-                      alt="account"
-                      className="w-10"
-                    />
-                    <p className="text-[18px] leading-[24px] text-dark-100 truncate">
-                      <span className="text-grey-500">Pud:</span>{" "}
-                      ckt1qzda0cr08m8f7xulejywt49kt...
-                    </p>
-                  </div>
-                  <div
-                    className="p-2 hover:bg-grey-200 rounded-full cursor-pointer"
-                    onClick={() => deleteSigner(i)}
-                  >
-                    <IcnTrash className="w-6" />
+            <div key={i}>
+              <div className="flex gap-6 mt-2">
+                <div className="w-[244px]">
+                  <p className="text-base text-grey-500">Signer Name</p>
+                  <input
+                    type="text"
+                    className={cn(
+                      `outline-none border border-grey-200 placeholder:text-grey-400 rounded-lg px-4 py-[19px] mt-2 w-full`,
+                      {
+                        "border-error-100": isSubmit && !errors[i].name,
+                      }
+                    )}
+                    placeholder="Enter the name"
+                    value={z.name}
+                    onChange={(e) => onChangeSignerName(e, i)}
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-base text-grey-500 mb-2">Signer</p>
+                  <div className="flex gap-4 items-center">
+                    <div
+                      className={cn(
+                        `flex-1 rounded-lg border border-grey-200 px-4 py-[11px] flex items-center gap-2 relative`,
+                        {
+                          "border-error-100": isSubmit && !errors[i].address,
+                        }
+                      )}
+                    >
+                      <img
+                        src="/images/account.png"
+                        alt="account"
+                        className="w-10"
+                      />
+                      {i === 0 ? (
+                        <p className="text-[18px] leading-[24px] text-dark-100 truncate flex gap-2 items-center">
+                          <span className="text-grey-500">{SHORT_NETWORK_NAME[NETWORK]}:</span>{" "}
+                          <span>{shortAddress(address, 10)}</span>
+                        </p>
+                      ) : (
+                        <div className="text-[18px] leading-[24px] text-dark-100 flex items-center gap-2 flex-1">
+                          <span className="text-grey-500">{SHORT_NETWORK_NAME[NETWORK]}:</span>{" "}
+                          <input
+                            type="text"
+                            className="outline-none border-none w-full flex-1"
+                            value={z.address}
+                            onChange={(e) => onChangeSignerAddress(e, i)}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    {i === 0 ? null : (
+                      <div
+                        className="p-2 hover:bg-grey-200 rounded-full cursor-pointer"
+                        onClick={() => deleteSigner(i)}
+                      >
+                        <IcnTrash className="w-6" />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
+              {i === 0 ? (
+                <p className="text-[14px] leading-[18px] text-grey-500 mt-1">
+                  Your connected wallet
+                </p>
+              ) : null}
             </div>
           ))}
 
@@ -120,6 +183,15 @@ const Step02 = ({
           >
             + Add New Signer
           </button>
+          {isSubmit && !isValidSigners ? (
+            <div className="text-error-100 text-sm mt-4">
+              <p>
+                *Signer name can only contain letters, numbers, _ and must be between 4 and
+                16 characters.
+              </p>
+              <p>*Address must be valid.</p>
+            </div>
+          ) : null}
         </div>
         <div className="pt-6 pb-8 border-b border-grey-200">
           <div className="flex items-center gap-2">
@@ -135,9 +207,9 @@ const Step02 = ({
           </p>
           <div className="flex gap-4 items-center mt-6">
             <Select
-              defaultValue="1"
+              defaultValue={threshold}
               style={{ width: 70 }}
-              onChange={() => {}}
+              onChange={setThreshold}
               suffixIcon={
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -154,13 +226,13 @@ const Step02 = ({
                   />
                 </svg>
               }
-              options={Array(signers.length + 1)
+              options={Array(signers.length)
                 .fill(0)
                 .map((z, i) => ({ value: i + 1, label: i + 1 }))}
             />
             <p className="text-[18px] leading-[24px] font-medium text-dark-100">
-              out of {signers.length + 1}{" "}
-              {signers.length > 0 ? "signers" : "signer"}
+              out of {signers.length}{" "}
+              {signers.length > 1 ? "signers" : "signer"}
             </p>
           </div>
         </div>
@@ -169,7 +241,12 @@ const Step02 = ({
         <Button kind="secondary" onClick={() => onCancel()}>
           Back
         </Button>
-        <Button onClick={() => onNext()}>Next</Button>
+        <Button
+          onClick={() => createSigners()}
+          disabled={isSubmit && !isValidSigners}
+        >
+          Next
+        </Button>
       </div>
     </div>
   );

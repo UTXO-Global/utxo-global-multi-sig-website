@@ -12,11 +12,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { selectStorage } from "@/redux/features/storage/reducer";
 import { setNetwork } from "@/redux/features/storage/action";
 import { NETWORK } from "@/configs/common";
-
-const NETWORK_NAME: { [key: string]: string } = {
-  nervos_testnet: "Pudge Testnet",
-  nervos: "Mirana Mainnet",
-};
+import { NETWORK_NAME } from "@/configs/network";
 
 const SwitchNetwork = ({
   iconClassname,

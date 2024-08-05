@@ -1,4 +1,9 @@
 import { toast } from "react-toastify";
+import {
+  addressToScript,
+  scriptToAddress,
+  AddressPrefix,
+} from "@nervosnetwork/ckb-sdk-utils";
 
 export const comingSoonMsg = () => {
   toast.info("Coming Soon!");
@@ -15,10 +20,38 @@ export function shortAddress(address?: string, len = 5) {
   return address.slice(0, len) + "..." + address.slice(address.length - len);
 }
 
-export const formatNumber = (number: number, minPrecision = 2, maxPrecision = 2) => {
+export const formatNumber = (
+  number: number,
+  minPrecision = 2,
+  maxPrecision = 2
+) => {
   const options = {
     minimumFractionDigits: minPrecision,
     maximumFractionDigits: maxPrecision,
+  };
+  return number.toLocaleString(undefined, options);
+};
+
+export const copy = (value: string) => {
+  navigator.clipboard.writeText(value);
+  toast.success("Copied");
+};
+
+export const isValidCKBAddress = (address: string, network: string) => {
+  try {
+    // const script = addressToScript(address);
+    // const reconstructedAddress = scriptToAddress(script);
+    // const isAddressValid = address === reconstructedAddress;
+    const isCorrectPrefix = address.startsWith(
+      network === "nervos" ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+    );
+    return true && isCorrectPrefix;
+  } catch (error) {
+    return false;
   }
-  return number.toLocaleString(undefined, options)
+};
+
+export const isValidName = (name: string) => {
+  const regex = /^[a-zA-Z0-9\_]{4,16}$/;
+  return regex.test(name)
 }

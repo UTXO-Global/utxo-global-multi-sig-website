@@ -1,16 +1,22 @@
 /* eslint-disable @next/next/no-img-element */
 import { Modal } from "antd";
+import Link from "next/link";
 
 import Button from "@/components/Common/Button";
 import IcnChecked from "@/public/icons/icn-checked.svg";
 import IcnCopy from "@/public/icons/icn-copy.svg";
 
+import { MultiSigAccountType } from "@/types/account";
+import { shortAddress, copy } from "@/utils/helpers";
+
 const Success = ({
   isModalOpen,
   setIsModalOpen,
+  account,
 }: {
   isModalOpen: boolean;
   setIsModalOpen: (val: boolean) => void;
+  account: MultiSigAccountType;
 }) => {
   const showModal = () => {
     setIsModalOpen(true);
@@ -48,14 +54,25 @@ const Success = ({
           <div className="my-8 rounded-lg bg-grey-300 px-4 py-3 flex gap-5 items-center">
             <img src="/images/account.png" alt="account" className="w-10" />
             <div className="flex-1">
-              <p className="text-base font-medium text-dark-100">CKB Account</p>
+              <p className="text-base font-medium text-dark-100">
+                {account?.name}
+              </p>
               <div className="flex gap-4 items-center">
-                <p className="text-[18px] leading-[24px] truncate w-[300px]">ckt1qzda0cr08m85hc8jlnfp3zerete...6j5lda</p>
-                <IcnCopy className="w-4 cursor-pointer" />
+                <p className="text-[18px] leading-[24px] truncate w-[300px]">
+                  {shortAddress(account?.multi_sig_address, 10)}
+                </p>
+                <IcnCopy
+                  className="w-4 cursor-pointer"
+                  onClick={() => copy(account?.multi_sig_address)}
+                />
               </div>
             </div>
           </div>
-          <Button className="" fullWidth onClick={handleCancel}>Let’s Go</Button>
+          <Link href="/">
+            <Button className="" fullWidth>
+              Let’s Go
+            </Button>
+          </Link>
         </div>
       </Modal>
     </>
