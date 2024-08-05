@@ -121,6 +121,7 @@ const Step02 = ({
                       }
                     )}
                     placeholder="Enter the name"
+                    readOnly={i === 0}
                     value={z.name}
                     onChange={(e) => onChangeSignerName(e, i)}
                   />
