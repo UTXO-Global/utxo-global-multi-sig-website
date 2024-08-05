@@ -8,6 +8,8 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import autoMergeLevel2 from "redux-persist/es/stateReconciler/autoMergeLevel2";
 import storageReducer from "./features/storage/reducer";
+import accountInfoReducer from "./features/account-info/reducer";
+import addressBookReducer from "./features/address-book/reducer";
 
 const persistConfig = {
   key: "utxo-global-multi-sig",
@@ -19,6 +21,8 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   storage: storageReducer,
+  accountInfo: accountInfoReducer,
+  addressBook: addressBookReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

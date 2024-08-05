@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import Button from "../Common/Button";
 import ReceiveTokens from "../ReceiveTokens";
@@ -11,8 +11,18 @@ import cn from "@/utils/cn";
 import IcnCopyBold from "@/public/icons/icn-copy-bold.svg";
 import IcnExternalLinkBold from "@/public/icons/icn-external-link-bold.svg";
 
+import { useAppSelector } from "@/redux/hook";
+import { selectAccountInfo } from "@/redux/features/account-info/reducer";
+import { shortAddress, copy } from "@/utils/helpers";
+import { EXPLORER } from "@/configs/common";
+
 const LeftMenu = () => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const address = searchParams.get("address");
+
+  const { info: account } = useAppSelector(selectAccountInfo);
+
   return (
     <div className="w-[230px] bg-light-100 border-r border-grey-200">
       <div className="p-4 grid gap-4 border-b border-grey-200">
@@ -24,31 +34,41 @@ const LeftMenu = () => {
               className="w-[40px] rounded-full"
             />
             <div className="absolute -top-[2px] -right-[2px] w-[18px] h-[18px] rounded-full text-[8px] text-light-100 font-medium flex justify-center items-center bg-orange-100">
-              2/2
+              {account?.threshold}/{account?.signers}
             </div>
           </div>
           <div>
             <p className="text-[16px] leading-[20px] font-bold text-dark-100">
-              Yang
+              {account?.name}
             </p>
             <p className="text-[14px] leading-[20px] font-medium text-grey-400 mt-[2px]">
-              <span className="text-dark-100">Pud:</span>ckt1q...g6j5l
+              <span className="text-dark-100">Pud: </span>
+              {shortAddress(account?.multi_sig_address, 5)}
             </p>
+            {/* TODO: load balance */}
             <p className="text-[14px] leading-[20px] font-medium text-grey-400 mt-[2px]">
               200 CKB
             </p>
           </div>
         </div>
         <div className="flex gap-2">
-          <ReceiveTokens />
-          <div className="w-8 aspect-square rounded-[4px] bg-grey-300 flex justify-center items-center cursor-pointer">
+          {account ? <ReceiveTokens account={account} /> : null}
+
+          <div
+            className="w-8 aspect-square rounded-[4px] bg-grey-300 flex justify-center items-center cursor-pointer"
+            onClick={() => copy(account?.multi_sig_address as any)}
+          >
             <IcnCopyBold className="w-4" />
           </div>
-          <div className="w-8 aspect-square rounded-[4px] bg-grey-300 flex justify-center items-center cursor-pointer">
+          <Link
+            href={`${EXPLORER}/address/${account?.multi_sig_address}`}
+            target="_blank"
+            className="w-8 aspect-square rounded-[4px] bg-grey-300 flex justify-center items-center cursor-pointer"
+          >
             <IcnExternalLinkBold className="w-4" />
-          </div>
+          </Link>
         </div>
-        <Link href="/dashboard/new-transaction">
+        <Link href={`/account/new-transaction/?address=${address}`}>
           <Button className="" size="small" fullWidth>
             New Transaction
           </Button>
@@ -56,7 +76,7 @@ const LeftMenu = () => {
       </div>
       <div className="px-4 py-2 grid gap-1 text-[14px] leading-[20px] font-medium text-dark-100">
         <Link
-          href="/dashboard/assets/"
+          href={`/account/?address=${address}`}
           className={cn(
             `rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer transition-all hover:pl-8`,
             {
@@ -85,7 +105,7 @@ const LeftMenu = () => {
           <span>Assets</span>
         </Link>
         <Link
-          href="/dashboard/transactions/"
+          href={`/account/transactions/?address=${address}`}
           className={cn(
             `rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer transition-all hover:pl-8`,
             {
@@ -116,7 +136,7 @@ const LeftMenu = () => {
           <span>Transactions</span>
         </Link>
         <Link
-          href="/dashboard/account-info"
+          href={`/account/info/?address=${address}`}
           className={cn(
             `rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer transition-all hover:pl-8`,
             {

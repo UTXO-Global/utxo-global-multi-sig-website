@@ -77,7 +77,10 @@ const Account = ({ account }: { account: MultiSigAccountType }) => {
 
   return (
     <div className="px-4 py-3 rounded-lg border border-grey-300 hover:bg-grey-300 transition-colors flex justify-between items-center cursor-pointer">
-      <Link href="/dashboard/assets" className="flex gap-5 items-center">
+      <Link
+        href={`/account/?address=${account.multi_sig_address}`}
+        className="flex gap-5 items-center"
+      >
         <div className="relative">
           <img
             src="/images/account.png"
@@ -91,7 +94,7 @@ const Account = ({ account }: { account: MultiSigAccountType }) => {
         <div>
           <p className="text-base font-medium text-dark-100">{account.name}</p>
           <p className="text-[14px] leading-[24px] text-grey-400">
-            <span className="text-dark-100">Pud:{" "}</span>
+            <span className="text-dark-100">Pud: </span>
             {shortAddress(account.multi_sig_address, 10)}
           </p>
         </div>

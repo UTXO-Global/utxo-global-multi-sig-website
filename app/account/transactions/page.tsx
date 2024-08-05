@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
+
 import cn from "@/utils/cn";
 
 import Transaction from "@/components/Transaction";
-import { useState } from "react";
 
 const Transactions = () => {
   const [tab, setTab] = useState<string>("queue");

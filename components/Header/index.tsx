@@ -4,31 +4,32 @@ import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 
 import useLogin from "@/hooks/useLogin";
+import useLoadAddressBooks from "@/hooks/useLoadAddressBooks";
 
 import AccountModal from "../AccountModal";
 import SwitchNetwork from "../SwitchNetwork";
 
 const PAGE_TITLE: { [key: string]: string } = {
-  "/dashboard/new-transaction/": "New Transaction",
-  "/dashboard/transactions/": "Transactions",
-  "/dashboard/assets/": "Assets",
-  "/dashboard/account-info/": "Account Info",
+  "/account/new-transaction/": "New Transaction",
+  "/account/transactions/": "Transactions",
+  "/account/assets/": "Assets",
+  "/account/info/": "Account Info",
 };
 
 const Header = () => {
   useLogin();
+  useLoadAddressBooks();
 
   const pathname = usePathname();
 
   const isDashboardLayout = useMemo(() => {
-    return pathname.includes("/dashboard");
+    return pathname.includes("/account");
   }, [pathname]);
 
   const pageTitle = useMemo(() => {
     return PAGE_TITLE[pathname];
   }, [pathname]);
 
-  
 
   return (
     <header className="bg-light-100 border-b border-grey-200 sticky top-0 z-[2]">

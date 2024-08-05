@@ -5,6 +5,9 @@ import {
   AddressPrefix,
 } from "@nervosnetwork/ckb-sdk-utils";
 
+import { InviteStatus } from "@/types/account";
+import { AddressBookType } from "@/types/address-book";
+
 export const comingSoonMsg = () => {
   toast.info("Coming Soon!");
 };
@@ -53,5 +56,28 @@ export const isValidCKBAddress = (address: string, network: string) => {
 
 export const isValidName = (name: string) => {
   const regex = /^[a-zA-Z0-9\_]{4,16}$/;
-  return regex.test(name)
-}
+  return regex.test(name);
+};
+
+export const inviteStatus = (status: InviteStatus) => {
+  const obj = {
+    [InviteStatus.Pending]: "Waiting for accept",
+    [InviteStatus.Accepted]: "Accepted",
+    [InviteStatus.Rejected]: "Rejected",
+  };
+  return obj[status];
+};
+
+export const getAddressBookName = (
+  address: string,
+  addressBooks: AddressBookType[]
+) => {
+  const isOwner = addressBooks.some((z) =>
+    isAddressEqual(z.user_address, address)
+  );
+  if (isOwner) return "Owner";
+  const addressBook = addressBooks.find((z) =>
+    isAddressEqual(z.signer_address, address)
+  );
+  return addressBook ? addressBook.signer_name : "--";
+};

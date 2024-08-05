@@ -4,8 +4,10 @@ import { Modal, QRCode } from "antd";
 
 import IcnQrBold from "@/public/icons/icn-qr-bold.svg";
 import IcnCopy from "@/public/icons/icn-copy.svg";
+import { MultiSigAccountType } from "@/types/account";
+import { shortAddress, copy } from "@/utils/helpers";
 
-const ReceiveTokens = () => {
+const ReceiveTokens = ({ account }: { account: MultiSigAccountType }) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const showModal = () => {
     setIsModalOpen(true);
@@ -42,7 +44,7 @@ const ReceiveTokens = () => {
           <div className="mt-10 grid gap-4">
             <div className="flex justify-center">
               <QRCode
-                value="ckt1qzda0cr08m85u...mf0j73qv6j5da"
+                value={account.multi_sig_address}
                 icon="/images/nervos.png"
                 bordered
               />
@@ -53,13 +55,16 @@ const ReceiveTokens = () => {
             <div className="px-4 py-3 rounded-lg bg-grey-300 flex items-center gap-2">
               <img src="/images/account.png" alt="account" className="w-10" />
               <div className="">
-                <p className="text-[16px] leading-[24px]">Yang</p>
+                <p className="text-[16px] leading-[24px]">{account.name}</p>
 
                 <div className="flex items-center gap-4">
                   <p className="text-[18px] leading-[24px]">
-                    ckt1qzda0cr08m85u...mf0j73qv6j5da
+                    {shortAddress(account.multi_sig_address, 10)}
                   </p>
-                  <IcnCopy className="w-4 cursor-pointer" />
+                  <IcnCopy
+                    className="w-4 cursor-pointer"
+                    onClick={() => copy(account.multi_sig_address)}
+                  />
                 </div>
               </div>
             </div>

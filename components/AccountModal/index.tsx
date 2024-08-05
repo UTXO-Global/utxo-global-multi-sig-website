@@ -10,6 +10,7 @@ import IcnLogout from "@/public/icons/icn-logout.svg";
 
 import { useAppDispatch } from "@/redux/hook";
 import { reset } from "@/redux/features/storage/action";
+import { reset as restAccountInfo } from "@/redux/features/account-info/action";
 import useAuthenticate from "@/hooks/useAuthenticate";
 import { shortAddress, formatNumber } from "@/utils/helpers";
 
@@ -35,6 +36,7 @@ const AccountModal = () => {
   const logout = () => {
     disconnect();
     dispatch(reset());
+    dispatch(restAccountInfo());
     hide();
   };
 
