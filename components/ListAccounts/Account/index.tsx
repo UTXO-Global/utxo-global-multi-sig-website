@@ -91,7 +91,7 @@ const Account = ({ account }: { account: MultiSigAccountType }) => {
         <div>
           <p className="text-base font-medium text-dark-100">{account.name}</p>
           <p className="text-[14px] leading-[24px] text-grey-400">
-            <span className="text-dark-100">Pud:</span>
+            <span className="text-dark-100">Pud:{" "}</span>
             {shortAddress(account.multi_sig_address, 10)}
           </p>
         </div>
