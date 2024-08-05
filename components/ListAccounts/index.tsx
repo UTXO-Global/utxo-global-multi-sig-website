@@ -36,7 +36,7 @@ const ListAccounts = () => {
             </div>
           ) : accounts.length === 0 ? (
             <div className="pt-[22px] pb-[28px] flex justify-center text-[16px] leading-[20px] text-grey-500">
-              You don't have any account yet
+              {`You don't have any account yet`}
             </div>
           ) : (
             accounts.map((z, i) => <Account key={i} account={z} />)
