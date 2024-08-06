@@ -15,7 +15,7 @@ import AccountManagement from "./AccountManagement";
 
 import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
-import { shortAddress, copy } from "@/utils/helpers";
+import { shortAddress, copy, formatNumber } from "@/utils/helpers";
 import { EXPLORER } from "@/configs/common";
 
 const LeftMenu = () => {
@@ -71,9 +71,8 @@ const LeftMenu = () => {
               <span className="text-dark-100">Pud: </span>
               {shortAddress(account?.multi_sig_address, 5)}
             </p>
-            {/* TODO: load balance */}
             <p className="text-[14px] leading-[20px] font-medium text-grey-400 mt-[2px]">
-              200 CKB
+              {account ? formatNumber(account?.balance as any) : "--"} CKB
             </p>
           </div>
         </div>

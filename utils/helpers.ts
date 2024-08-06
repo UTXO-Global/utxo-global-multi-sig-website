@@ -4,9 +4,14 @@ import {
   scriptToAddress,
   AddressPrefix,
 } from "@nervosnetwork/ckb-sdk-utils";
+import { ccc } from "@ckb-ccc/core";
+import { BI } from "@ckb-lumos/lumos";
 
-import { InviteStatus } from "@/types/account";
+import { InviteStatus, SignerDetailType } from "@/types/account";
 import { AddressBookType } from "@/types/address-book";
+
+import api from "./api";
+import { EXPLORER_API } from "@/configs/common";
 
 export const comingSoonMsg = () => {
   toast.info("Coming Soon!");
@@ -80,4 +85,28 @@ export const getAddressBookName = (
     isAddressEqual(z.signer_address, address)
   );
   return addressBook ? addressBook.signer_name : "--";
+};
+
+export const getBalanceMultiSigAccount = async (
+  signers: SignerDetailType[]
+) => {
+  console.log(signers);
+  let balance = BI.from(0);
+
+  for (let i = 0; i < signers.length; i++) {
+    const res = await fetch(
+      `${EXPLORER_API}/api/v1/addresses/${signers[i].signer_address}`,
+      {
+        headers: {
+          Accept: "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+        },
+      }
+    );
+    const data = await res.json();
+    balance = balance.add(
+      BI.from(data.data[0].attributes.balance).div(Math.pow(10, 8))
+    );
+  }
+  return balance.toNumber();
 };

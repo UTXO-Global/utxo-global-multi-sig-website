@@ -15,7 +15,12 @@ export const EXPLORER =
   NETWORK === "nervos_testnet"
     ? "https://pudge.explorer.nervos.org/en"
     : "https://explorer.nervos.org/en";
-export const FEATURE_REQUEST_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSeUC9e8ka0iSAFXR1gPjepQEcygdLgwKbtnAWfc_2IRqL1pqw/viewform"
+export const EXPLORER_API =
+  NETWORK === "nervos_testnet"
+    ? "https://testnet-api.explorer.nervos.org"
+    : "https://mainnet-api.explorer.nervos.org";
+export const FEATURE_REQUEST_LINK =
+  "https://docs.google.com/forms/d/e/1FAIpQLSeUC9e8ka0iSAFXR1gPjepQEcygdLgwKbtnAWfc_2IRqL1pqw/viewform";
 
 export const NAVIGATIONS = [
   {

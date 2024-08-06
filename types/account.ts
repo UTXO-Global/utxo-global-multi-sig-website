@@ -36,4 +36,5 @@ export type MultiSigAccountType = {
   mutli_sig_witness_data: string;
   signers_detail?: SignerDetailType[];
   invites?: InviteType[];
+  balance: number;
 };

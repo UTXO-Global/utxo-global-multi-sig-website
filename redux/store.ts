@@ -7,6 +7,7 @@ import {
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import autoMergeLevel2 from "redux-persist/es/stateReconciler/autoMergeLevel2";
+import appReducer from "./features/app/reducer";
 import storageReducer from "./features/storage/reducer";
 import accountInfoReducer from "./features/account-info/reducer";
 import addressBookReducer from "./features/address-book/reducer";
@@ -20,6 +21,7 @@ const persistConfig = {
 };
 
 const rootReducer = combineReducers({
+  app: appReducer,
   storage: storageReducer,
   accountInfo: accountInfoReducer,
   addressBook: addressBookReducer,

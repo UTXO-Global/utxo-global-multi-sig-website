@@ -6,6 +6,7 @@ import { useMemo } from "react";
 
 import useLogin from "@/hooks/useLogin";
 import useLoadAddressBooks from "@/hooks/useLoadAddressBooks";
+import useCkbPrice from "@/hooks/useCkbPrice";
 
 import AccountModal from "../AccountModal";
 import SwitchNetwork from "../SwitchNetwork";
@@ -20,6 +21,7 @@ const PAGE_TITLE: { [key: string]: string } = {
 const Header = () => {
   useLogin();
   useLoadAddressBooks();
+  useCkbPrice();
 
   const pathname = usePathname();
 
