@@ -15,9 +15,11 @@ export enum InviteStatus {
 }
 
 export type InviterType = {
+  account_name: string;
   address: string;
   multisig_address: string;
-  account_name: string;
+  signers: number;
+  threshold: number;
 };
 
 export type InviteType = {

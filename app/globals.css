@@ -224,3 +224,15 @@ body {
 .ant-switch.ant-switch-checked {
   background: #0d0d0d !important;
 }
+
+.account-management.ant-modal {
+  left: 0;
+  margin-left: 0;
+  top: 69.71px;
+  transform: translateX(0) !important;
+  padding-bottom: 0px !important;
+}
+
+.account-management.ant-modal-mask {
+  z-index: 999 !important;
+}

@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 import Button from "../Common/Button";
@@ -10,6 +11,7 @@ import ReceiveTokens from "../ReceiveTokens";
 import cn from "@/utils/cn";
 import IcnCopyBold from "@/public/icons/icn-copy-bold.svg";
 import IcnExternalLinkBold from "@/public/icons/icn-external-link-bold.svg";
+import AccountManagement from "./AccountManagement";
 
 import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
@@ -21,10 +23,34 @@ const LeftMenu = () => {
   const searchParams = useSearchParams();
   const address = searchParams.get("address");
 
+  const [isShowAccountManagement, setIsShowAccountManagement] =
+    useState<boolean>(false);
+
   const { info: account } = useAppSelector(selectAccountInfo);
 
   return (
-    <div className="w-[230px] bg-light-100 border-r border-grey-200">
+    <div className="w-[230px] bg-light-100 border-r border-grey-200 relative">
+      <div
+        className="absolute top-10 -right-4 w-8 aspect-square rounded-full bg-light-100 border border-grey-300 flex justify-center items-center transition-colors hover:bg-[#FFF7F1] cursor-pointer"
+        onClick={() => setIsShowAccountManagement(true)}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+        >
+          <path
+            d="M6.66656 4L5.72656 4.94L8.7799 8L5.72656 11.06L6.66656 12L10.6666 8L6.66656 4Z"
+            fill="#787575"
+          />
+        </svg>
+      </div>
+      <AccountManagement
+        isModalOpen={isShowAccountManagement}
+        setIsModalOpen={setIsShowAccountManagement}
+      />
       <div className="p-4 grid gap-4 border-b border-grey-200">
         <div className="flex items-center gap-3">
           <div className="relative">
