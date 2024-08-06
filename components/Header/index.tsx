@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 
@@ -30,13 +31,14 @@ const Header = () => {
     return PAGE_TITLE[pathname];
   }, [pathname]);
 
-
   return (
     <header className="bg-light-100 border-b border-grey-200 sticky top-0 z-[2]">
       {isDashboardLayout ? (
         <div className="flex items-center">
           <div className="w-[230px] flex justify-center items-center border-r border-grey-200 py-4 ">
-            <img src="/logo.png" alt="utxo global" className="w-[80px]" />
+            <Link href="/">
+              <img src="/logo.png" alt="utxo global" className="w-[80px]" />
+            </Link>
           </div>
           <div className="flex-1 flex justify-between items-center px-6">
             <p className="text-[24px] leading-[28px] font-bold text-dark-100">
