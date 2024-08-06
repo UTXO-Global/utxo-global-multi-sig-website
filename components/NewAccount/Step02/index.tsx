@@ -145,7 +145,7 @@ const Step02 = ({
                       {i === 0 ? (
                         <p className="text-[18px] leading-[24px] text-dark-100 truncate flex gap-2 items-center">
                           <span className="text-grey-500">{SHORT_NETWORK_NAME[NETWORK]}:</span>{" "}
-                          <span>{shortAddress(address, 10)}</span>
+                          <span>{shortAddress(address, 14)}</span>
                         </p>
                       ) : (
                         <div className="text-[18px] leading-[24px] text-dark-100 flex items-center gap-2 flex-1">

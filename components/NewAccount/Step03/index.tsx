@@ -67,7 +67,7 @@ const Step03 = ({
                       className="w-[38px]"
                     />
                     <p className="text-[18px] leading-[24px] text-dark-100">
-                      {shortAddress(z.address, 9)}
+                      {shortAddress(z.address, 14)}
                     </p>
                   </div>
                   <div className="flex gap-1 items-center">

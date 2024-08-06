@@ -117,7 +117,7 @@ const EditName = ({
           ) : null}
 
           <div className="p-4 rounded-lg bg-grey-300 text-[16px] leading-[20px] text-dark-100 mt-4">
-            {shortAddress(account.multi_sig_address, 10)}
+            {shortAddress(account.multi_sig_address, 14)}
           </div>
           <div className="mt-6 grid grid-cols-2 gap-6">
             <Button

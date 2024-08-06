@@ -59,7 +59,7 @@ const ReceiveTokens = ({ account }: { account: MultiSigAccountType }) => {
 
                 <div className="flex items-center gap-4">
                   <p className="text-[18px] leading-[24px]">
-                    {shortAddress(account.multi_sig_address, 10)}
+                    {shortAddress(account.multi_sig_address, 14)}
                   </p>
                   <IcnCopy
                     className="w-4 cursor-pointer"

@@ -59,7 +59,7 @@ const Success = ({
               </p>
               <div className="flex gap-4 items-center">
                 <p className="text-[18px] leading-[24px] truncate w-[300px]">
-                  {shortAddress(account?.multi_sig_address, 10)}
+                  {shortAddress(account?.multi_sig_address, 14)}
                 </p>
                 <IcnCopy
                   className="w-4 cursor-pointer"

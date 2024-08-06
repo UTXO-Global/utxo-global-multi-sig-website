@@ -73,7 +73,7 @@ const Info = () => {
                         </p>
                         <div className="flex items-center">
                           <p className="text-[14px] leading-[18px] text-grey-400">
-                            {shortAddress(z.signer_address, 10)}
+                            {shortAddress(z.signer_address, 14)}
                           </p>
                           <div
                             className="p-1 hover:bg-grey-300 cursor-pointer ml-2 transition-colors rounded-full"
@@ -119,7 +119,7 @@ const Info = () => {
                         </p>
                         <div className="flex items-center">
                           <p className="text-[14px] leading-[18px] text-grey-400">
-                            {shortAddress(z.signer_address, 10)}
+                            {shortAddress(z.signer_address, 14)}
                           </p>
                           <div
                             className="p-1 hover:bg-grey-300 cursor-pointer ml-2 transition-colors rounded-full"
