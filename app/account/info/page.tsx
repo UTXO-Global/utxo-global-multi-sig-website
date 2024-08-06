@@ -161,7 +161,8 @@ const Info = () => {
                 Any transaction requires the confirmation of:
               </p>
               <p className="mt-[18px] text-[16px] leading-[20px] font-medium">
-                2 out of 2 signers
+                {account.threshold} out of {account.signers}{" "}
+                {account.signers > 1 ? "signers" : "signer"}
               </p>
             </div>
           </>
