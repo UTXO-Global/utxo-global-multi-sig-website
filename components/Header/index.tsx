@@ -13,7 +13,7 @@ import SwitchNetwork from "../SwitchNetwork";
 const PAGE_TITLE: { [key: string]: string } = {
   "/account/new-transaction/": "New Transaction",
   "/account/transactions/": "Transactions",
-  "/account/assets/": "Assets",
+  "/account/": "Assets",
   "/account/info/": "Account Info",
 };
 
