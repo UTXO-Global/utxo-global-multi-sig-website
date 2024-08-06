@@ -185,7 +185,7 @@ const Account = ({
             />
             <div
               className={cn(
-                `absolute -top-[2px] -right-[2px] w-[18px] h-[18px] rounded-full text-[8px] text-light-100 font-medium flex justify-center items-center bg-orange-100`,
+                `absolute -top-[2px] -right-[2px] w-[18px] h-[18px] rounded-full text-[8px] text-dark-100 font-medium flex justify-center items-center bg-[#FFD5B3]`,
                 {
                   "w-[14px] h-[14px] text-[6px]": isSmall,
                 }

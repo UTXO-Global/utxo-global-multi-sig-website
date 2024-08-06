@@ -70,9 +70,9 @@ const AccountModal = () => {
           <div className="w-[1px] h-[69.71px] bg-grey-200 absolute -right-6 -top-4"></div>
           <div>
             <img
-              src="/images/account.png"
+              src="/images/wallet-account.png"
               alt="account"
-              className="w-8 rounded-full"
+              className="w-8"
             />
           </div>
           <div className="flex gap-6 items-center">

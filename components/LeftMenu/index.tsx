@@ -59,7 +59,7 @@ const LeftMenu = () => {
               alt="account"
               className="w-[40px] rounded-full"
             />
-            <div className="absolute -top-[2px] -right-[2px] w-[18px] h-[18px] rounded-full text-[8px] text-light-100 font-medium flex justify-center items-center bg-orange-100">
+            <div className="absolute -top-[2px] -right-[2px] w-[18px] h-[18px] rounded-full text-[8px] text-dark-100 font-medium flex justify-center items-center bg-[#FFD5B3]">
               {account?.threshold}/{account?.signers}
             </div>
           </div>
