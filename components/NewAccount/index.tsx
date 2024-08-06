@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 import LineStep from "./LineStep";
 import Step01 from "./Step01";
@@ -28,6 +29,7 @@ const NewAccount = () => {
       });
       setAccountCreated(data);
     } catch (e) {
+      toast.error("Multi-sig account already exists!")
       console.error(e);
     }
   };
