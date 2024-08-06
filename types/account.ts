@@ -14,6 +14,12 @@ export enum InviteStatus {
   Rejected = 2,
 }
 
+export type InviterType = {
+  address: string;
+  multisig_address: string;
+  account_name: string;
+};
+
 export type InviteType = {
   signer_address: string;
   multi_sig_address: string;

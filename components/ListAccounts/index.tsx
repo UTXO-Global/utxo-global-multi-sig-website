@@ -8,9 +8,15 @@ import InvitationAccount from "./InvitationAccount";
 import IcnSpinner from "@/public/icons/icn-spinner.svg";
 
 import useListAccounts from "@/hooks/useListAccounts";
+import useInvitation from "@/hooks/useInvitation";
 
 const ListAccounts = () => {
   const { isLoading, accounts, load } = useListAccounts();
+  const {
+    isLoading: isInvitesLoading,
+    invites,
+    load: loadInvitation,
+  } = useInvitation();
 
   return (
     <div className="grid gap-6">
@@ -45,23 +51,29 @@ const ListAccounts = () => {
           )}
         </div>
       </div>
-      {/* TODO: invitation list */}
-      {/* <div className="px-6 py-5 rounded-lg bg-light-100">
+      <div className="px-6 py-5 rounded-lg bg-light-100">
         <p className="text-[20px] leading-[28px] font-medium text-dark-100">
-          Invitation List <span className="text-grey-400">(1)</span>
+          Invitation List{" "}
+          <span className="text-grey-400">
+            {invites.length > 0 ? `(${invites.length})` : null}
+          </span>
         </p>
         <div className="mt-[10px] grid gap-2">
-          {true ? (
-            <>
-              <InvitationAccount />
-            </>
+          {isInvitesLoading ? (
+            <div className="py-6 flex justify-center">
+              <IcnSpinner className="w-10 fill-dark-100 animate-spin" />
+            </div>
+          ) : invites.length === 0 ? (
+            <div className="pt-[22px] pb-[28px] flex justify-center text-[16px] leading-[20px] text-grey-500">
+              {`You don't have any invitation yet`}
+            </div>
           ) : (
-            <p className="text-[16px] leading-[20px] text-grey-500 text-center mt-2 mb-6">
-              Watch any Account to keep an <br /> eye on its activity
-            </p>
+            invites.map((z, i) => (
+              <InvitationAccount key={i} account={z} refresh={loadInvitation} />
+            ))
           )}
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };

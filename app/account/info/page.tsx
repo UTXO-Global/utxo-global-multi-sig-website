@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 
 import IcnCopy from "@/public/icons/icn-copy.svg";
@@ -28,6 +29,10 @@ const Info = () => {
 
   const { data: addressBooks } = useAppSelector(selectAddressBook);
 
+  const invites = useMemo(() => {
+    return account?.invites?.filter((k) => k.status !== InviteStatus.Accepted);
+  }, [account?.invites]);
+
   return (
     <main className="h-full overflow-y-auto">
       <div className="px-6 py-4">
@@ -45,7 +50,16 @@ const Info = () => {
                 {account.signers_detail?.map((z, i) => (
                   <div
                     key={`signer-${i}`}
-                    className="py-4 flex justify-between items-center border-b border-grey-300"
+                    className={cn(
+                      `py-4 flex justify-between items-center border-b border-grey-300`,
+                      {
+                        "border-transparent":
+                          account && account.signers_detail
+                            ? account.signers_detail?.length - 1 &&
+                              invites?.length === 0
+                            : false,
+                      }
+                    )}
                   >
                     <div className="flex gap-4 items-center">
                       <img
@@ -83,10 +97,15 @@ const Info = () => {
                     </div>
                   </div>
                 ))}
-                {account.invites?.map((z, i) => (
+                {invites?.map((z, i) => (
                   <div
                     key={`invite-${i}`}
-                    className="py-4 flex justify-between items-center border-b border-grey-300"
+                    className={cn(
+                      `py-4 flex justify-between items-center border-b border-grey-300`,
+                      {
+                        "border-transparent": i === invites.length - 1,
+                      }
+                    )}
                   >
                     <div className="flex gap-4 items-center">
                       <img
