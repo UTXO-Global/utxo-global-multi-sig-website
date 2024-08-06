@@ -147,10 +147,12 @@ const Account = ({
   account,
   refresh,
   isSmall,
+  isActive,
 }: {
   account: MultiSigAccountType;
   refresh: () => void;
   isSmall?: boolean;
+  isActive?: boolean;
 }) => {
   const [isShowEditName, setIsShowEditName] = useState<boolean>(false);
   const router = useRouter();
@@ -158,7 +160,12 @@ const Account = ({
   return (
     <>
       <div
-        className="cursor-pointer px-4 py-3 rounded-lg border border-grey-300 hover:bg-grey-300 transition-colors flex justify-between items-center group"
+        className={cn(
+          `cursor-pointer px-4 py-3 rounded-lg border border-grey-300 hover:bg-grey-300 transition-colors flex justify-between items-center group`,
+          {
+            "bg-grey-300": isActive,
+          }
+        )}
         onClick={() =>
           router.push(`/account/?address=${account.multi_sig_address}`)
         }
@@ -247,7 +254,7 @@ const Account = ({
             </p>
           </div>
           <IcnPencil
-            className="w-4 fill-grey-400 cursor-pointer"
+            className="w-4 fill-grey-400 hover:fill-dark-100 cursor-pointer"
             onClick={(e: any) => {
               setIsShowEditName(true);
               e.stopPropagation();

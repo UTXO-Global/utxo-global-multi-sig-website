@@ -9,6 +9,9 @@ import IcnSpinner from "@/public/icons/icn-spinner.svg";
 import useListAccounts from "@/hooks/useListAccounts";
 import useInvitation from "@/hooks/useInvitation";
 import InvitationAccount from "@/components/ListAccounts/InvitationAccount";
+import { useAppSelector } from "@/redux/hook";
+import { selectAccountInfo } from "@/redux/features/account-info/reducer";
+import { isAddressEqual } from "@/utils/helpers";
 
 const AccountManagement = ({
   isModalOpen,
@@ -27,6 +30,8 @@ const AccountManagement = ({
     isLoading: isInvitesLoading,
     load: loadInvites,
   } = useInvitation();
+
+  const { info: account } = useAppSelector(selectAccountInfo);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -84,7 +89,20 @@ const AccountManagement = ({
                 </div>
               ) : (
                 accounts.map((z, i) => (
-                  <Account key={i} account={z} refresh={loadAccounts} isSmall />
+                  <Account
+                    key={i}
+                    account={z}
+                    refresh={loadAccounts}
+                    isActive={
+                      account
+                        ? isAddressEqual(
+                            account?.multi_sig_address as any,
+                            z.multi_sig_address
+                          )
+                        : false
+                    }
+                    isSmall
+                  />
                 ))
               )}
             </div>
