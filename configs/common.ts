@@ -15,6 +15,7 @@ export const EXPLORER =
   NETWORK === "nervos_testnet"
     ? "https://pudge.explorer.nervos.org/en"
     : "https://explorer.nervos.org/en";
+export const FEATURE_REQUEST_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSeUC9e8ka0iSAFXR1gPjepQEcygdLgwKbtnAWfc_2IRqL1pqw/viewform"
 
 export const NAVIGATIONS = [
   {

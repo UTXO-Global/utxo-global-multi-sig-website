@@ -53,7 +53,10 @@ const Header = () => {
         </div>
       ) : (
         <div className="px-6 py-4 flex justify-between">
-          <img src="/logo.png" alt="utxo global" className="w-[80px]" />
+          <Link href="/">
+            <img src="/logo.png" alt="utxo global" className="w-[80px]" />
+          </Link>
+
           <div className="flex">
             <AccountModal />
             <SwitchNetwork />
