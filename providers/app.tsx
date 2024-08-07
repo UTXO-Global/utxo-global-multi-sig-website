@@ -8,13 +8,13 @@ import Footer from "@/components/Footer";
 import NotSupportedScreen from "@/components/NotSupportedScreen";
 import TestnetModeActivated from "@/components/TestnetModeActivated";
 
-import { useAppSelector } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { selectStorage } from "@/redux/features/storage/reducer";
 
 import { isAddressEqual } from "@/utils/helpers";
 import ConnectedRequired from "@/components/ConnectedRequired";
 import useSupportedScreen from "@/hooks/useSupportedScreen";
-// import { reset } from "@/redux/features/storage/action";
+import { reset } from "@/redux/features/storage/action";
 
 const defaultValue = {
   address: "",
@@ -30,7 +30,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const { isSupported } = useSupportedScreen();
 
   const { addressLogged, token } = useAppSelector(selectStorage);
-  // const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
 
   const signer = ccc.useSigner();
 
@@ -55,11 +55,11 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     checkIsLoggedIn();
   }, [checkIsLoggedIn]);
 
-  // useEffect(() => {
-  //   if (!address) return;
-  //   if (isAddressEqual(address, addressLogged)) return;
-  //   dispatch(reset());
-  // }, [address, addressLogged, dispatch]);
+  useEffect(() => {
+    if (!address) return;
+    if (isAddressEqual(address, addressLogged)) return;
+    dispatch(reset());
+  }, [address, addressLogged, dispatch]);
 
 
   if (!isSupported) return <NotSupportedScreen />;
