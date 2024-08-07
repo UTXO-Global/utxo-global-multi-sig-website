@@ -78,13 +78,13 @@ const AccountManagement = ({
                 {accounts.length > 0 ? `(${accounts.length})` : null}
               </span>
             </p>
-            <div className="mt-4 grid gap-4">
+            <div className="mt-4 grid gap-4 max-h-[300px] overflow-y-auto">
               {isAccountsLoading ? (
-                <div className="py-6 flex justify-center">
+                <div className="py-[13px] flex justify-center">
                   <IcnSpinner className="w-6 fill-dark-100 animate-spin" />
                 </div>
               ) : accounts.length === 0 ? (
-                <div className="py-5 flex justify-center text-[12px] leading-[18px] text-grey-500">
+                <div className="py-4 flex justify-center text-[12px] leading-[18px] text-grey-500">
                   {`You don't have any account yet`}
                 </div>
               ) : (
@@ -112,13 +112,13 @@ const AccountManagement = ({
                 {invites.length > 0 ? `(${invites.length})` : null}
               </span>
             </p>
-            <div className="mt-4 grid gap-4">
+            <div className="mt-4 grid gap-4 max-h-[300px] overflow-y-auto">
               {isInvitesLoading ? (
-                <div className="py-6 flex justify-center">
+                <div className="py-[13px] flex justify-center">
                   <IcnSpinner className="w-6 fill-dark-100 animate-spin" />
                 </div>
               ) : invites.length === 0 ? (
-                <div className="py-5 flex justify-center text-[12px] leading-[18px] text-grey-500">
+                <div className="py-4 flex justify-center text-[12px] leading-[18px] text-grey-500">
                   {`You don't have any invitation yet`}
                 </div>
               ) : (

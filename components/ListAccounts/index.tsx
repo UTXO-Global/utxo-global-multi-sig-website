@@ -35,9 +35,9 @@ const ListAccounts = () => {
             {accounts.length > 0 ? `(${accounts.length})` : null}
           </span>
         </p>
-        <div className="mt-[10px] grid gap-2">
+        <div className="mt-[10px] grid gap-2 max-h-[300px] overflow-y-auto">
           {isLoading ? (
-            <div className="py-6 flex justify-center">
+            <div className="py-[15px] flex justify-center">
               <IcnSpinner className="w-10 fill-dark-100 animate-spin" />
             </div>
           ) : accounts.length === 0 ? (
@@ -58,9 +58,9 @@ const ListAccounts = () => {
             {invites.length > 0 ? `(${invites.length})` : null}
           </span>
         </p>
-        <div className="mt-[10px] grid gap-2">
+        <div className="mt-[10px] grid gap-2 max-h-[300px] overflow-y-auto">
           {isInvitesLoading ? (
-            <div className="py-6 flex justify-center">
+            <div className="py-[15px] flex justify-center">
               <IcnSpinner className="w-10 fill-dark-100 animate-spin" />
             </div>
           ) : invites.length === 0 ? (
