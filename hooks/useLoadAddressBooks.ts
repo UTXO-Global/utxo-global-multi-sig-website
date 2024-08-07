@@ -12,7 +12,7 @@ const useLoadAddressBooks = () => {
   useEffect(() => {
     if (!isLoggedIn) dispatch(reset());
     else dispatch(load());
-  }, [isLoggedIn]);
+  }, [dispatch, isLoggedIn]);
 };
 
 export default useLoadAddressBooks;

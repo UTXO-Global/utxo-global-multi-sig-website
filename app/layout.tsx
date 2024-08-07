@@ -7,6 +7,7 @@ import { ConfigProvider } from "antd";
 
 import { ReduxProvider } from "@/redux/Provider";
 import CCCProvider from "@/providers/ccc";
+import { AppProvider } from "@/providers/app";
 import MainLayout from "@/layouts/MainLayout";
 
 import {
@@ -71,7 +72,9 @@ export default function RootLayout({
         >
           <ReduxProvider>
             <CCCProvider>
-              <MainLayout>{children}</MainLayout>
+              <AppProvider>
+                <MainLayout>{children}</MainLayout>
+              </AppProvider>
 
               <ToastContainer
                 autoClose={5000}

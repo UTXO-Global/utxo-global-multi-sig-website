@@ -11,10 +11,10 @@ const useAcceptInvitation = () => {
     try {
       const { data } = await api.put(`/multi-sig/invites/accept/${address}`);
       if (data.result) {
-        toast.success("Accpeted!");
+        toast.success("Accepted!");
         cb?.();
       } else {
-        toast.error("Accpet failed!");
+        toast.error("Accept failed!");
       }
     } catch (e) {
       console.error(e);

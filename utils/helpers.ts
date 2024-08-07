@@ -1,16 +1,10 @@
 import { toast } from "react-toastify";
-import {
-  addressToScript,
-  scriptToAddress,
-  AddressPrefix,
-} from "@nervosnetwork/ckb-sdk-utils";
-import { ccc } from "@ckb-ccc/core";
+import { AddressPrefix } from "@nervosnetwork/ckb-sdk-utils";
 import { BI } from "@ckb-lumos/lumos";
 
 import { InviteStatus, SignerDetailType } from "@/types/account";
 import { AddressBookType } from "@/types/address-book";
 
-import api from "./api";
 import { EXPLORER_API } from "@/configs/common";
 
 export const comingSoonMsg = () => {

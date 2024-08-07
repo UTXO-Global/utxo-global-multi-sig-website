@@ -1,39 +1,38 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import NotSupportedScreen from "@/components/NotSupportedScreen";
+import { useAppDispatch } from "@/redux/hook";
+import useAuthenticate from "@/hooks/useAuthenticate";
+import useLogin from "@/hooks/useLogin";
+import useLoadAddressBooks from "@/hooks/useLoadAddressBooks";
+import useCkbPrice from "@/hooks/useCkbPrice";
 
-const WIDTH_SUPPORTED = 1024;
+import { reset } from "@/redux/features/storage/action";
+import ConnectedRequired from "@/components/ConnectedRequired";
+
+
+const _MainLayout = ({ children }: { children: React.ReactNode }) => {
+  return <>{children}</>;
+};
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
-  const [isSupported, setIsSupported] = useState<boolean>(true);
+  const { isLoggedIn } = useAuthenticate();
+  
+  useLogin();
+  useLoadAddressBooks();
+  useCkbPrice();
+
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsSupported(window.innerWidth >= WIDTH_SUPPORTED);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+    if (!isLoggedIn) {
+      dispatch(reset());
+    }
+  }, [dispatch, isLoggedIn]);
 
-  return (
-    <>
-      {isSupported ? (
-        <>
-          <Header />
-          {children}
-          <Footer />
-        </>
-      ) : (
-        <NotSupportedScreen />
-      )}
-    </>
-  );
+
+  if (!isLoggedIn) return <ConnectedRequired />;
+  return <_MainLayout>{children}</_MainLayout>;
 };
 
 export default MainLayout;
