@@ -97,6 +97,8 @@ export const getBalanceMultiSigAccount = async (
     const res = await fetch(
       `${EXPLORER_API}/api/v1/addresses/${signers[i].signer_address}`,
       {
+        method: "GET",
+        mode: "no-cors",
         headers: {
           Accept: "application/vnd.api+json",
           "Content-Type": "application/vnd.api+json",
