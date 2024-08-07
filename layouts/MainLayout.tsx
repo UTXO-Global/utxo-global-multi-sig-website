@@ -21,11 +21,11 @@ const _MainLayout = ({ children }: { children: React.ReactNode }) => {
 
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    if (!address) return;
-    if (isAddressEqual(address, addressLogged)) return;
-    dispatch(reset());
-  }, [address, addressLogged, dispatch]);
+  // useEffect(() => {
+  //   if (!address) return;
+  //   if (isAddressEqual(address, addressLogged)) return;
+  //   dispatch(reset());
+  // }, [address, addressLogged, dispatch]);
 
   return <>{children}</>;
 };
