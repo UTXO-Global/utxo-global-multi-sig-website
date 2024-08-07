@@ -58,6 +58,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!address) return;
     if (isAddressEqual(address, addressLogged)) return;
+    console.log('=====reset')
     dispatch(reset());
   }, [address, addressLogged, dispatch]);
 

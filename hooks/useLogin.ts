@@ -68,6 +68,7 @@ const useLogin = () => {
       return login()
     }
     const address = (await signer?.getInternalAddress()) as string;
+    console.log('=======isLoggedIn', isLoggedIn)
     if (isLoggedIn) return;
     const nonce = await _getNonce(address);
     const signature = (await _signMessage(nonce)) as string;
