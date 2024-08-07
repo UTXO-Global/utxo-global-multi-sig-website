@@ -46,7 +46,8 @@ const ReceiveTokens = ({ account }: { account: MultiSigAccountType }) => {
               <QRCode
                 value={account.multi_sig_address}
                 icon="/images/nervos.png"
-                bordered
+                
+                size={200}
               />
             </div>
             <p className="text-[16px] leading-[20px] text-orange-100 text-center">
