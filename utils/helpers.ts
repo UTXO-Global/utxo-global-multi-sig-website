@@ -6,7 +6,6 @@ import {
 } from "@nervosnetwork/ckb-sdk-utils";
 import { ccc } from "@ckb-ccc/core";
 import { BI } from "@ckb-lumos/lumos";
-import fetch from 'cross-fetch';
 
 import { InviteStatus, SignerDetailType } from "@/types/account";
 import { AddressBookType } from "@/types/address-book";
@@ -98,6 +97,8 @@ export const getBalanceMultiSigAccount = async (
     const res = await fetch(
       `${EXPLORER_API}/api/v1/addresses/${signers[i].signer_address}`,
       {
+        method: "GET",
+        mode: "no-cors",
         headers: {
           Accept: "application/vnd.api+json",
           "Content-Type": "application/vnd.api+json",
