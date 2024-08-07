@@ -7,9 +7,7 @@ import { ConfigProvider } from "antd";
 
 import { ReduxProvider } from "@/redux/Provider";
 import CCCProvider from "@/providers/ccc";
-
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import MainLayout from "@/layouts/MainLayout";
 
 import {
   SITE_DESCRIPTION,
@@ -73,9 +71,8 @@ export default function RootLayout({
         >
           <ReduxProvider>
             <CCCProvider>
-              <Header />
-              {children}
-              <Footer />
+              <MainLayout>{children}</MainLayout>
+
               <ToastContainer
                 autoClose={5000}
                 closeOnClick
