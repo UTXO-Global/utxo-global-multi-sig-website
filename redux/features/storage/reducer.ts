@@ -5,6 +5,7 @@ import { RootState } from "@/redux/store";
 import {
   reset,
   setAddressLogged,
+  setIsDontShowAgainTestnetPopup,
   setNetwork,
   setToken,
   setTokenExpired,
@@ -24,6 +25,9 @@ const storageReducer = createReducer(defaultStorageReducer, (builder) => {
     })
     .addCase(setNetwork, (state, action) => {
       state.network = action.payload;
+    })
+    .addCase(setIsDontShowAgainTestnetPopup, (state, action) => {
+      state.isDontShowAgainTestnetPopup = action.payload;
     })
     .addCase(reset, (state) => {
       state.token = "";

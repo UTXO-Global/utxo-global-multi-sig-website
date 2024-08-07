@@ -5,6 +5,7 @@ export type StorageReducerType = {
   addressLogged: string;
   tokenExpired: number;
   network: CkbNetwork;
+  isDontShowAgainTestnetPopup: boolean;
 };
 
 export const defaultStorageReducer: StorageReducerType = {
@@ -12,4 +13,5 @@ export const defaultStorageReducer: StorageReducerType = {
   token: "",
   tokenExpired: 0,
   network: CkbNetwork.PudgeTestnet,
+  isDontShowAgainTestnetPopup: false,
 };

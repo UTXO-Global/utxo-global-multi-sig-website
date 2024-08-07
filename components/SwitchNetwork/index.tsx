@@ -39,12 +39,9 @@ const SwitchNetwork = ({
   };
   const content = (
     <div className="py-1 bg-light-100 text-[14px] leading-[20px] rounded-lg overflow-hidden font-medium text-dark-100">
-      {/* <div
-        className="px-4 py-[10px] flex gap-2 hover:bg-grey-300 transition-colors items-center cursor-pointer"
-        onClick={() => {
-          changeNetwork(CkbNetwork.MiranaMainnet);
-          hide();
-        }}
+      <div
+        className="px-4 py-[10px] flex gap-2 cursor-not-allowed transition-colors items-center"
+        onClick={() => {}}
       >
         <img
           src="/images/nervos.png"
@@ -52,9 +49,9 @@ const SwitchNetwork = ({
           className="w-6 rounded-full"
         />
         <p>Mirana Mainnet</p>
-      </div> */}
+      </div>
       <div
-        className="px-4 py-[10px] flex gap-2 hover:bg-grey-300 transition-colors items-center cursor-pointer"
+        className="px-4 py-[10px] flex gap-2 bg-grey-300 transition-colors items-center cursor-pointer"
         onClick={() => {
           changeNetwork(CkbNetwork.PudgeTestnet);
           hide();

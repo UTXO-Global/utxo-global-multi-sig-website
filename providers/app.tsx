@@ -6,6 +6,7 @@ import { ccc } from "@ckb-ccc/connector-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NotSupportedScreen from "@/components/NotSupportedScreen";
+import TestnetModeActivated from "@/components/TestnetModeActivated";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { selectStorage } from "@/redux/features/storage/reducer";
@@ -66,6 +67,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AppContext.Provider value={{ address, isLoggedIn }}>
       <Header />
+      <TestnetModeActivated />
       {!signer ? (
         <>
           <ConnectedRequired />

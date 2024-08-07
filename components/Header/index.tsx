@@ -27,7 +27,7 @@ const Header = () => {
   }, [pathname]);
 
   return (
-    <header className="bg-light-100 border-b border-grey-200 sticky top-0 z-[1000]">
+    <header className="bg-light-100 border-b border-grey-200 sticky top-0 z-[5]">
       {isDashboardLayout ? (
         <div className="flex items-center">
           <div className="w-[230px] flex justify-center items-center border-r border-grey-200 py-4 ">

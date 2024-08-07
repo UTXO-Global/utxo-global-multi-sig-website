@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const WIDTH_SUPPORTED = 10;
+const WIDTH_SUPPORTED = 1024;
 
 const useSupportedScreen = () => {
   const [isSupported, setIsSupported] = useState<boolean>(true);

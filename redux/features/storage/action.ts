@@ -12,4 +12,8 @@ export const setTokenExpired = createAction<number>(
 
 export const setNetwork = createAction<CkbNetwork>("storage/set-network");
 
+export const setIsDontShowAgainTestnetPopup = createAction<boolean>(
+  "storage/set-is-dont-show-again-testnet-popup"
+);
+
 export const reset = createAction("storage/reset");

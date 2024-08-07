@@ -55,7 +55,7 @@ const AccountManagement = ({
         width={350}
         closeIcon={false}
         footer={null}
-        zIndex={999}
+        zIndex={4}
       >
         <div className="bg-light-100 h-[calc(100vh-69.71px)]">
           <div className="px-4 py-5 flex items-center justify-between border-b border-grey-300">
