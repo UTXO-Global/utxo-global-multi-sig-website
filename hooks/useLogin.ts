@@ -65,16 +65,15 @@ const useLogin = () => {
     const isNetworkEqual = currentNetwork === NETWORK;
     if (!isNetworkEqual) {
       await (window as any).utxoGlobal.switchNetwork(NETWORK);
-      return login()
+      return login();
     }
     const address = (await signer?.getInternalAddress()) as string;
-    console.log('=======isLoggedIn', isLoggedIn)
     if (isLoggedIn) return;
     const nonce = await _getNonce(address);
     const signature = (await _signMessage(nonce)) as string;
     await _login(signature, address);
-    return
-  }, [isLoggedIn, signer, _getNonce, _signMessage, _login]);
+    return;
+  }, [signer, isLoggedIn, _getNonce, _signMessage, _login]);
 
   useEffect(() => {
     login();

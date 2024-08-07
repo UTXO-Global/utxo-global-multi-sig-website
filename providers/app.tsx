@@ -18,38 +18,32 @@ import { reset } from "@/redux/features/storage/action";
 
 const defaultValue = {
   address: "",
-  isLoggedIn: false,
 };
 
 const AppContext = createContext(defaultValue);
 
 const AppProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [address, setAddress] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { isSupported } = useSupportedScreen();
 
-  const { addressLogged, token } = useAppSelector(selectStorage);
+  const { addressLogged } = useAppSelector(selectStorage);
   const dispatch = useAppDispatch();
 
   const signer = ccc.useSigner();
 
   const checkIsLoggedIn = useCallback(async () => {
-    const _checkIsLoggedIn = async () => {
-      if (!signer) return false;
-      const address = await signer.getInternalAddress();
-      setAddress(address);
-      if (!address) return false;
-      return !!token && isAddressEqual(address, addressLogged) ? true : false;
+    const _getAddress = async () => {
+      try {
+        if (!signer) return "";
+        const address = await signer.getInternalAddress();
+        return address;
+      } catch (e) {
+        return "";
+      }
     };
-    const _isLoggedIn = await _checkIsLoggedIn();
-    if (_isLoggedIn) {
-      setIsLoggedIn(true);
-      setIsLoading(false);
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, [addressLogged, signer, token]);
+    const _address = await _getAddress();
+    setAddress(_address);
+  }, [signer]);
 
   useEffect(() => {
     checkIsLoggedIn();
@@ -58,15 +52,13 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!address) return;
     if (isAddressEqual(address, addressLogged)) return;
-    console.log('=====reset')
     dispatch(reset());
   }, [address, addressLogged, dispatch]);
-
 
   if (!isSupported) return <NotSupportedScreen />;
 
   return (
-    <AppContext.Provider value={{ address, isLoggedIn }}>
+    <AppContext.Provider value={{ address }}>
       <Header />
       <TestnetModeActivated />
       {!signer ? (
