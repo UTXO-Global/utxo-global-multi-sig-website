@@ -90,7 +90,7 @@ const InvitationAccount = ({
         >
           Accept
         </Button>
-        <Button
+        {/* <Button
           size="small"
           className={cn(`w-[100px]`, {
             "w-[60px] !px-2 !py-[3px] !text-[12px]": isSmall,
@@ -101,7 +101,7 @@ const InvitationAccount = ({
           onClick={() => reject(account.multisig_address, refresh)}
         >
           Remove
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
