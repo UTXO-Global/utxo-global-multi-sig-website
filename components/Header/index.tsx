@@ -6,6 +6,8 @@ import { useMemo } from "react";
 
 import AccountModal from "../AccountModal";
 import SwitchNetwork from "../SwitchNetwork";
+import { useAppSelector } from "@/redux/hook";
+import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 
 const PAGE_TITLE: { [key: string]: string } = {
   "/account/new-transaction/": "New Transaction",
@@ -15,8 +17,9 @@ const PAGE_TITLE: { [key: string]: string } = {
 };
 
 const Header = () => {
-
   const pathname = usePathname();
+
+  const { info: account } = useAppSelector(selectAccountInfo);
 
   const isDashboardLayout = useMemo(() => {
     return pathname.includes("/account");
@@ -37,7 +40,7 @@ const Header = () => {
           </div>
           <div className="flex-1 flex justify-between items-center px-6">
             <p className="text-[24px] leading-[28px] font-bold text-dark-100">
-              {pageTitle}
+              {!!account ? pageTitle : ""}
             </p>
             <div className="flex">
               <AccountModal />

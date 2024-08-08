@@ -14,9 +14,10 @@ const accountInfoReducer = createReducer(
         state.isInfoLoading = true;
       })
       .addCase(loadInfo.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.info = action.payload;
+        }
         state.isInfoLoading = false;
-        if (!action.payload) return;
-        state.info = action.payload;
       })
       .addCase(loadInfo.rejected, (state) => {
         state.isInfoLoading = false;
