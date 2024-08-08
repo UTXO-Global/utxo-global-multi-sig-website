@@ -43,10 +43,17 @@ const Transactions = () => {
           <>
             <Transaction status="pending" isConfirm={true} />
             <Transaction status="pending" />
+            <Transaction status="pending" />
+            <Transaction status="pending" isConfirm={true} />
+            <Transaction status="pending" />
+            <Transaction status="pending" isConfirm={true} />
+            <Transaction status="pending" />
+            <Transaction status="pending" />
+            <Transaction status="pending" isConfirm={true} />
+            <Transaction status="pending" />
           </>
         ) : (
           <>
-            <Transaction status="pending" />
             <Transaction status="success" />
             <Transaction status="unsuccess" />
           </>
