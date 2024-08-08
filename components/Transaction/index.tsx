@@ -76,7 +76,7 @@ const Transaction = ({
                   {
                     "text-success-200": status === "success",
                     "text-error-100": status === "unsuccess",
-                    "mr-[10px]": status === "pending",
+                    "mr-[9px]": status === "pending",
                   }
                 )}
               >
