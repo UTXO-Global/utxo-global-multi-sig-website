@@ -89,7 +89,7 @@ export const getBalanceMultiSigAccount = async (
 
     for (let i = 0; i < signers.length; i++) {
       const res = await fetch(
-        `${EXPLORER_API}/api/v1/addresses/${signers[i].signer_address}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/ckb/v1/addresses/${signers[i].signer_address}`,
         {
           headers: {
             Accept: "application/vnd.api+json",
