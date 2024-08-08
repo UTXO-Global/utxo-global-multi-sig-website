@@ -26,7 +26,7 @@ const LeftMenu = () => {
   const [isShowAccountManagement, setIsShowAccountManagement] =
     useState<boolean>(false);
 
-  const { info: account } = useAppSelector(selectAccountInfo);
+  const { info: account, isInfoLoading } = useAppSelector(selectAccountInfo);
 
   return (
     <div className="w-[230px] bg-light-100 border-r border-grey-200 relative">
@@ -63,17 +63,27 @@ const LeftMenu = () => {
               {account?.threshold}/{account?.signers}
             </div>
           </div>
-          <div>
-            <p className="text-[16px] leading-[20px] font-bold text-dark-100">
-              {account?.name}
-            </p>
-            <p className="text-[14px] leading-[20px] font-medium text-grey-400 mt-[2px]">
-              <span className="text-dark-100">Pud: </span>
-              {shortAddress(account?.multi_sig_address, 5)}
-            </p>
-            <p className="text-[14px] leading-[20px] font-medium text-grey-400 mt-[2px]">
-              {account ? formatNumber(account?.balance as any) : "--"} CKB
-            </p>
+          <div className="flex-1">
+            {isInfoLoading ? (
+              <>
+                <div className="w-[40px] h-[16px] my-[2px] rounded-lg bg-grey-300 animate-pulse"></div>
+                <div className="w-[80%] h-[16px] rounded-lg bg-grey-300 animate-pulse mt-[7px]"></div>
+                <div className="w-[80%] h-[16px] rounded-lg bg-grey-300 animate-pulse mt-[7px]"></div>
+              </>
+            ) : (
+              <>
+                <p className="text-[16px] leading-[20px] font-bold text-dark-100">
+                  {account?.name}
+                </p>
+                <p className="text-[14px] leading-[20px] font-medium text-grey-400 mt-[2px]">
+                  <span className="text-dark-100">Pud: </span>
+                  {shortAddress(account?.multi_sig_address, 5)}
+                </p>
+                <p className="text-[14px] leading-[20px] font-medium text-grey-400 mt-[2px]">
+                  {account ? formatNumber(account?.balance as any) : "--"} CKB
+                </p>
+              </>
+            )}
           </div>
         </div>
         <div className="flex gap-2">
