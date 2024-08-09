@@ -81,27 +81,24 @@ export const getAddressBookName = (
   return addressBook ? addressBook.signer_name : "--";
 };
 
-export const getBalanceMultiSigAccount = async (
-  signers: SignerDetailType[]
-) => {
+export const getBalance = async (address: string) => {
   try {
     let balance = BI.from(0);
 
-    for (let i = 0; i < signers.length; i++) {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/ckb/v1/addresses/${signers[i].signer_address}`,
-        {
-          headers: {
-            Accept: "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-          },
-        }
-      );
-      const data = await res.json();
-      balance = balance.add(
-        BI.from(data.data[0].attributes.balance).div(Math.pow(10, 8))
-      );
-    }
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/ckb/v1/addresses/${address}`,
+      {
+        headers: {
+          Accept: "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+        },
+      }
+    );
+    const data = await res.json();
+    balance = balance.add(
+      BI.from(data.data[0].attributes.balance).div(Math.pow(10, 8))
+    );
+
     return balance.toNumber();
   } catch (e) {
     console.error(e);
