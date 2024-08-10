@@ -38,3 +38,11 @@ export type MultiSigAccountType = {
   invites?: InviteType[];
   balance: number;
 };
+
+export type SendTokenType = {
+  send_from: string;
+  send_to: string;
+  amount: number;
+  network: string;
+  is_include_fee: boolean;
+};

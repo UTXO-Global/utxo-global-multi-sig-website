@@ -6,6 +6,7 @@ import { InviteStatus, SignerDetailType } from "@/types/account";
 import { AddressBookType } from "@/types/address-book";
 
 import { EXPLORER_API } from "@/configs/common";
+import { ccc } from "@ckb-ccc/connector-react";
 
 export const comingSoonMsg = () => {
   toast.info("Coming Soon!");
