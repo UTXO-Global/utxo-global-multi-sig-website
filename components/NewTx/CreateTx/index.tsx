@@ -6,8 +6,29 @@ import { NumericFormat } from "react-number-format";
 
 import SwitchNetwork from "@/components/SwitchNetwork";
 import Button from "@/components/Common/Button";
+import { SendTokenType } from "@/types/account";
+import { useMemo } from "react";
+import useSignerInfo from "@/hooks/useSignerInfo";
+import { ccc } from "@ckb-ccc/connector-react";
+import { formatNumber } from "@/utils/helpers";
+import cn from "@/utils/cn";
 
-const CreateTx = ({ onNext }: { onNext: () => void }) => {
+const CreateTx = ({
+  txInfo,
+  setTxInfo,
+  onNext,
+}: {
+  txInfo: SendTokenType;
+  setTxInfo: (info: SendTokenType) => void;
+  onNext: () => void;
+}) => {
+  const { address, balance } = useSignerInfo();
+
+  const isValidTx = useMemo(() => {
+    const bal = Number(ccc.fixedPointToString(balance));
+    return txInfo.send_to !== "" && txInfo.amount > 0 && txInfo.amount <= bal;
+  }, [txInfo, balance]);
+
   return (
     <>
       <p className="text-[24px] leading-[28px] font-medium text-dark-100 px-6 border-b border-grey-300 pb-4">
@@ -26,6 +47,10 @@ const CreateTx = ({ onNext }: { onNext: () => void }) => {
             <input
               type="text"
               className="border-none outline-none flex-1 placeholder:text-grey-400 text-grey-400"
+              value={txInfo.send_to}
+              onChange={(e) =>
+                setTxInfo({ ...txInfo, send_to: e.target.value })
+              }
             />
           </div>
         </div>
@@ -42,7 +67,12 @@ const CreateTx = ({ onNext }: { onNext: () => void }) => {
                   if (!floatValue) return true;
                   return (floatValue as any) <= 999999;
                 }}
-                onChange={(e) => {}}
+                onChange={(e) => {
+                  setTxInfo({
+                    ...txInfo,
+                    amount: Number(e.target.value.replaceAll(",", "")),
+                  });
+                }}
                 placeholder="Enter amount"
                 thousandSeparator=","
               />
@@ -54,7 +84,9 @@ const CreateTx = ({ onNext }: { onNext: () => void }) => {
               <SwitchNetwork
                 iconClassname="w-8 h-8"
                 customEl={
-                  <span className="text-[14px] leading-[18px]">200 CKB</span>
+                  <span className="text-[14px] leading-[18px]">
+                    {formatNumber(Number(ccc.fixedPointToString(balance)))} CKB
+                  </span>
                 }
               />
             </div>
@@ -62,11 +94,20 @@ const CreateTx = ({ onNext }: { onNext: () => void }) => {
         </div>
         <div className="flex gap-2 items-center">
           <p className="text-base text-grey-400">Include Fee In The Amount</p>
-          <Switch defaultChecked />
+          <Switch
+            defaultChecked={txInfo.is_include_fee}
+            onChange={(isChecked) => {
+              setTxInfo({ ...txInfo, is_include_fee: isChecked });
+            }}
+          />
         </div>
       </div>
       <div className="px-6 mt-6">
-        <Button fullWidth onClick={onNext}>
+        <Button
+          fullWidth
+          onClick={() => isValidTx && onNext()}
+          disabled={!isValidTx}
+        >
           Next
         </Button>
       </div>
