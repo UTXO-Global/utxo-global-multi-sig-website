@@ -13,6 +13,7 @@ import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { cccA } from "@ckb-ccc/connector-react/advanced";
 import { useRouter } from "next/navigation";
+import { CKB_RPC } from "@/configs/common";
 
 const { AGGRON4 } = predefined;
 
@@ -26,7 +27,7 @@ const ConfirmTx = ({
   const router = useRouter();
   const { info: account } = useAppSelector(selectAccountInfo);
   const signer = ccc.useSigner();
-  const indexer = new Indexer("https://testnet.ckb.dev/rpc");
+  const indexer = new Indexer(CKB_RPC);
 
   const onSign = async () => {
     if (!signer) {

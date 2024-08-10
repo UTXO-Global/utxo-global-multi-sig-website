@@ -22,6 +22,11 @@ export const EXPLORER_API =
 export const FEATURE_REQUEST_LINK =
   "https://docs.google.com/forms/d/e/1FAIpQLSeUC9e8ka0iSAFXR1gPjepQEcygdLgwKbtnAWfc_2IRqL1pqw/viewform";
 
+export const CKB_RPC =
+  NETWORK === "nervos_testnet"
+    ? "https://testnet.ckb.dev/rpc"
+    : "https://mainnet.ckb.dev/rpc";
+
 export const NAVIGATIONS = [
   {
     id: "about-us",
