@@ -17,6 +17,8 @@ import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { shortAddress, copy, formatNumber } from "@/utils/helpers";
 import { EXPLORER } from "@/configs/common";
+import useMultisigBalance from "@/hooks/useMultisigBalance";
+import { ccc } from "@ckb-ccc/connector-react";
 
 const LeftMenu = () => {
   const pathname = usePathname();
@@ -27,6 +29,7 @@ const LeftMenu = () => {
     useState<boolean>(false);
 
   const { info: account, isInfoLoading } = useAppSelector(selectAccountInfo);
+  const { balance: multisigBalance } = useMultisigBalance();
 
   return (
     <div className="w-[230px] bg-light-100 border-r border-grey-200 relative">
@@ -80,7 +83,12 @@ const LeftMenu = () => {
                   {shortAddress(account?.multi_sig_address, 5)}
                 </p>
                 <p className="text-[14px] leading-[20px] font-medium text-grey-400 mt-[2px]">
-                  {account ? formatNumber(account?.balance as any) : "--"} CKB
+                  {account
+                    ? formatNumber(
+                        Number(ccc.fixedPointToString(multisigBalance))
+                      )
+                    : "--"}{" "}
+                  CKB
                 </p>
               </>
             )}
