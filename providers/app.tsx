@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useState, useEffect, useCallback } from "react";
+import {ccc} from "@ckb-ccc/connector-react"
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -29,6 +30,8 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [address, setAddress] = useState<string>("");
   const { isSupported } = useSupportedScreen();
 
+  const signer = ccc.useSigner()
+
   const { addressLogged } = useAppSelector(selectStorage);
   const dispatch = useAppDispatch();
 
@@ -45,7 +48,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     };
     const _address = await _getAddress();
     setAddress(_address);
-  }, []);
+  }, [signer]);
 
   useEffect(() => {
     AOS.init({

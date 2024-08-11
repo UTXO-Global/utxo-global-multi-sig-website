@@ -60,7 +60,6 @@ const useLogin = () => {
   );
 
   const login = useCallback(async () => {
-    if (!signer) return;
     const currentNetwork = await (window as any).utxoGlobal.getNetwork();
     const isNetworkEqual = currentNetwork === NETWORK;
     if (!isNetworkEqual) {
