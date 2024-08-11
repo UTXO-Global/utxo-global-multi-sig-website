@@ -1,7 +1,6 @@
 "use client";
 
 import React, { createContext, useState, useEffect, useCallback } from "react";
-import { ccc } from "@ckb-ccc/connector-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -33,13 +32,12 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const { addressLogged } = useAppSelector(selectStorage);
   const dispatch = useAppDispatch();
 
-  const signer = ccc.useSigner();
-
   const checkIsLoggedIn = useCallback(async () => {
     const _getAddress = async () => {
       try {
-        if (!signer) return "";
-        const address = await signer.getInternalAddress();
+        const [address] = await (
+          window as any
+        ).utxoGlobal.ckbSigner.getAccount();
         return address;
       } catch (e) {
         return "";
@@ -47,7 +45,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     };
     const _address = await _getAddress();
     setAddress(_address);
-  }, [signer]);
+  }, []);
 
   useEffect(() => {
     AOS.init({
@@ -77,13 +75,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     <AppContext.Provider value={{ address }}>
       <Header />
       <TestnetModeActivated />
-      {!signer ? (
-        <>
-          <ConnectedRequired />
-        </>
-      ) : address ? (
-        children
-      ) : null}
+      {address ? children : <ConnectedRequired />}
       <Footer />
     </AppContext.Provider>
   );
