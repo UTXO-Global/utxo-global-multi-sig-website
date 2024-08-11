@@ -24,7 +24,7 @@ const ReceiveTokens = ({ account }: { account: MultiSigAccountType }) => {
   return (
     <>
       <div
-        className="w-8 aspect-square rounded-[4px] bg-grey-300 flex justify-center items-center cursor-pointer"
+        className="w-8 aspect-square rounded-[4px] transition-colors hover:bg-grey-200 bg-grey-300 flex justify-center items-center cursor-pointer"
         onClick={() => setIsModalOpen(true)}
       >
         <IcnQrBold className="w-4" />
@@ -46,7 +46,6 @@ const ReceiveTokens = ({ account }: { account: MultiSigAccountType }) => {
               <QRCode
                 value={account.multi_sig_address}
                 icon="/images/nervos.png"
-                
                 size={200}
               />
             </div>
@@ -54,18 +53,24 @@ const ReceiveTokens = ({ account }: { account: MultiSigAccountType }) => {
               Only send Pudget Testnet assets to this Account.
             </p>
             <div className="px-4 py-3 rounded-lg bg-grey-300 flex items-center gap-2">
-              <img src="/images/account.png" alt="account" className="w-10" />
-              <div className="">
+              <img
+                src="/images/multi-sig-account.png"
+                alt="account"
+                className="w-10"
+              />
+              <div className="flex-1">
                 <p className="text-[16px] leading-[24px]">{account.name}</p>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 justify-between">
                   <p className="text-[18px] leading-[24px]">
                     {shortAddress(account.multi_sig_address, 14)}
                   </p>
-                  <IcnCopy
-                    className="w-4 cursor-pointer"
+                  <div
+                    className="p-2 rounded-full transition-colors cursor-pointer hover:bg-grey-200"
                     onClick={() => copy(account.multi_sig_address)}
-                  />
+                  >
+                    <IcnCopy className="w-4" />
+                  </div>
                 </div>
               </div>
             </div>

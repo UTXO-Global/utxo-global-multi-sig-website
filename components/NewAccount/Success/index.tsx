@@ -48,23 +48,25 @@ const Success = ({
             Your Account Is All Set!
           </p>
           <p className="text-[16px] leading-[20px] text-grey-400 text-center mt-2">
-            Start your journey to the smart account security now Use your
+            Start your journey to the smart account security now. Use your
             address to receive funds on Nervos{" "}
           </p>
-          <div className="my-8 rounded-lg bg-grey-300 px-4 py-3 flex gap-5 items-center">
-            <img src="/images/account.png" alt="account" className="w-10" />
+          <div className="my-8 rounded-lg bg-grey-300 px-4 py-3 flex gap-4 items-center">
+            <img src="/images/multi-sig-account.png" alt="account" className="w-10" />
             <div className="flex-1">
               <p className="text-base font-medium text-dark-100">
                 {account?.name}
               </p>
-              <div className="flex gap-4 items-center">
-                <p className="text-[18px] leading-[24px] truncate w-[300px]">
+              <div className="flex gap-4 items-center justify-between">
+                <p className="text-[18px] leading-[24px] truncate">
                   {shortAddress(account?.multi_sig_address, 14)}
                 </p>
-                <IcnCopy
-                  className="w-4 cursor-pointer"
+                <div
+                  className="p-2 rounded-full transition-colors hover:bg-grey-200 cursor-pointer"
                   onClick={() => copy(account?.multi_sig_address)}
-                />
+                >
+                  <IcnCopy className="w-4" />
+                </div>
               </div>
             </div>
           </div>

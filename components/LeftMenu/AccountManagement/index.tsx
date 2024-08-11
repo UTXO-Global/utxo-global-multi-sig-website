@@ -60,7 +60,7 @@ const AccountManagement = ({
         <div className="bg-light-100 h-[calc(100vh-69.71px)]">
           <div className="px-4 py-5 flex items-center justify-between border-b border-grey-300">
             <p className="text-[14px] leading-[20px] font-bold text-dark-100">
-              Multi-Sign Accounts
+              Multi-Sig Accounts
             </p>
             <Link href="/">
               <Button
@@ -74,7 +74,7 @@ const AccountManagement = ({
           <div className="px-4 py-2">
             <p className="text-[14px] leading-[20px] font-medium text-dark-100">
               Accounts{" "}
-              <span className="text-grey-500">
+              <span className="text-grey-500 text-xs">
                 {accounts.length > 0 ? `(${accounts.length})` : null}
               </span>
             </p>
@@ -108,7 +108,7 @@ const AccountManagement = ({
             </div>
             <p className="text-[14px] leading-[20px] font-medium text-dark-100 mt-6">
               Invitation List{" "}
-              <span className="text-grey-500">
+              <span className="text-grey-500 text-xs">
                 {invites.length > 0 ? `(${invites.length})` : null}
               </span>
             </p>

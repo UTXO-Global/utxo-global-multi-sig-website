@@ -31,7 +31,7 @@ const ListAccounts = () => {
       <div className="px-6 py-5 rounded-lg bg-light-100">
         <p className="text-[20px] leading-[28px] font-medium text-dark-100">
           Accounts{" "}
-          <span className="text-grey-400">
+          <span className="text-grey-400 text-base">
             {accounts.length > 0 ? `(${accounts.length})` : null}
           </span>
         </p>
@@ -54,7 +54,7 @@ const ListAccounts = () => {
       <div className="px-6 py-5 rounded-lg bg-light-100">
         <p className="text-[20px] leading-[28px] font-medium text-dark-100">
           Invitation List{" "}
-          <span className="text-grey-400">
+          <span className="text-grey-400 text-base">
             {invites.length > 0 ? `(${invites.length})` : null}
           </span>
         </p>

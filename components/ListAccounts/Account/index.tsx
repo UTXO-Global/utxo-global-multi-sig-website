@@ -111,8 +111,8 @@ const EditName = ({
           </div>
           {isSubmit && isError ? (
             <p className="text-sm text-error-100 mt-1">
-              Account name can only contain letters, numbers, _ and must be
-              between 4 and 16 characters.
+              Account name must be be between 4 and 16 character and contain
+              only letters, numbers, and underscores.
             </p>
           ) : null}
 
@@ -177,7 +177,7 @@ const Account = ({
         >
           <div className="relative">
             <img
-              src="/images/account.png"
+              src="/images/multi-sig-account.png"
               alt="account"
               className={cn(`w-[40px] rounded-full`, {
                 "w-8": isSmall,

@@ -33,7 +33,7 @@ const Assets = () => {
                 </p>
               </div>
               <div className="text-base font-medium text-dark-100 w-[20%]">
-                {account ? formatNumber(account.balance) : "--"}
+                {account ? formatNumber(account.balance) : "--"} CKB
               </div>
               <div className="text-base font-medium text-dark-100 w-[20%] text-right">
                 ${account ? formatNumber(account.balance * ckbPrice) : 0}
