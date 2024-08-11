@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Select, Tooltip } from "antd";
 import { ccc } from "@ckb-ccc/connector-react";
+import { toast } from "react-toastify";
 
 import IcnInfoOutline from "@/public/icons/icn-info-outline.svg";
 import IcnTrash from "@/public/icons/icn-trash.svg";
@@ -70,7 +71,6 @@ const Step02 = ({
   };
 
   const validate = useCallback(() => {
-    const regex = /^[a-zA-Z]{4,16}$/;
     setErrors(
       signers.map((z, i) => ({
         name: isValidName(z.name),
@@ -79,8 +79,17 @@ const Step02 = ({
     );
   }, [signers]);
 
+  const _isDuplicateSigner = () => {
+    const set = new Set(signers.map((z) => z.address.toLowerCase()));
+    return set.size !== signers.length;
+  };
+
   const createSigners = () => {
     setIsSubmit(true);
+    if (_isDuplicateSigner()) {
+      toast.warning("Signer address duplicated!");
+      return;
+    }
     if (isValidSigners) onNext();
   };
 
