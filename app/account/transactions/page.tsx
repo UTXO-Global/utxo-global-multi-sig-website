@@ -5,57 +5,81 @@ import { useState } from "react";
 import cn from "@/utils/cn";
 
 import Transaction from "@/components/Transaction";
+import IcnSpinner from "@/public/icons/icn-spinner.svg";
+import useTransactions from "@/hooks/useTransactions";
+import { TransactionTab } from "@/types/transaction";
+import { useAppSelector } from "@/redux/hook";
+import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 
 const Transactions = () => {
-  const [tab, setTab] = useState<string>("queue");
+  const [tab, setTab] = useState<TransactionTab>(TransactionTab.Queue);
+  const { isLoading, queue, history } = useTransactions();
+  const { info: account, isInfoLoading } = useAppSelector(selectAccountInfo);
 
   return (
     <main className="h-full overflow-y-auto">
       <div className="px-6 pt-4 bg-light-100 flex justify-start">
-        <div
-          className={cn(
-            `px-6 pt-3 pb-4 border-b-2 border-transparent text-[16px] leading-[20px] font-medium text-grey-400 cursor-pointer`,
-            {
-              "border-dark-100 font-bold text-dark-100": tab === "queue",
-            }
-          )}
-          onClick={() => setTab("queue")}
-        >
-          Queue
-        </div>
-        <div
-          className={cn(
-            `px-6 pt-3 pb-4 border-b-2 border-transparent text-[16px] leading-[20px] font-medium text-grey-400 cursor-pointer`,
-            {
-              "border-dark-100 font-bold text-dark-100": tab === "history",
-            }
-          )}
-          onClick={() => setTab("history")}
-        >
-          History
-        </div>
+        {[TransactionTab.Queue, TransactionTab.History].map((z, i) => (
+          <div
+            key={i}
+            className={cn(
+              `px-6 pt-3 pb-4 border-b-2 border-transparent text-[16px] leading-[20px] font-medium text-grey-400 cursor-pointer capitalize`,
+              {
+                "border-dark-100 font-bold text-dark-100": tab === z,
+              }
+            )}
+            onClick={() => setTab(z)}
+          >
+            {z}
+          </div>
+        ))}
       </div>
       <div className="py-4 px-6 grid gap-2">
-        <p className="text-[16px] leading-[20px] font-medium text-grey-400">
-          Next
-        </p>
-        {tab === "queue" ? (
-          <>
-            <Transaction status="pending" isConfirm={true} />
-            <Transaction status="pending" />
-            <Transaction status="pending" />
-            <Transaction status="pending" isConfirm={true} />
-            <Transaction status="pending" />
-            <Transaction status="pending" isConfirm={true} />
-            <Transaction status="pending" />
-            <Transaction status="pending" />
-            <Transaction status="pending" isConfirm={true} />
-            <Transaction status="pending" />
-          </>
+        {isLoading || isInfoLoading ? (
+          <div className="flex justify-center items-center py-10">
+            <IcnSpinner className="w-10 animate-spin" />
+          </div>
         ) : (
           <>
-            <Transaction status="success" />
-            <Transaction status="unsuccess" />
+            <div>
+              <p className="text-[16px] leading-[20px] font-medium text-grey-400">
+                Next
+              </p>
+            </div>
+
+            {tab === TransactionTab.Queue ? (
+              <>
+                {queue.length === 0 ? (
+                  <div className="pt-[22px] pb-[28px] flex justify-center text-[16px] leading-[20px] text-grey-500">
+                    {`You don't have any transaction yet`}
+                  </div>
+                ) : (
+                  queue.map((z, i) => (
+                    <Transaction
+                      key={`queue-${i}`}
+                      data={z}
+                      accountInfo={account as any}
+                    />
+                  ))
+                )}
+              </>
+            ) : (
+              <>
+                {history.length === 0 ? (
+                  <div className="pt-[22px] pb-[28px] flex justify-center text-[16px] leading-[20px] text-grey-500">
+                    {`You don't have any transaction yet`}
+                  </div>
+                ) : (
+                  history.map((z, i) => (
+                    <Transaction
+                      key={`history-${i}`}
+                      data={z}
+                      accountInfo={account as any}
+                    />
+                  ))
+                )}
+              </>
+            )}
           </>
         )}
       </div>

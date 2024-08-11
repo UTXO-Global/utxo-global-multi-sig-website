@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useMemo, useState } from "react";
+import { formatDistanceStrict, format } from "date-fns";
 
 import Button from "../Common/Button";
 import IcnSend from "@/public/icons/icn-send.svg";
@@ -9,15 +10,45 @@ import IcnChecked from "@/public/icons/icn-checked.svg";
 import IcnUserGroup from "@/public/icons/icn-user-group.svg";
 
 import cn from "@/utils/cn";
+import { TransactionStatus, TransactionType } from "@/types/transaction";
+import { formatNumber, isAddressEqual, shortAddress } from "@/utils/helpers";
+import { MultiSigAccountType } from "@/types/account";
+import { AppContext } from "@/providers/app";
+
+const STATUS_TEXT = {
+  [TransactionStatus.Sent]: "Success",
+  [TransactionStatus.WaitingSigned]: "Pending",
+};
 
 const Transaction = ({
-  status = "pending",
-  isConfirm,
+  data,
+  accountInfo,
 }: {
-  status?: string;
-  isConfirm?: boolean;
+  data: TransactionType;
+  accountInfo: MultiSigAccountType;
 }) => {
   const [isShow, setIsShow] = useState<boolean>(false);
+  const [isConfirmLoading, setIsConfirmLoading] = useState<boolean>(false);
+  const { address } = useContext(AppContext);
+
+  const statusTxt = useMemo(() => {
+    return STATUS_TEXT[data.status];
+  }, [data.status]);
+
+  const isConfirmed = useMemo(() => {
+    return data.confirmed.some((z) => isAddressEqual(z, address));
+  }, [address, data.confirmed]);
+
+  const confirm = () => {
+    setIsConfirmLoading(false);
+    try {
+      // TODO: confirm tx
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsConfirmLoading(false);
+    }
+  };
 
   return (
     <div className="rounded-lg bg-light-100 overflow-hidden">
@@ -25,7 +56,7 @@ const Transaction = ({
         className={cn(
           `px-4 py-[18px] flex items-center cursor-pointer hover:bg-grey-200 transition-colors`,
           {
-            "py-[14px]": isConfirm,
+            "py-[14px]": !isConfirmed,
           }
         )}
         onClick={() => setIsShow(!isShow)}
@@ -37,35 +68,33 @@ const Transaction = ({
           </p>
         </div>
         <div className="w-[30%] text-[16px] leading-[20px] font-medium text-grey-400 grid grid-cols-2 gap-4 pl-2">
-          <p>-100 CKB</p>
-          <p>1 minute ago</p>
+          <p>-{formatNumber(data.amount)} CKB</p>
+          <p>{formatDistanceStrict(new Date(data.created_at), new Date())}</p>
         </div>
         <div className="w-[40%] flex items-center gap-3 pl-4">
           <div className="flex justify-between flex-1">
             <div className="flex gap-1 items-center">
-              {status === "success" ? (
+              {data.status === TransactionStatus.Sent ? (
                 <div className="w-6 aspect-square p-[2px]">
                   <IcnChecked className="fill-success-100 w-full" />
                 </div>
-              ) : status === "pending" ? (
+              ) : data.status === TransactionStatus.WaitingSigned ? (
                 <IcnUserGroup className="w-6" />
-              ) : (
-                <IcnUserGroup className="w-6 stroke-error-100" />
-              )}
+              ) : null}
 
               <p
                 className={cn(
                   `text-[16px] leading-[20px] font-medium text-orange-100`,
                   {
-                    "text-success-200": status === "success",
-                    "text-error-100": status === "unsuccess",
+                    "text-success-200": data.status === TransactionStatus.Sent,
+                    "text-error-100": false,
                   }
                 )}
               >
-                {status === "success" ? `2 out of 2` : `1 out of 2`}
+                {`${data.confirmed.length} out of ${accountInfo.signers}`}
               </p>
             </div>
-            {isConfirm ? (
+            {!isConfirmed ? (
               <Button size="small" kind="secondary" className="!py-[5px]">
                 Confirm
               </Button>
@@ -74,13 +103,13 @@ const Transaction = ({
                 className={cn(
                   `text-[16px] leading-[20px] font-medium text-orange-100 capitalize`,
                   {
-                    "text-success-200": status === "success",
-                    "text-error-100": status === "unsuccess",
-                    "mr-[9px]": status === "pending",
+                    "text-success-200": data.status === TransactionStatus.Sent,
+                    "text-error-100": false,
+                    "mr-[9px]": data.status === TransactionStatus.WaitingSigned,
                   }
                 )}
               >
-                {status}
+                {statusTxt}
               </p>
             )}
           </div>
@@ -103,22 +132,24 @@ const Transaction = ({
         <div className="w-[60%] px-4 py-6 grid gap-2 border-r border-grey-300 content-start sticky top-0">
           <div className="flex gap-8 text-[16px] leading-[20px] text-grey-400">
             <p className="w-[90px] font-medium">To Address:</p>
-            <p>ckt1qzda0cr08m85...7tfcu</p>
+            <p>{shortAddress(data.to_address, 14)}</p>
           </div>
           <div className="flex gap-8 text-[16px] leading-[20px] text-grey-400">
             <p className="w-[90px] font-medium">Created:</p>
-            <p>Jul 19, 2024, 11:01:11 AM</p>
+            <p>{format(new Date(data.created_at), "MMM d, yyyy hh:mm:ss a")}</p>
           </div>
-          <p className="text-[16px] leading-[20px] font-medium text-orange-100">
-            Number of confirmations required: 2
-          </p>
+          {data.status === TransactionStatus.WaitingSigned ? (
+            <p className="text-[16px] leading-[20px] font-medium text-orange-100">
+              Number of confirmations required: {accountInfo.threshold}
+            </p>
+          ) : null}
         </div>
         <div className="w-[40%] p-4">
           <div
             className={cn(
               `text-[16px] leading-[20px] grid gap-6 relative transition-all max-h-[calc(100%-64px)] overflow-auto`,
               {
-                "max-h-full": status !== "pending",
+                "max-h-full": data.status !== TransactionStatus.WaitingSigned,
               }
             )}
           >
@@ -146,7 +177,7 @@ const Transaction = ({
             </div>
             <div className="relative">
               <div className="flex gap-2 items-center bg-light-100">
-                {status === "success" ? (
+                {data.status === TransactionStatus.Sent ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -163,46 +194,23 @@ const Transaction = ({
                       fill="white"
                     />
                   </svg>
-                ) : status === "pending" ? (
+                ) : data.status === TransactionStatus.WaitingSigned ? (
                   <div className="border border-grey-500 rounded-full w-4 aspect-square"></div>
-                ) : (
-                  <div className="w-4 aspect-square bg-error-100/30 rounded-full flex justify-center items-center">
-                    <div className="w-[10px] aspect-square rounded-full bg-error-100"></div>
-                  </div>
-                )}
+                ) : null}
 
                 <p className="font-medium text-dark-100">
                   Confirmed{" "}
                   <span className="text-grey-400">
-                    {status === "success" ? `(2 of 2)` : `(1 of 2)`}
+                    {`(${data.confirmed.length} of ${accountInfo.threshold})`}
                   </span>
                 </p>
               </div>
               <div className="grid gap-4 mt-5">
-                <div className="flex gap-2 items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
+                {data.confirmed.map((z, i) => (
+                  <div
+                    key={`confirmed-${i}`}
+                    className="flex gap-2 items-center"
                   >
-                    <path
-                      d="M8 11C9.65686 11 11 9.65686 11 8C11 6.34315 9.65686 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65686 6.34315 11 8 11Z"
-                      fill="#0D0D0D"
-                    />
-                  </svg>
-                  <div className="flex gap-2">
-                    <p className="text-success-200 font-normal text-[14px]">
-                      ckt1qzda...abc4sr05
-                    </p>
-                    <div className="px-1 py-[2px] bg-[#E0FBF2] rounded-[4px] text-[10px] leading-[16px] text-success-200">
-                      Confirmed
-                    </div>
-                  </div>
-                </div>
-                {status === "success" ? (
-                  <div className="flex gap-2 items-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -217,40 +225,17 @@ const Transaction = ({
                     </svg>
                     <div className="flex gap-2">
                       <p className="text-success-200 font-normal text-[14px]">
-                        ckt1qzda...abc4sr05
+                        {shortAddress(z, 14)}
                       </p>
                       <div className="px-1 py-[2px] bg-[#E0FBF2] rounded-[4px] text-[10px] leading-[16px] text-success-200">
                         Confirmed
                       </div>
                     </div>
                   </div>
-                ) : status === "unsuccess" ? (
-                  <div className="flex gap-2 items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                    >
-                      <path
-                        d="M8 11C9.65686 11 11 9.65686 11 8C11 6.34315 9.65686 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65686 6.34315 11 8 11Z"
-                        fill="#0D0D0D"
-                      />
-                    </svg>
-                    <div className="flex gap-2">
-                      <p className="text-error-100 font-normal text-[14px]">
-                        ckt1qzda...abc4sr05
-                      </p>
-                      <div className="px-1 py-[2px] bg-[#FEE7E7] rounded-[4px] text-[10px] leading-[16px] text-error-100">
-                        Rejected
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
+                ))}
               </div>
             </div>
-            {status === "success" ? (
+            {data.status === TransactionStatus.Sent ? (
               <div className="flex gap-2 items-center bg-light-100 relative">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -270,21 +255,27 @@ const Transaction = ({
                 </svg>
                 <p className="font-medium text-dark-100">Completed</p>
               </div>
-            ) : status === "pending" ? (
+            ) : data.status === TransactionStatus.WaitingSigned ? (
               <div className="flex gap-2 items-center bg-light-100 relative">
                 <div className="border border-grey-500 rounded-full w-4 aspect-square"></div>
                 <p className="font-medium text-grey-400">Completed</p>
               </div>
             ) : null}
           </div>
-          {status === "pending" ? (
+          {data.status === TransactionStatus.WaitingSigned ? (
             <div className="grid grid-cols-2 gap-2 mt-6">
-              <Button fullWidth size="small" disabled={!isConfirm}>
+              <Button
+                fullWidth
+                size="small"
+                disabled={isConfirmed || isConfirmLoading}
+                loading={isConfirmLoading}
+                onClick={confirm}
+              >
                 Confirm
               </Button>
-              <Button fullWidth size="small" kind="danger-outline">
+              {/* <Button fullWidth size="small" kind="danger-outline">
                 Reject
-              </Button>
+              </Button> */}
             </div>
           ) : null}
         </div>
