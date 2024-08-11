@@ -12,6 +12,7 @@ import useSignerInfo from "@/hooks/useSignerInfo";
 import { ccc } from "@ckb-ccc/connector-react";
 import { formatNumber } from "@/utils/helpers";
 import cn from "@/utils/cn";
+import useMultisigBalance from "@/hooks/useMultisigBalance";
 
 const CreateTx = ({
   txInfo,
@@ -22,7 +23,7 @@ const CreateTx = ({
   setTxInfo: (info: SendTokenType) => void;
   onNext: () => void;
 }) => {
-  const { address, balance } = useSignerInfo();
+  const { balance } = useMultisigBalance();
 
   const isValidTx = useMemo(() => {
     const bal = Number(ccc.fixedPointToString(balance));
