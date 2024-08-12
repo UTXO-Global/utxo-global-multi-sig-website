@@ -25,7 +25,6 @@ const Step01 = ({
   };
 
   const next = () => {
-    console.log(error);
     setIsSubmit(true);
     if (!error) onNext();
   };

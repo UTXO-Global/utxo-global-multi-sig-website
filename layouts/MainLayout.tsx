@@ -1,5 +1,6 @@
 "use client";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import { useAppDispatch } from "@/redux/hook";
 import useAuthenticate from "@/hooks/useAuthenticate";
@@ -16,6 +17,8 @@ const _MainLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
+  const router = useRouter()
+
   const { isLoggedIn } = useAuthenticate();
   
   useLogin();
@@ -26,6 +29,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (!isLoggedIn) {
+      router.push("/")
       dispatch(reset());
     }
   }, [dispatch, isLoggedIn]);

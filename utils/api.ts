@@ -1,6 +1,7 @@
 import Axios, { AxiosRequestConfig, AxiosRequestHeaders } from "axios";
 import { toast } from "react-toastify";
 import { reset } from "@/redux/features/storage/action";
+import { isAddressEqual } from "./helpers";
 
 interface AdaptAxiosRequestConfig extends AxiosRequestConfig {
   headers: AxiosRequestHeaders;
@@ -14,9 +15,21 @@ export const injectStore = (_store: any) => {
 const api = Axios.create({ baseURL: process.env.NEXT_PUBLIC_API_URL });
 
 api.interceptors.request.use(
-  (config): AdaptAxiosRequestConfig => {
+  async (config) => {
     const token = store.getState().storage.token;
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    const addressLogged = store.getState().storage.addressLogged;
+    const [currentAddress] = await (
+      window as any
+    ).utxoGlobal.ckbSigner.getAccount();
+    if (!!addressLogged && !!currentAddress) {
+      if (isAddressEqual(addressLogged, currentAddress)) {
+        if (token) config.headers.Authorization = `Bearer ${token}`;
+        return config;
+      } else {
+        store.dispatch(reset());
+        return Promise.reject("Invalid token");
+      }
+    }
     return config;
   },
   (error): any => {
@@ -27,7 +40,6 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    console.log(error)
     const response = error?.response;
     const status = response?.status;
     const handleAuthorization = () => {

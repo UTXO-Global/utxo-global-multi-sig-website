@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { Popover } from "antd";
 import { ccc } from "@ckb-ccc/connector-react";
+import { useRouter } from "next/navigation";
 
 import IcnChevron from "@/public/icons/icn-chevron.svg";
 import IcnLogout from "@/public/icons/icn-logout.svg";
@@ -17,6 +18,7 @@ import { shortAddress, formatNumber } from "@/utils/helpers";
 import useSignerInfo from "@/hooks/useSignerInfo";
 
 const AccountModal = () => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const { address, balance } = useSignerInfo();
 
@@ -35,6 +37,7 @@ const AccountModal = () => {
 
   const logout = () => {
     disconnect();
+    router.push("/");
     dispatch(reset());
     dispatch(restAccountInfo());
     hide();
