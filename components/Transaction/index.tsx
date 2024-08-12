@@ -1,6 +1,7 @@
 "use client";
 
 import { useContext, useMemo, useState } from "react";
+import Decimal from "decimal.js";
 import Link from "next/link";
 import { formatDistanceStrict, format } from "date-fns";
 
@@ -104,7 +105,10 @@ const Transaction = ({
         </div>
         <div className="w-[30%] text-[16px] leading-[20px] font-medium text-grey-400 grid grid-cols-2 gap-4 pl-2">
           <p>
-            -{formatNumber(Number(BI.from(transaction.amount).div(10 ** 8)))}{" "}
+            -
+            {formatNumber(
+              new Decimal(transaction.amount).div(10 ** 8).toNumber()
+            )}{" "}
             CKB
           </p>
           <p>

@@ -1,4 +1,5 @@
 import { toast } from "react-toastify";
+import Decimal from "decimal.js";
 import { AddressPrefix } from "@nervosnetwork/ckb-sdk-utils";
 import { BI } from "@ckb-lumos/lumos";
 
@@ -26,7 +27,7 @@ export function shortAddress(address?: string, len = 5) {
 export const formatNumber = (
   number: number,
   minPrecision = 2,
-  maxPrecision = 2
+  maxPrecision = 8
 ) => {
   const options = {
     minimumFractionDigits: minPrecision,
@@ -82,7 +83,6 @@ export const getAddressBookName = (
 
 export const getBalance = async (address: string) => {
   try {
-    let balance = BI.from(0);
 
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/ckb/v1/addresses/${address}`,
@@ -94,10 +94,8 @@ export const getBalance = async (address: string) => {
       }
     );
     const data = await res.json();
-    balance = balance.add(
-      BI.from(data.data[0].attributes.balance).div(Math.pow(10, 8))
-    );
-
+    const balance = new Decimal(data.data[0].attributes.balance).div(10 ** 8)
+   
     return balance.toNumber();
   } catch (e) {
     console.error(e);
