@@ -46,3 +46,8 @@ export type SendTokenType = {
   network: string;
   is_include_fee: boolean;
 };
+
+export type TransactionType = {
+  transaction_id: string;
+  payload: string;
+};

@@ -57,7 +57,7 @@ const Transactions = () => {
                   queue.map((z, i) => (
                     <Transaction
                       key={`queue-${i}`}
-                      data={z}
+                      transaction={z}
                       accountInfo={account as any}
                     />
                   ))

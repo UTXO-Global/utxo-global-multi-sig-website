@@ -14,6 +14,10 @@ import { TransactionStatus, TransactionType } from "@/types/transaction";
 import { formatNumber, isAddressEqual, shortAddress } from "@/utils/helpers";
 import { MultiSigAccountType } from "@/types/account";
 import { AppContext } from "@/providers/app";
+import { ccc } from "@ckb-ccc/connector-react";
+import { cccA } from "@ckb-ccc/connector-react/advanced";
+import api from "@/utils/api";
+import { toast } from "react-toastify";
 
 const STATUS_TEXT = {
   [TransactionStatus.Sent]: "Success",
@@ -21,28 +25,54 @@ const STATUS_TEXT = {
 };
 
 const Transaction = ({
-  data,
+  transaction,
   accountInfo,
 }: {
-  data: TransactionType;
+  transaction: TransactionType;
   accountInfo: MultiSigAccountType;
 }) => {
   const [isShow, setIsShow] = useState<boolean>(false);
   const [isConfirmLoading, setIsConfirmLoading] = useState<boolean>(false);
   const { address } = useContext(AppContext);
+  const signer = ccc.useSigner();
 
   const statusTxt = useMemo(() => {
-    return STATUS_TEXT[data.status];
-  }, [data.status]);
+    if (!transaction) return STATUS_TEXT[TransactionStatus.WaitingSigned];
+    return STATUS_TEXT[transaction.status];
+  }, [transaction]);
 
   const isConfirmed = useMemo(() => {
-    return data.confirmed.some((z) => isAddressEqual(z, address));
-  }, [address, data.confirmed]);
+    return transaction?.confirmed.some((z) => isAddressEqual(z, address));
+  }, [address, transaction]);
 
-  const confirm = () => {
+  const confirm = async () => {
     setIsConfirmLoading(false);
     try {
-      // TODO: confirm tx
+      if (!signer) return;
+      const jsonTx = JSON.parse(transaction.payload) as cccA.JsonRpcTransaction;
+      const rawTx = cccA.JsonRpcTransformers.transactionTo(jsonTx);
+      await Promise.all([
+        rawTx.inputs.forEach(async (input, idx) => {
+          const cellInput = await signer.client.getCell({
+            txHash: input.previousOutput.txHash,
+            index: input.previousOutput.index,
+          });
+
+          rawTx.inputs[idx].cellOutput = cellInput?.cellOutput;
+        }),
+      ]);
+
+      const signature = await signer.signOnlyTransaction(rawTx);
+
+      const witnesses = signature.witnesses.toString();
+      const { data } = await api.post("/multi-sig/signature", {
+        txid: transaction.transaction_id,
+        signature: witnesses.slice(42),
+      });
+
+      if (data && !!data.transaction_id) {
+        toast.success("Transaction has signed");
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -68,17 +98,19 @@ const Transaction = ({
           </p>
         </div>
         <div className="w-[30%] text-[16px] leading-[20px] font-medium text-grey-400 grid grid-cols-2 gap-4 pl-2">
-          <p>-{formatNumber(data.amount)} CKB</p>
-          <p>{formatDistanceStrict(new Date(data.created_at), new Date())}</p>
+          <p>-{formatNumber(transaction.amount)} CKB</p>
+          <p>
+            {formatDistanceStrict(new Date(transaction.created_at), new Date())}
+          </p>
         </div>
         <div className="w-[40%] flex items-center gap-3 pl-4">
           <div className="flex justify-between flex-1">
             <div className="flex gap-1 items-center">
-              {data.status === TransactionStatus.Sent ? (
+              {transaction.status === TransactionStatus.Sent ? (
                 <div className="w-6 aspect-square p-[2px]">
                   <IcnChecked className="fill-success-100 w-full" />
                 </div>
-              ) : data.status === TransactionStatus.WaitingSigned ? (
+              ) : transaction.status === TransactionStatus.WaitingSigned ? (
                 <IcnUserGroup className="w-6" />
               ) : null}
 
@@ -86,12 +118,13 @@ const Transaction = ({
                 className={cn(
                   `text-[16px] leading-[20px] font-medium text-orange-100`,
                   {
-                    "text-success-200": data.status === TransactionStatus.Sent,
+                    "text-success-200":
+                      transaction.status === TransactionStatus.Sent,
                     "text-error-100": false,
                   }
                 )}
               >
-                {`${data.confirmed.length} out of ${accountInfo.signers}`}
+                {`${transaction.confirmed.length} out of ${accountInfo.signers}`}
               </p>
             </div>
             {!isConfirmed ? (
@@ -103,9 +136,11 @@ const Transaction = ({
                 className={cn(
                   `text-[16px] leading-[20px] font-medium text-orange-100 capitalize`,
                   {
-                    "text-success-200": data.status === TransactionStatus.Sent,
+                    "text-success-200":
+                      transaction.status === TransactionStatus.Sent,
                     "text-error-100": false,
-                    "mr-[9px]": data.status === TransactionStatus.WaitingSigned,
+                    "mr-[9px]":
+                      transaction.status === TransactionStatus.WaitingSigned,
                   }
                 )}
               >
@@ -132,13 +167,18 @@ const Transaction = ({
         <div className="w-[60%] px-4 py-6 grid gap-2 border-r border-grey-300 content-start sticky top-0">
           <div className="flex gap-8 text-[16px] leading-[20px] text-grey-400">
             <p className="w-[90px] font-medium">To Address:</p>
-            <p>{shortAddress(data.to_address, 14)}</p>
+            <p>{shortAddress(transaction.to_address, 14)}</p>
           </div>
           <div className="flex gap-8 text-[16px] leading-[20px] text-grey-400">
             <p className="w-[90px] font-medium">Created:</p>
-            <p>{format(new Date(data.created_at), "MMM d, yyyy hh:mm:ss a")}</p>
+            <p>
+              {format(
+                new Date(transaction.created_at),
+                "MMM d, yyyy hh:mm:ss a"
+              )}
+            </p>
           </div>
-          {data.status === TransactionStatus.WaitingSigned ? (
+          {transaction.status === TransactionStatus.WaitingSigned ? (
             <p className="text-[16px] leading-[20px] font-medium text-orange-100">
               Number of confirmations required: {accountInfo.threshold}
             </p>
@@ -149,7 +189,8 @@ const Transaction = ({
             className={cn(
               `text-[16px] leading-[20px] grid gap-6 relative transition-all max-h-[calc(100%-64px)] overflow-auto`,
               {
-                "max-h-full": data.status !== TransactionStatus.WaitingSigned,
+                "max-h-full":
+                  transaction.status !== TransactionStatus.WaitingSigned,
               }
             )}
           >
@@ -177,7 +218,7 @@ const Transaction = ({
             </div>
             <div className="relative">
               <div className="flex gap-2 items-center bg-light-100">
-                {data.status === TransactionStatus.Sent ? (
+                {transaction.status === TransactionStatus.Sent ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -194,19 +235,19 @@ const Transaction = ({
                       fill="white"
                     />
                   </svg>
-                ) : data.status === TransactionStatus.WaitingSigned ? (
+                ) : transaction.status === TransactionStatus.WaitingSigned ? (
                   <div className="border border-grey-500 rounded-full w-4 aspect-square"></div>
                 ) : null}
 
                 <p className="font-medium text-dark-100">
                   Confirmed{" "}
                   <span className="text-grey-400">
-                    {`(${data.confirmed.length} of ${accountInfo.threshold})`}
+                    {`(${transaction.confirmed.length} of ${accountInfo.threshold})`}
                   </span>
                 </p>
               </div>
               <div className="grid gap-4 mt-5">
-                {data.confirmed.map((z, i) => (
+                {transaction.confirmed.map((z, i) => (
                   <div
                     key={`confirmed-${i}`}
                     className="flex gap-2 items-center"
@@ -235,7 +276,7 @@ const Transaction = ({
                 ))}
               </div>
             </div>
-            {data.status === TransactionStatus.Sent ? (
+            {transaction.status === TransactionStatus.Sent ? (
               <div className="flex gap-2 items-center bg-light-100 relative">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -255,14 +296,14 @@ const Transaction = ({
                 </svg>
                 <p className="font-medium text-dark-100">Completed</p>
               </div>
-            ) : data.status === TransactionStatus.WaitingSigned ? (
+            ) : transaction.status === TransactionStatus.WaitingSigned ? (
               <div className="flex gap-2 items-center bg-light-100 relative">
                 <div className="border border-grey-500 rounded-full w-4 aspect-square"></div>
                 <p className="font-medium text-grey-400">Completed</p>
               </div>
             ) : null}
           </div>
-          {data.status === TransactionStatus.WaitingSigned ? (
+          {transaction.status === TransactionStatus.WaitingSigned ? (
             <div className="grid grid-cols-2 gap-2 mt-6">
               <Button
                 fullWidth
