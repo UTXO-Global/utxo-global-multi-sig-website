@@ -37,12 +37,13 @@ const Transaction = ({
   const signer = ccc.useSigner();
 
   const statusTxt = useMemo(() => {
+    if (!transaction) return STATUS_TEXT[TransactionStatus.WaitingSigned];
     return STATUS_TEXT[transaction.status];
-  }, [transaction.status]);
+  }, [transaction]);
 
   const isConfirmed = useMemo(() => {
-    return transaction.confirmed.some((z) => isAddressEqual(z, address));
-  }, [address, transaction.confirmed]);
+    return transaction?.confirmed.some((z) => isAddressEqual(z, address));
+  }, [address, transaction]);
 
   const confirm = async () => {
     setIsConfirmLoading(false);
