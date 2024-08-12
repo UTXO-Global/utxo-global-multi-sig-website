@@ -77,7 +77,7 @@ const Transaction = ({
       });
 
       if (data && !!data.transaction_id) {
-        refresh?.()
+        refresh?.();
         toast.success("Transaction has signed");
       }
     } catch (e) {
@@ -138,7 +138,17 @@ const Transaction = ({
               </p>
             </div>
             {!isConfirmed ? (
-              <Button size="small" kind="secondary" className="!py-[5px]">
+              <Button
+                size="small"
+                kind="secondary"
+                className="!py-[5px]"
+                disabled={isConfirmLoading}
+                loading={isConfirmLoading}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  confirm();
+                }}
+              >
                 Confirm
               </Button>
             ) : (
