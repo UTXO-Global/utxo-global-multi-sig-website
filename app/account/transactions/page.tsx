@@ -73,7 +73,7 @@ const Transactions = () => {
                   history.map((z, i) => (
                     <Transaction
                       key={`history-${i}`}
-                      data={z}
+                      transaction={z}
                       accountInfo={account as any}
                     />
                   ))
