@@ -14,10 +14,10 @@ const ConnectedRequired = () => {
         }}
       >
         <h3 className="text-[40px] leading-[48px] font-medium text-dark-100 text-center">
-          Multi-Sign Account
+          Multi-Sig Account
         </h3>
         <p className="text-[24px] leading-[30px] text-grey-400 text-center mt-6 mb-10">
-          Connect your wallet to create a new Multi-Sign Account or open an
+          Connect your wallet to create a new Multi-Sig Account or open an
           existing one
         </p>
         <Button onClick={open}>Connect Your Wallet</Button>

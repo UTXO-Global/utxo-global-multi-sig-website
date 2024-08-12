@@ -1,23 +1,24 @@
 import { ccc } from "@ckb-ccc/connector-react";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "@/providers/app";
+import { getBalance } from "@/utils/helpers";
 
 const useSignerInfo = () => {
   const { address } = useContext(AppContext);
-  const [balance, setBalance] = useState(ccc.Zero);
+  const [balance, setBalance] = useState(0);
 
   const signer = ccc.useSigner();
 
   useEffect(() => {
     if (!signer) {
-      setBalance(ccc.Zero);
+      setBalance(0);
       return;
     }
 
     (async () => {
-      setBalance(await signer.getBalance());
+      setBalance(await getBalance(address));
     })();
-  }, [signer]);
+  }, [address, signer]);
 
   return {
     address,

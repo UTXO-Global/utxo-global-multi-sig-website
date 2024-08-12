@@ -61,7 +61,7 @@ export const isValidName = (name: string) => {
 
 export const inviteStatus = (status: InviteStatus) => {
   const obj = {
-    [InviteStatus.Pending]: "Waiting for accept",
+    [InviteStatus.Pending]: "Waiting for approval",
     [InviteStatus.Accepted]: "Accepted",
     [InviteStatus.Rejected]: "Rejected",
   };

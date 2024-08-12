@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Select, Tooltip } from "antd";
 import { ccc } from "@ckb-ccc/connector-react";
+import { toast } from "react-toastify";
 
 import IcnInfoOutline from "@/public/icons/icn-info-outline.svg";
 import IcnTrash from "@/public/icons/icn-trash.svg";
@@ -70,7 +71,6 @@ const Step02 = ({
   };
 
   const validate = useCallback(() => {
-    const regex = /^[a-zA-Z]{4,16}$/;
     setErrors(
       signers.map((z, i) => ({
         name: isValidName(z.name),
@@ -79,8 +79,17 @@ const Step02 = ({
     );
   }, [signers]);
 
+  const _isDuplicateSigner = () => {
+    const set = new Set(signers.map((z) => z.address.toLowerCase()));
+    return set.size !== signers.length;
+  };
+
   const createSigners = () => {
     setIsSubmit(true);
+    if (_isDuplicateSigner()) {
+      toast.warning("Signer address duplicated!");
+      return;
+    }
     if (isValidSigners) onNext();
   };
 
@@ -144,12 +153,16 @@ const Step02 = ({
                       />
                       {i === 0 ? (
                         <p className="text-[18px] leading-[24px] text-dark-100 truncate flex gap-2 items-center">
-                          <span className="text-grey-500">{SHORT_NETWORK_NAME[NETWORK]}:</span>{" "}
+                          <span className="text-grey-500">
+                            {SHORT_NETWORK_NAME[NETWORK]}:
+                          </span>{" "}
                           <span>{shortAddress(address, 14)}</span>
                         </p>
                       ) : (
                         <div className="text-[18px] leading-[24px] text-dark-100 flex items-center gap-2 flex-1">
-                          <span className="text-grey-500">{SHORT_NETWORK_NAME[NETWORK]}:</span>{" "}
+                          <span className="text-grey-500">
+                            {SHORT_NETWORK_NAME[NETWORK]}:
+                          </span>{" "}
                           <input
                             type="text"
                             className="outline-none border-none w-full flex-1"
@@ -187,8 +200,8 @@ const Step02 = ({
           {isSubmit && !isValidSigners ? (
             <div className="text-error-100 text-sm mt-4">
               <p>
-                *Signer name can only contain letters, numbers, _ and must be between 4 and
-                16 characters.
+                *Signer name must be be between 4 and 16 character and contain
+                only letters, numbers, and underscores.
               </p>
               <p>*Address must be valid.</p>
             </div>
@@ -199,7 +212,7 @@ const Step02 = ({
             <p className="text-[24px] leading-[28px] font-medium text-dark-100">
               Threshold
             </p>
-            <Tooltip title="The threshold of a Multi-Sign Account specifies how many signers need to confirm a Account transaction before it can be executed.">
+            <Tooltip title="The threshold of a Multi-Sig Account specifies how many signers need to confirm a Account Transaction before it can be executed.">
               <IcnInfoOutline className="w-5 stroke-grey-400 cursor-pointer" />
             </Tooltip>
           </div>

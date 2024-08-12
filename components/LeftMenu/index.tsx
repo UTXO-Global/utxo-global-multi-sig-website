@@ -58,7 +58,7 @@ const LeftMenu = () => {
         <div className="flex items-center gap-3">
           <div className="relative">
             <img
-              src="/images/account.png"
+              src="/images/multi-sig-account.png"
               alt="account"
               className="w-[40px] rounded-full"
             />
@@ -98,7 +98,7 @@ const LeftMenu = () => {
           {account ? <ReceiveTokens account={account} /> : null}
 
           <div
-            className="w-8 aspect-square rounded-[4px] bg-grey-300 flex justify-center items-center cursor-pointer"
+            className="w-8 aspect-square rounded-[4px] transition-colors hover:bg-grey-200 bg-grey-300 flex justify-center items-center cursor-pointer"
             onClick={() => copy(account?.multi_sig_address as any)}
           >
             <IcnCopyBold className="w-4" />
@@ -106,7 +106,7 @@ const LeftMenu = () => {
           <Link
             href={`${EXPLORER}/address/${account?.multi_sig_address}`}
             target="_blank"
-            className="w-8 aspect-square rounded-[4px] bg-grey-300 flex justify-center items-center cursor-pointer"
+            className="w-8 aspect-square rounded-[4px] transition-colors hover:bg-grey-200 bg-grey-300 flex justify-center items-center cursor-pointer"
           >
             <IcnExternalLinkBold className="w-4" />
           </Link>
@@ -123,7 +123,7 @@ const LeftMenu = () => {
           className={cn(
             `rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer transition-all hover:pl-8`,
             {
-              "bg-grey-300 hover:pl-4": pathname === "/dashboard/assets/",
+              "bg-grey-300 hover:pl-4": pathname === "/account/",
             }
           )}
         >
@@ -152,7 +152,7 @@ const LeftMenu = () => {
           className={cn(
             `rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer transition-all hover:pl-8`,
             {
-              "bg-grey-300 hover:pl-4": pathname === "/dashboard/transactions/",
+              "bg-grey-300 hover:pl-4": pathname === "/account/transactions/",
             }
           )}
         >
@@ -183,7 +183,7 @@ const LeftMenu = () => {
           className={cn(
             `rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer transition-all hover:pl-8`,
             {
-              "bg-grey-300": pathname === "/dashboard/account-info/",
+              "bg-grey-300": pathname === "/account/info/",
             }
           )}
         >

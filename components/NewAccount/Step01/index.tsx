@@ -40,7 +40,7 @@ const Step01 = ({
         Enter Your Account Name and Select The Network
       </h6>
       <p className="text-[16px] leading-[20px] text-grey-400 text-center mt-2 px-16">
-        Select the nework on which to create your Multi-Sign Account
+        Select the nework on which to create your Multi-Sig Account
       </p>
       <div className="mt-6 px-16">
         <div className="border-b border-grey-200 grid gap-2 pb-[48px]">
@@ -68,8 +68,8 @@ const Step01 = ({
           </div>
           {isSubmit && error ? (
             <p className="text-sm text-error-100">
-              Account name can only contain letters, numbers, _ and must be
-              between 4 and 16 characters.
+              Account name must be be between 4 and 16 character and contain
+              only letters, numbers, and underscores.
             </p>
           ) : null}
 

@@ -30,7 +30,7 @@ const InvitationAccount = ({
       >
         <div className="relative">
           <img
-            src="/images/account.png"
+            src="/images/multi-sig-account.png"
             alt="account"
             className={cn(`w-[40px] rounded-full`, {
               "w-8": isSmall,
