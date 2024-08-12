@@ -5,7 +5,14 @@ import { SendTokenType } from "@/types/account";
 import api from "@/utils/api";
 import { formatNumber, shortAddress } from "@/utils/helpers";
 import { ccc } from "@ckb-ccc/connector-react";
-import { BI, Cell, Indexer, WitnessArgs, helpers } from "@ckb-lumos/lumos";
+import {
+  BI,
+  Cell,
+  Indexer,
+  WitnessArgs,
+  helpers,
+  commons,
+} from "@ckb-lumos/lumos";
 import { predefined } from "@ckb-lumos/config-manager";
 import { bytes, blockchain } from "@ckb-lumos/lumos/codec";
 import { useState } from "react";
@@ -34,7 +41,9 @@ const ConfirmTx = ({
       return;
     }
 
-    let txSkeleton = helpers.TransactionSkeleton({});
+    let txSkeleton = helpers.TransactionSkeleton({
+      cellProvider: indexer,
+    });
 
     const fromScript = helpers.parseAddress(txInfo.send_from, {
       config: AGGRON4,
@@ -43,8 +52,8 @@ const ConfirmTx = ({
     const toScript = helpers.parseAddress(txInfo.send_to, {
       config: AGGRON4,
     });
-
-    const neededCapacity = BI.from(txInfo.amount);
+    helpers;
+    const neededCapacity = BI.from(txInfo.amount * 10 ** 8);
     let collectedSum = BI.from(0);
     const collected: Cell[] = [];
 
@@ -61,7 +70,7 @@ const ConfirmTx = ({
 
     const transferOutput: Cell = {
       cellOutput: {
-        capacity: BI.from(txInfo.amount).toHexString(),
+        capacity: neededCapacity.toHexString(),
         lock: toScript,
       },
       data: "0x",
@@ -150,6 +159,14 @@ const ConfirmTx = ({
         witnesses.set(firstIndex, witness)
       );
     }
+
+    txSkeleton = await commons.common.payFeeByFeeRate(
+      txSkeleton,
+      [txInfo.send_from],
+      BigInt(3600),
+      undefined,
+      { config: AGGRON4 }
+    );
 
     const tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
     const signature = await signer.signOnlyTransaction(tx);

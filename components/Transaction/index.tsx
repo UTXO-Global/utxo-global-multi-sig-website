@@ -18,6 +18,7 @@ import { ccc } from "@ckb-ccc/connector-react";
 import { cccA } from "@ckb-ccc/connector-react/advanced";
 import api from "@/utils/api";
 import { toast } from "react-toastify";
+import { BI } from "@ckb-lumos/lumos";
 
 const STATUS_TEXT = {
   [TransactionStatus.Sent]: "Success",
@@ -98,7 +99,10 @@ const Transaction = ({
           </p>
         </div>
         <div className="w-[30%] text-[16px] leading-[20px] font-medium text-grey-400 grid grid-cols-2 gap-4 pl-2">
-          <p>-{formatNumber(transaction.amount)} CKB</p>
+          <p>
+            -{formatNumber(Number(BI.from(transaction.amount).div(10 ** 8)))}{" "}
+            CKB
+          </p>
           <p>
             {formatDistanceStrict(new Date(transaction.created_at), new Date())}
           </p>
