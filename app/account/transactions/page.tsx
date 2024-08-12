@@ -74,6 +74,7 @@ const Transactions = () => {
                       key={`queue-${i}`}
                       transaction={z}
                       accountInfo={account as any}
+                      refresh={() => loadTransactions(true)}
                     />
                   ))
                 )}

@@ -31,9 +31,11 @@ const STATUS_TEXT = {
 const Transaction = ({
   transaction,
   accountInfo,
+  refresh,
 }: {
   transaction: TransactionType;
   accountInfo: MultiSigAccountType;
+  refresh?: () => void;
 }) => {
   const [isShow, setIsShow] = useState<boolean>(false);
   const [isConfirmLoading, setIsConfirmLoading] = useState<boolean>(false);
@@ -50,7 +52,7 @@ const Transaction = ({
   }, [address, transaction]);
 
   const confirm = async () => {
-    setIsConfirmLoading(false);
+    setIsConfirmLoading(true);
     try {
       if (!signer) return;
       const jsonTx = JSON.parse(transaction.payload) as cccA.JsonRpcTransaction;
@@ -75,6 +77,7 @@ const Transaction = ({
       });
 
       if (data && !!data.transaction_id) {
+        refresh?.()
         toast.success("Transaction has signed");
       }
     } catch (e) {
