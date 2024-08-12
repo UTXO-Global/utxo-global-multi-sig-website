@@ -70,12 +70,10 @@ export const inviteStatus = (status: InviteStatus) => {
 
 export const getAddressBookName = (
   address: string,
-  addressBooks: AddressBookType[]
+  addressBooks: AddressBookType[],
+  currentAddress: string
 ) => {
-  const isOwner = addressBooks.some((z) =>
-    isAddressEqual(z.user_address, address)
-  );
-  if (isOwner) return "Owner";
+  if (isAddressEqual(currentAddress, address)) return "Me";
   const addressBook = addressBooks.find((z) =>
     isAddressEqual(z.signer_address, address)
   );

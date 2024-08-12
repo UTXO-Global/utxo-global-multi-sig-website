@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import Link from "next/link";
 
 import IcnCopy from "@/public/icons/icn-copy.svg";
@@ -22,8 +22,10 @@ import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { InviteStatus } from "@/types/account";
 import { selectAddressBook } from "@/redux/features/address-book/reducer";
+import { AppContext } from "@/providers/app";
 
 const Info = () => {
+  const { address: currentAddress } = useContext(AppContext);
   const { info: account, isInfoLoading: isLoading } =
     useAppSelector(selectAccountInfo);
 
@@ -69,7 +71,13 @@ const Info = () => {
                       />
                       <div>
                         <p className="text-[16px] leading-[20px] font-medium">
-                          {getAddressBookName(z.signer_address, addressBooks)}
+                          {i === 0
+                            ? "Owner"
+                            : getAddressBookName(
+                                z.signer_address,
+                                addressBooks,
+                                currentAddress
+                              )}
                         </p>
                         <div className="flex items-center">
                           <p className="text-[14px] leading-[18px] text-grey-400">
@@ -115,7 +123,7 @@ const Info = () => {
                       />
                       <div>
                         <p className="text-[16px] leading-[20px] font-medium">
-                          {getAddressBookName(z.signer_address, addressBooks)}
+                          {getAddressBookName(z.signer_address, addressBooks, currentAddress)}
                         </p>
                         <div className="flex items-center">
                           <p className="text-[14px] leading-[18px] text-grey-400">
