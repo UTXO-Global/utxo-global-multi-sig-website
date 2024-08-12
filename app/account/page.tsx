@@ -1,14 +1,21 @@
 /* eslint-disable @next/next/no-img-element */
-"use client"
+"use client";
 
+import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { selectApp } from "@/redux/features/app/reducer";
 import { useAppSelector } from "@/redux/hook";
 import { formatNumber } from "@/utils/helpers";
+import { ccc } from "@ckb-ccc/connector-react";
+import { useMemo } from "react";
 
 const Assets = () => {
   const { info: account } = useAppSelector(selectAccountInfo);
   const { ckbPrice } = useAppSelector(selectApp);
+  const { balance } = useMultisigBalance();
+  const multisigBalance = useMemo(() => {
+    return Number(ccc.fixedPointToString(balance));
+  }, [balance]);
 
   return (
     <main className="h-full overflow-y-auto">
@@ -33,10 +40,10 @@ const Assets = () => {
                 </p>
               </div>
               <div className="text-base font-medium text-dark-100 w-[20%]">
-                {account ? formatNumber(account.balance) : "--"} CKB
+                {account ? formatNumber(Number(multisigBalance)) : "--"} CKB
               </div>
               <div className="text-base font-medium text-dark-100 w-[20%] text-right">
-                ${account ? formatNumber(account.balance * ckbPrice) : 0}
+                ${account ? formatNumber(multisigBalance * ckbPrice) : 0}
               </div>
             </div>
           </div>
