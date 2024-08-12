@@ -29,7 +29,7 @@ const NewAccount = () => {
       });
       setAccountCreated(data);
     } catch (e) {
-      toast.error("Multi-sig account already exists!")
+      toast.error((e as any).message);
       console.error(e);
     }
   };
