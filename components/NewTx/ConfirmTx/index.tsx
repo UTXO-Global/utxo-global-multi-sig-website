@@ -23,7 +23,6 @@ import { useRouter } from "next/navigation";
 import { CKB_RPC } from "@/configs/common";
 
 const { AGGRON4 } = predefined;
-const feeRate = 3600;
 const ConfirmTx = ({
   txInfo,
   onBack,
@@ -35,12 +34,13 @@ const ConfirmTx = ({
     undefined
   );
 
-  const [txFee, setTxFee] = useState(BI.from(0));
+  const [txFee, setTxFee] = useState(BI.from(100000)); // Set fee = 0.001
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { info: account } = useAppSelector(selectAccountInfo);
   const signer = ccc.useSigner();
   const indexer = new Indexer(CKB_RPC);
+  const [error, setError] = useState("");
 
   const onSign = async () => {
     if (!signer) {
@@ -48,29 +48,35 @@ const ConfirmTx = ({
     }
 
     if (!transaction) return;
+    setLoading(true);
+    try {
+      const signature = await signer.signOnlyTransaction(transaction);
+      const witnesses = signature.witnesses.toString();
+      const payload = {
+        ...cccA.JsonRpcTransformers.transactionFrom(transaction),
+        hash: transaction.hash(),
+      };
 
-    const signature = await signer.signOnlyTransaction(transaction);
-    const witnesses = signature.witnesses.toString();
-    const payload = {
-      ...cccA.JsonRpcTransformers.transactionFrom(transaction),
-      hash: transaction.hash(),
-    };
+      const { data } = await api.post("/multi-sig/new-transfer", {
+        payload: JSON.stringify(payload, (_, value) => {
+          if (typeof value === "bigint") {
+            return `0x${value.toString(16)}`;
+          }
+          return value;
+        }),
+        signature: witnesses.slice(42),
+      });
+      setLoading(false);
 
-    const { data } = await api.post("/multi-sig/new-transfer", {
-      payload: JSON.stringify(payload, (_, value) => {
-        if (typeof value === "bigint") {
-          return `0x${value.toString(16)}`;
-        }
-        return value;
-      }),
-      signature: witnesses.slice(42),
-    });
-
-    if (data && !!data.transaction_id) {
-      router.push(
-        `/account/transactions/?address=${account?.multi_sig_address}`
-      );
+      if (data && !!data.transaction_id) {
+        router.push(
+          `/account/transactions/?address=${account?.multi_sig_address}`
+        );
+      }
+    } catch (e) {
+      console.log(e);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -89,7 +95,7 @@ const ConfirmTx = ({
         config: AGGRON4,
       });
 
-      let toAmount = BI.from(txInfo.amount * 10 ** 8);
+      let toAmount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
       if (txInfo.is_include_fee) {
         toAmount = toAmount.sub(txFee.mul(account.threshold));
       }
@@ -106,6 +112,7 @@ const ConfirmTx = ({
       }
 
       if (collectedSum.lt(neededCapacity)) {
+        setError("Not enough CKB");
         throw new Error("Not enough CKB");
       }
 
@@ -179,6 +186,7 @@ const ConfirmTx = ({
             !!newWitnessArgs.lock &&
             !bytes.equal(lock, newWitnessArgs.lock)
           ) {
+            setError("Lock field in first witness is set aside for signature!");
             throw new Error(
               "Lock field in first witness is set aside for signature!"
             );
@@ -201,28 +209,15 @@ const ConfirmTx = ({
         );
       }
 
-      if (txFee.gt(0)) {
-        txSkeleton = await commons.common.payFee(
-          txSkeleton,
-          [txInfo.send_from],
-          txFee,
-          undefined,
-          { config: AGGRON4 }
-        );
-      } else {
-        txSkeleton = await commons.common.payFeeByFeeRate(
-          txSkeleton,
-          [txInfo.send_from],
-          BigInt(feeRate),
-          undefined,
-          { config: AGGRON4 }
-        );
-      }
+      txSkeleton = await commons.common.payFee(
+        txSkeleton,
+        [txInfo.send_from],
+        txFee,
+        undefined,
+        { config: AGGRON4 }
+      );
 
       const tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
-      if (txFee.lte(0)) {
-        setTxFee(BI.from(tx.estimateFee(feeRate)));
-      }
       setTransaction(tx);
     };
 
@@ -273,7 +268,7 @@ const ConfirmTx = ({
             )}{" "}
             CKB
             {txInfo.is_include_fee && (
-              <span className="text-grey-500">(Included Fee)</span>
+              <span className="text-grey-500"> (Included Fee)</span>
             )}
           </div>
         </div>
@@ -282,8 +277,12 @@ const ConfirmTx = ({
         <Button fullWidth kind="secondary" onClick={onBack}>
           Back
         </Button>
-        <Button fullWidth onClick={onSign} disabled={!signer}>
-          Sign
+        <Button
+          fullWidth
+          onClick={onSign}
+          disabled={!signer || !!error || loading}
+        >
+          {loading ? "Signing" : "Sign"}
         </Button>
       </div>
     </>
