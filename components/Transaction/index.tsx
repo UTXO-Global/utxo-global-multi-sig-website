@@ -1,6 +1,7 @@
 "use client";
 
 import { useContext, useMemo, useState } from "react";
+import Link from "next/link";
 import { formatDistanceStrict, format } from "date-fns";
 
 import Button from "../Common/Button";
@@ -8,6 +9,7 @@ import IcnSend from "@/public/icons/icn-send.svg";
 import IcnChevron from "@/public/icons/icn-chevron.svg";
 import IcnChecked from "@/public/icons/icn-checked.svg";
 import IcnUserGroup from "@/public/icons/icn-user-group.svg";
+import IcnExternalLink from "@/public/icons/icn-external-link.svg";
 
 import cn from "@/utils/cn";
 import { TransactionStatus, TransactionType } from "@/types/transaction";
@@ -19,6 +21,7 @@ import { cccA } from "@ckb-ccc/connector-react/advanced";
 import api from "@/utils/api";
 import { toast } from "react-toastify";
 import { BI } from "@ckb-lumos/lumos";
+import { EXPLORER } from "@/configs/common";
 
 const STATUS_TEXT = {
   [TransactionStatus.Sent]: "Success",
@@ -168,7 +171,7 @@ const Transaction = ({
           }
         )}
       >
-        <div className="w-[60%] px-4 py-6 grid gap-2 border-r border-grey-300 content-start sticky top-0">
+        <div className="w-[60%] px-4 py-6 grid gap-3 border-r border-grey-300 content-start sticky top-0">
           <div className="flex gap-8 text-[16px] leading-[20px] text-grey-400">
             <p className="w-[90px] font-medium">To Address:</p>
             <p>{shortAddress(transaction.to_address, 14)}</p>
@@ -186,6 +189,17 @@ const Transaction = ({
             <p className="text-[16px] leading-[20px] font-medium text-orange-100">
               Number of confirmations required: {accountInfo.threshold}
             </p>
+          ) : null}
+          {transaction.status === TransactionStatus.Sent ? (
+            <div className="flex gap-8 text-[16px] leading-[20px] text-grey-400">
+              <p className="w-[90px] font-medium">Explorer:</p>
+              <Link
+                href={`${EXPLORER}/transaction/0x${transaction.transaction_id}`}
+                target="_blank"
+              >
+                <IcnExternalLink className="w-[16px] stroke-grey-400 transition-colors hover:stroke-dark-100" />
+              </Link>
+            </div>
           ) : null}
         </div>
         <div className="w-[40%] p-4">

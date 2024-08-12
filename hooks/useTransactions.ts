@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { load } from "@/redux/features/transactions/action";
@@ -7,8 +7,10 @@ import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { TransactionStatus } from "@/types/transaction";
 
 const useTransactions = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { info: account } = useAppSelector(selectAccountInfo);
-  const { data, isLoading } = useAppSelector(selectTransactions);
+  const { data } = useAppSelector(selectTransactions);
+
   const dispatch = useAppDispatch();
 
   const queue = useMemo(() => {
@@ -19,15 +21,25 @@ const useTransactions = () => {
     return data.filter((z) => z.status === TransactionStatus.Sent);
   }, [data]);
 
+  const loadTransactions = useCallback(
+    async (isLoading: boolean) => {
+      if (!account) return;
+      setIsLoading(isLoading);
+      await dispatch(load(account?.multi_sig_address));
+      setIsLoading(false);
+    },
+    [account, dispatch]
+  );
+
   useEffect(() => {
-    if (!account) return;
-    dispatch(load(account.multi_sig_address));
-  }, [account, dispatch]);
+    loadTransactions(true);
+  }, [loadTransactions]);
 
   return {
     queue,
     history,
     isLoading,
+    loadTransactions,
   };
 };
 
