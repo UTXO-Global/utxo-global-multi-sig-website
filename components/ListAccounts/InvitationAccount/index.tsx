@@ -7,6 +7,8 @@ import useRejectInvitation from "@/hooks/useRejectInvitation";
 
 import cn from "@/utils/cn";
 import { shortAddress } from "@/utils/helpers";
+import { SHORT_NETWORK_NAME } from "@/configs/network";
+import { NETWORK } from "@/configs/common";
 
 const InvitationAccount = ({
   account,
@@ -60,7 +62,7 @@ const InvitationAccount = ({
                 "text-[12px] leading-[16px]": isSmall,
               })}
             >
-              <span className="text-dark-100">Pud: </span>
+              <span className="text-dark-100">{SHORT_NETWORK_NAME[NETWORK]}: </span>
               {shortAddress(account.multisig_address, 5)}
             </p>
         </div>

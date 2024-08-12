@@ -13,6 +13,8 @@ import { ccc } from "@ckb-ccc/connector-react";
 import { formatNumber } from "@/utils/helpers";
 import cn from "@/utils/cn";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
+import { SHORT_NETWORK_NAME } from "@/configs/network";
+import { NETWORK } from "@/configs/common";
 
 const CreateTx = ({
   txInfo,
@@ -42,12 +44,12 @@ const CreateTx = ({
             <div className="flex items-center gap-2">
               <div className="w-10 aspect-square rounded-full bg-grey-200"></div>
               <p className="text-[16px] leading-[20px] font-medium text-grey-500">
-                Pud:
+                {SHORT_NETWORK_NAME[NETWORK]}:
               </p>
             </div>
             <input
               type="text"
-              className="border-none outline-none flex-1 placeholder:text-grey-400 text-grey-400"
+              className="border-none outline-none flex-1 placeholder:text-grey-400 text-dark-100"
               value={txInfo.send_to}
               onChange={(e) =>
                 setTxInfo({ ...txInfo, send_to: e.target.value })
@@ -61,7 +63,7 @@ const CreateTx = ({
             <div className="rounded-lg border border-grey-200 py-[19px] px-4 flex items-center gap-4 flex-1">
               <NumericFormat
                 allowNegative={false}
-                className="border-none outline-none flex-1 placeholder:text-grey-400 text-grey-400"
+                className="border-none outline-none flex-1 placeholder:text-grey-400 text-dark-100"
                 decimalScale={8}
                 isAllowed={(values) => {
                   const { floatValue } = values;

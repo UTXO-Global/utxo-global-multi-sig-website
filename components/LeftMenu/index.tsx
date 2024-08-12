@@ -19,6 +19,8 @@ import { shortAddress, copy, formatNumber } from "@/utils/helpers";
 import { EXPLORER } from "@/configs/common";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { ccc } from "@ckb-ccc/connector-react";
+import { SHORT_NETWORK_NAME } from "@/configs/network";
+import { NETWORK } from "@/configs/common";
 
 const LeftMenu = () => {
   const pathname = usePathname();
@@ -79,7 +81,7 @@ const LeftMenu = () => {
                   {account?.name}
                 </p>
                 <p className="text-[14px] leading-[20px] font-medium text-grey-400 mt-[2px]">
-                  <span className="text-dark-100">Pud: </span>
+                  <span className="text-dark-100">{SHORT_NETWORK_NAME[NETWORK]}: </span>
                   {shortAddress(account?.multi_sig_address, 5)}
                 </p>
                 <p className="text-[14px] leading-[20px] font-medium text-grey-400 mt-[2px]">

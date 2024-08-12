@@ -12,7 +12,7 @@ import IcnTimesCircle from "@/public/icons/icn-times-circle.svg";
 import { isAddressEqual, isValidName, shortAddress } from "@/utils/helpers";
 import { MultiSigAccountType } from "@/types/account";
 import { NETWORK } from "@/configs/common";
-import { NETWORK_NAME } from "@/configs/network";
+import { NETWORK_NAME, SHORT_NETWORK_NAME } from "@/configs/network";
 
 import api from "@/utils/api";
 import cn from "@/utils/cn";
@@ -222,7 +222,7 @@ const Account = ({
                 "text-[12px] leading-[16px]": isSmall,
               })}
             >
-              <span className="text-dark-100">Pud: </span>
+              <span className="text-dark-100">{SHORT_NETWORK_NAME[NETWORK]}: </span>
               {shortAddress(account.multi_sig_address, 5)}
             </p>
           </div>
