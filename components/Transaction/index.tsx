@@ -56,20 +56,18 @@ const Transaction = ({
     try {
       if (!signer) return;
       const jsonTx = JSON.parse(transaction.payload) as cccA.JsonRpcTransaction;
-      const rawTx = cccA.JsonRpcTransformers.transactionTo(jsonTx);
-      await Promise.all([
-        rawTx.inputs.forEach(async (input, idx) => {
-          const cellInput = await signer.client.getCell({
-            txHash: input.previousOutput.txHash,
-            index: input.previousOutput.index,
-          });
+      const rawTx = cccA.JsonRpcTransformers.transactionTo({ ...jsonTx });
+      for (let i = 0; i < rawTx.inputs.length; i++) {
+        const input = rawTx.inputs[i];
+        const cellInput = await signer.client.getCell({
+          txHash: input.previousOutput.txHash,
+          index: input.previousOutput.index,
+        });
 
-          rawTx.inputs[idx].cellOutput = cellInput?.cellOutput;
-        }),
-      ]);
+        rawTx.inputs[i].cellOutput = cellInput?.cellOutput;
+      }
 
       const signature = await signer.signOnlyTransaction(rawTx);
-
       const witnesses = signature.witnesses.toString();
       const { data } = await api.post("/multi-sig/signature", {
         txid: transaction.transaction_id,
