@@ -15,6 +15,6 @@ export type TransactionType = {
   confirmed: string[];
   status: TransactionStatus;
   payload: string;
-  created_at: string;
+  created_at: number;
   amount: number;
 };

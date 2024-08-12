@@ -112,7 +112,7 @@ const Transaction = ({
             CKB
           </p>
           <p>
-            {formatDistanceStrict(new Date(transaction.created_at), new Date())}
+            {formatDistanceStrict(new Date(transaction.created_at * 1000), new Date())}
           </p>
         </div>
         <div className="w-[40%] flex items-center gap-3 pl-4">
