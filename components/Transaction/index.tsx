@@ -9,15 +9,55 @@ import IcnChecked from "@/public/icons/icn-checked.svg";
 import IcnUserGroup from "@/public/icons/icn-user-group.svg";
 
 import cn from "@/utils/cn";
+import { TransactionType } from "@/types/account";
+import api from "@/utils/api";
+import { toast } from "react-toastify";
+import { useAppSelector } from "@/redux/hook";
+import { selectAccountInfo } from "@/redux/features/account-info/reducer";
+import { CellOutput, ccc } from "@ckb-ccc/connector-react";
+import { helpers } from "@ckb-lumos/lumos";
+import { cccA } from "@ckb-ccc/connector-react/advanced";
 
 const Transaction = ({
+  transaction,
   status = "pending",
   isConfirm,
 }: {
+  transaction: TransactionType;
   status?: string;
   isConfirm?: boolean;
 }) => {
   const [isShow, setIsShow] = useState<boolean>(false);
+  const { info: account } = useAppSelector(selectAccountInfo);
+  const signer = ccc.useSigner();
+
+  const onConfrmTx = async () => {
+    if (!signer) return;
+    const jsonTx = JSON.parse(transaction.payload) as cccA.JsonRpcTransaction;
+    const rawTx = cccA.JsonRpcTransformers.transactionTo(jsonTx);
+    await Promise.all([
+      rawTx.inputs.forEach(async (input, idx) => {
+        const cellInput = await signer.client.getCell({
+          txHash: input.previousOutput.txHash,
+          index: input.previousOutput.index,
+        });
+
+        rawTx.inputs[idx].cellOutput = cellInput?.cellOutput;
+      }),
+    ]);
+
+    const signature = await signer.signOnlyTransaction(rawTx);
+
+    const witnesses = signature.witnesses.toString();
+    const { data } = await api.post("/multi-sig/signature", {
+      txid: transaction.transaction_id,
+      signature: witnesses.slice(42),
+    });
+
+    if (data && !!data.transaction_id) {
+      toast.success("Transaction has signed");
+    }
+  };
 
   return (
     <div className="rounded-lg bg-light-100 overflow-hidden">
@@ -66,7 +106,12 @@ const Transaction = ({
               </p>
             </div>
             {isConfirm ? (
-              <Button size="small" kind="secondary" className="!py-[5px]">
+              <Button
+                size="small"
+                kind="secondary"
+                className="!py-[5px]"
+                onClick={onConfrmTx}
+              >
                 Confirm
               </Button>
             ) : (

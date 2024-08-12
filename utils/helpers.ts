@@ -106,3 +106,7 @@ export const getBalance = async (address: string) => {
     return 0;
   }
 };
+
+export const camelToSnakeCase = (str: string) => {
+  return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+};
