@@ -2,12 +2,11 @@
 import Button from "@/components/Common/Button";
 import { InviterType } from "@/types/account";
 
-import { NETWORK } from "@/configs/common";
-import { NETWORK_NAME } from "@/configs/network";
 import useAcceptInvitation from "@/hooks/useAcceptInvitation";
 import useRejectInvitation from "@/hooks/useRejectInvitation";
 
 import cn from "@/utils/cn";
+import { shortAddress } from "@/utils/helpers";
 
 const InvitationAccount = ({
   account,
@@ -56,22 +55,14 @@ const InvitationAccount = ({
           >
             {account.account_name}
           </p>
-          <div className="flex gap-1 items-center">
-            <img
-              src="/images/nervos.png"
-              alt="nervos"
-              className={cn(`w-4 rounded-full`, {
-                "w-3": isSmall,
-              })}
-            />
-            <p
-              className={cn(`text-[12px] leading-[16px] text-dark-100`, {
-                "text-[10px]": isSmall,
+          <p
+              className={cn(`text-[14px] leading-[24px] text-grey-400`, {
+                "text-[12px] leading-[16px]": isSmall,
               })}
             >
-              {NETWORK_NAME[NETWORK]}
+              <span className="text-dark-100">Pud: </span>
+              {shortAddress(account.multisig_address, 5)}
             </p>
-          </div>
         </div>
       </div>
       <div

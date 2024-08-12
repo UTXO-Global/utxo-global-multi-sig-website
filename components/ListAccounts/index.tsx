@@ -69,7 +69,10 @@ const ListAccounts = () => {
             </div>
           ) : (
             invites.map((z, i) => (
-              <InvitationAccount key={i} account={z} refresh={loadInvitation} />
+              <InvitationAccount key={i} account={z} refresh={() => {
+                load()
+                loadInvitation()
+              }} />
             ))
           )}
         </div>

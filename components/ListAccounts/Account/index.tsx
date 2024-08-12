@@ -9,13 +9,16 @@ import Button from "@/components/Common/Button";
 import IcnPencil from "@/public/icons/icn-pencil.svg";
 import IcnTimesCircle from "@/public/icons/icn-times-circle.svg";
 
-import { isValidName, shortAddress } from "@/utils/helpers";
+import { isAddressEqual, isValidName, shortAddress } from "@/utils/helpers";
 import { MultiSigAccountType } from "@/types/account";
 import { NETWORK } from "@/configs/common";
 import { NETWORK_NAME } from "@/configs/network";
 
 import api from "@/utils/api";
 import cn from "@/utils/cn";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { selectAccountInfo } from "@/redux/features/account-info/reducer";
+import { updateAccountName } from "@/redux/features/account-info/action";
 
 const EditName = ({
   isModalOpen,
@@ -33,6 +36,9 @@ const EditName = ({
   const [isError, setIsError] = useState<boolean>(false);
   const [isSubmit, setIsSubmit] = useState<boolean>(false);
 
+  const { info: currentAccount } = useAppSelector(selectAccountInfo);
+  const dispatch = useAppDispatch();
+
   const editName = async () => {
     setIsSubmit(true);
     if (isError) return;
@@ -44,6 +50,15 @@ const EditName = ({
       });
       toast.success("Updated!");
       await refresh();
+      if (
+        currentAccount &&
+        isAddressEqual(
+          account.multi_sig_address,
+          currentAccount.multi_sig_address
+        )
+      ) {
+        dispatch(updateAccountName(nameVal));
+      }
       handleOk();
     } catch (e) {
       console.error(e);

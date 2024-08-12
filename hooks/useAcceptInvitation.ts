@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
+import { sleep } from "@/utils/helpers";
 import api from "@/utils/api";
 
 const useAcceptInvitation = () => {
@@ -11,6 +12,7 @@ const useAcceptInvitation = () => {
     try {
       const { data } = await api.put(`/multi-sig/invites/accept/${address}`);
       if (data.result) {
+        await sleep(500);
         toast.success("Accepted!");
         cb?.();
       } else {

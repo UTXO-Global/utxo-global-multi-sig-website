@@ -2,7 +2,7 @@ import { createReducer } from "@reduxjs/toolkit";
 
 import { RootState } from "@/redux/store";
 
-import { loadInfo, reset } from "./action";
+import { loadInfo, reset, updateAccountName } from "./action";
 import { defaultAccountInfoReducer } from "./type";
 
 const accountInfoReducer = createReducer(
@@ -21,6 +21,13 @@ const accountInfoReducer = createReducer(
       })
       .addCase(loadInfo.rejected, (state) => {
         state.isInfoLoading = false;
+      })
+
+      .addCase(updateAccountName, (state, action) => {
+        state.info = {
+          ...state.info,
+          name: action.payload,
+        } as any;
       })
 
       .addCase(reset, (state) => {

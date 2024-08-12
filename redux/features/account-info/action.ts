@@ -25,4 +25,6 @@ export const loadInfo = createAsyncThunk(
   }
 );
 
+export const updateAccountName = createAction<string>("account-info/update-account-name")
+
 export const reset = createAction("account-info/reset");
