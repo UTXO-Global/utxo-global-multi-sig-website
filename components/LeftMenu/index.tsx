@@ -81,7 +81,9 @@ const LeftMenu = () => {
                   {account?.name}
                 </p>
                 <p className="text-[14px] leading-[20px] font-medium text-grey-400 mt-[2px]">
-                  <span className="text-dark-100">{SHORT_NETWORK_NAME[NETWORK]}: </span>
+                  <span className="text-dark-100">
+                    {SHORT_NETWORK_NAME[NETWORK]}:{" "}
+                  </span>
                   {shortAddress(account?.multi_sig_address, 5)}
                 </p>
                 <p className="text-[14px] leading-[20px] font-medium text-grey-400 mt-[2px]">

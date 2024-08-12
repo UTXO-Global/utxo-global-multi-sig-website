@@ -8,14 +8,13 @@ import SwitchNetwork from "@/components/SwitchNetwork";
 import Button from "@/components/Common/Button";
 import { SendTokenType } from "@/types/account";
 import { useMemo } from "react";
-import useSignerInfo from "@/hooks/useSignerInfo";
 import { ccc } from "@ckb-ccc/connector-react";
 import { formatNumber } from "@/utils/helpers";
-import cn from "@/utils/cn";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
 import { NETWORK } from "@/configs/common";
 
+const CKB_MIN_TRANSFER = 61; // 61 CKB
 const CreateTx = ({
   txInfo,
   setTxInfo,
@@ -27,10 +26,17 @@ const CreateTx = ({
 }) => {
   const { balance } = useMultisigBalance();
 
-  const isValidTx = useMemo(() => {
-    const bal = Number(ccc.fixedPointToString(balance));
-    return txInfo.send_to !== "" && txInfo.amount > 0 && txInfo.amount <= bal;
+  const balanceN = useMemo(() => {
+    return Number(ccc.fixedPointToString(balance));
   }, [txInfo, balance]);
+
+  const isValidTx = useMemo(() => {
+    return (
+      txInfo.send_to !== "" &&
+      txInfo.amount > CKB_MIN_TRANSFER &&
+      txInfo.amount <= balanceN
+    );
+  }, [txInfo, balanceN]);
 
   return (
     <>
@@ -70,6 +76,7 @@ const CreateTx = ({
                   if (!floatValue) return true;
                   return (floatValue as any) <= 999999;
                 }}
+                value={txInfo.amount}
                 onChange={(e) => {
                   setTxInfo({
                     ...txInfo,
@@ -79,7 +86,15 @@ const CreateTx = ({
                 placeholder="Enter amount"
                 thousandSeparator=","
               />
-              <p className="text-base text-dark-100 cursor-pointer font-medium">
+              <p
+                className="text-base text-dark-100 cursor-pointer font-medium"
+                onClick={() =>
+                  setTxInfo({
+                    ...txInfo,
+                    amount: balanceN,
+                  })
+                }
+              >
                 Max
               </p>
             </div>
@@ -88,7 +103,7 @@ const CreateTx = ({
                 iconClassname="w-8 h-8"
                 customEl={
                   <span className="text-[14px] leading-[18px]">
-                    {formatNumber(Number(ccc.fixedPointToString(balance)))} CKB
+                    {formatNumber(balanceN)} CKB
                   </span>
                 }
               />
