@@ -124,7 +124,7 @@ const Transaction = ({
                   }
                 )}
               >
-                {`${transaction.confirmed.length} out of ${accountInfo.signers}`}
+                {`${transaction.confirmed.length} out of ${accountInfo.threshold}`}
               </p>
             </div>
             {!isConfirmed ? (
