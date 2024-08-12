@@ -77,7 +77,7 @@ const Transaction = ({
       });
 
       if (data && !!data.transaction_id) {
-        refresh?.()
+        refresh?.();
         toast.success("Transaction has signed");
       }
     } catch (e) {

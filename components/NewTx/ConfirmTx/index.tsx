@@ -15,7 +15,7 @@ import {
 } from "@ckb-lumos/lumos";
 import { predefined } from "@ckb-lumos/config-manager";
 import { bytes, blockchain } from "@ckb-lumos/lumos/codec";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { cccA } from "@ckb-ccc/connector-react/advanced";
@@ -23,7 +23,7 @@ import { useRouter } from "next/navigation";
 import { CKB_RPC } from "@/configs/common";
 
 const { AGGRON4 } = predefined;
-
+const feeRate = 3600;
 const ConfirmTx = ({
   txInfo,
   onBack,
@@ -31,6 +31,12 @@ const ConfirmTx = ({
   txInfo: SendTokenType;
   onBack: () => void;
 }) => {
+  const [transaction, setTransaction] = useState<ccc.Transaction | undefined>(
+    undefined
+  );
+
+  const [txFee, setTxFee] = useState(BI.from(0));
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { info: account } = useAppSelector(selectAccountInfo);
   const signer = ccc.useSigner();
@@ -41,139 +47,13 @@ const ConfirmTx = ({
       return;
     }
 
-    let txSkeleton = helpers.TransactionSkeleton({
-      cellProvider: indexer,
-    });
+    if (!transaction) return;
 
-    const fromScript = helpers.parseAddress(txInfo.send_from, {
-      config: AGGRON4,
-    });
-
-    const toScript = helpers.parseAddress(txInfo.send_to, {
-      config: AGGRON4,
-    });
-    helpers;
-    const neededCapacity = BI.from(txInfo.amount * 10 ** 8);
-    let collectedSum = BI.from(0);
-    const collected: Cell[] = [];
-
-    const collector = indexer.collector({ lock: fromScript, type: "empty" });
-    for await (const cell of collector.collect()) {
-      collectedSum = collectedSum.add(cell.cellOutput.capacity);
-      collected.push(cell);
-      if (collectedSum.gte(neededCapacity)) break;
-    }
-
-    if (collectedSum.lt(neededCapacity)) {
-      throw new Error("Not enough CKB");
-    }
-
-    const transferOutput: Cell = {
-      cellOutput: {
-        capacity: neededCapacity.toHexString(),
-        lock: toScript,
-      },
-      data: "0x",
-    };
-
-    const changeOutput: Cell = {
-      cellOutput: {
-        capacity: collectedSum.sub(neededCapacity).toHexString(),
-        lock: fromScript,
-      },
-      data: "0x",
-    };
-
-    txSkeleton = txSkeleton.update("inputs", (inputs) =>
-      inputs.push(...collected)
-    );
-
-    txSkeleton = txSkeleton.update("outputs", (outputs) =>
-      outputs.push(transferOutput, changeOutput)
-    );
-
-    txSkeleton = txSkeleton.update("cellDeps", (cellDeps) =>
-      cellDeps.push({
-        outPoint: {
-          txHash: AGGRON4.SCRIPTS.SECP256K1_BLAKE160_MULTISIG.TX_HASH,
-          index: AGGRON4.SCRIPTS.SECP256K1_BLAKE160_MULTISIG.INDEX,
-        },
-        depType: AGGRON4.SCRIPTS.SECP256K1_BLAKE160_MULTISIG.DEP_TYPE,
-      })
-    );
-
-    const firstIndex = txSkeleton
-      .get("inputs")
-      .findIndex((input) =>
-        bytes.equal(
-          blockchain.Script.pack(input.cellOutput.lock),
-          blockchain.Script.pack(fromScript)
-        )
-      );
-
-    if (firstIndex !== -1) {
-      while (firstIndex >= txSkeleton.get("witnesses").size) {
-        txSkeleton = txSkeleton.update("witnesses", (witnesses) =>
-          witnesses.push("0x")
-        );
-      }
-
-      let witness: string = txSkeleton.get("witnesses").get(firstIndex)!;
-      const SECP_SIGNATURE_PLACEHOLDER = "00".repeat(65);
-
-      let newWitnessArgs: WitnessArgs = {
-        lock:
-          "0x" +
-          account?.mutli_sig_witness_data +
-          SECP_SIGNATURE_PLACEHOLDER.repeat(account?.threshold!),
-      };
-
-      if (witness !== "0x") {
-        const witnessArgs = blockchain.WitnessArgs.unpack(
-          bytes.bytify(witness)
-        );
-        const lock = witnessArgs.lock;
-        if (
-          !!lock &&
-          !!newWitnessArgs.lock &&
-          !bytes.equal(lock, newWitnessArgs.lock)
-        ) {
-          throw new Error(
-            "Lock field in first witness is set aside for signature!"
-          );
-        }
-
-        const inputType = witnessArgs.inputType;
-        if (!!inputType) {
-          newWitnessArgs.inputType = inputType;
-        }
-
-        const outputType = witnessArgs.outputType;
-        if (!!outputType) {
-          newWitnessArgs.outputType = outputType;
-        }
-      }
-
-      witness = bytes.hexify(blockchain.WitnessArgs.pack(newWitnessArgs));
-      txSkeleton = txSkeleton.update("witnesses", (witnesses) =>
-        witnesses.set(firstIndex, witness)
-      );
-    }
-
-    txSkeleton = await commons.common.payFeeByFeeRate(
-      txSkeleton,
-      [txInfo.send_from],
-      BigInt(3600),
-      undefined,
-      { config: AGGRON4 }
-    );
-
-    const tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
-    const signature = await signer.signOnlyTransaction(tx);
+    const signature = await signer.signOnlyTransaction(transaction);
     const witnesses = signature.witnesses.toString();
     const payload = {
-      ...cccA.JsonRpcTransformers.transactionFrom(tx),
-      hash: tx.hash(),
+      ...cccA.JsonRpcTransformers.transactionFrom(transaction),
+      hash: transaction.hash(),
     };
 
     const { data } = await api.post("/multi-sig/new-transfer", {
@@ -192,6 +72,164 @@ const ConfirmTx = ({
       );
     }
   };
+
+  useEffect(() => {
+    const f = async () => {
+      if (!txInfo || !account) return;
+
+      let txSkeleton = helpers.TransactionSkeleton({
+        cellProvider: indexer,
+      });
+
+      const fromScript = helpers.parseAddress(txInfo.send_from, {
+        config: AGGRON4,
+      });
+
+      const toScript = helpers.parseAddress(txInfo.send_to, {
+        config: AGGRON4,
+      });
+
+      let toAmount = BI.from(txInfo.amount * 10 ** 8);
+      if (txInfo.is_include_fee) {
+        toAmount = toAmount.sub(txFee.mul(account.threshold));
+      }
+
+      const neededCapacity = toAmount.add(txFee);
+      let collectedSum = BI.from(0);
+      const collected: Cell[] = [];
+
+      const collector = indexer.collector({ lock: fromScript, type: "empty" });
+      for await (const cell of collector.collect()) {
+        collectedSum = collectedSum.add(cell.cellOutput.capacity);
+        collected.push(cell);
+        if (collectedSum.gte(neededCapacity)) break;
+      }
+
+      if (collectedSum.lt(neededCapacity)) {
+        throw new Error("Not enough CKB");
+      }
+
+      const transferOutput: Cell = {
+        cellOutput: {
+          capacity: toAmount.toHexString(),
+          lock: toScript,
+        },
+        data: "0x",
+      };
+
+      const changeOutput: Cell = {
+        cellOutput: {
+          capacity: collectedSum.sub(neededCapacity).toHexString(),
+          lock: fromScript,
+        },
+        data: "0x",
+      };
+
+      txSkeleton = txSkeleton.update("inputs", (inputs) =>
+        inputs.push(...collected)
+      );
+
+      txSkeleton = txSkeleton.update("outputs", (outputs) =>
+        outputs.push(transferOutput, changeOutput)
+      );
+
+      txSkeleton = txSkeleton.update("cellDeps", (cellDeps) =>
+        cellDeps.push({
+          outPoint: {
+            txHash: AGGRON4.SCRIPTS.SECP256K1_BLAKE160_MULTISIG.TX_HASH,
+            index: AGGRON4.SCRIPTS.SECP256K1_BLAKE160_MULTISIG.INDEX,
+          },
+          depType: AGGRON4.SCRIPTS.SECP256K1_BLAKE160_MULTISIG.DEP_TYPE,
+        })
+      );
+
+      const firstIndex = txSkeleton
+        .get("inputs")
+        .findIndex((input) =>
+          bytes.equal(
+            blockchain.Script.pack(input.cellOutput.lock),
+            blockchain.Script.pack(fromScript)
+          )
+        );
+
+      if (firstIndex !== -1) {
+        while (firstIndex >= txSkeleton.get("witnesses").size) {
+          txSkeleton = txSkeleton.update("witnesses", (witnesses) =>
+            witnesses.push("0x")
+          );
+        }
+
+        let witness: string = txSkeleton.get("witnesses").get(firstIndex)!;
+        const SECP_SIGNATURE_PLACEHOLDER = "00".repeat(65);
+
+        let newWitnessArgs: WitnessArgs = {
+          lock:
+            "0x" +
+            account?.mutli_sig_witness_data +
+            SECP_SIGNATURE_PLACEHOLDER.repeat(account?.threshold!),
+        };
+
+        if (witness !== "0x") {
+          const witnessArgs = blockchain.WitnessArgs.unpack(
+            bytes.bytify(witness)
+          );
+          const lock = witnessArgs.lock;
+          if (
+            !!lock &&
+            !!newWitnessArgs.lock &&
+            !bytes.equal(lock, newWitnessArgs.lock)
+          ) {
+            throw new Error(
+              "Lock field in first witness is set aside for signature!"
+            );
+          }
+
+          const inputType = witnessArgs.inputType;
+          if (!!inputType) {
+            newWitnessArgs.inputType = inputType;
+          }
+
+          const outputType = witnessArgs.outputType;
+          if (!!outputType) {
+            newWitnessArgs.outputType = outputType;
+          }
+        }
+
+        witness = bytes.hexify(blockchain.WitnessArgs.pack(newWitnessArgs));
+        txSkeleton = txSkeleton.update("witnesses", (witnesses) =>
+          witnesses.set(firstIndex, witness)
+        );
+      }
+
+      if (txFee.gt(0)) {
+        txSkeleton = await commons.common.payFee(
+          txSkeleton,
+          [txInfo.send_from],
+          txFee,
+          undefined,
+          { config: AGGRON4 }
+        );
+      } else {
+        txSkeleton = await commons.common.payFeeByFeeRate(
+          txSkeleton,
+          [txInfo.send_from],
+          BigInt(feeRate),
+          undefined,
+          { config: AGGRON4 }
+        );
+      }
+
+      const tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
+      if (txFee.lte(0)) {
+        setTxFee(BI.from(tx.estimateFee(feeRate)));
+      }
+      setTransaction(tx);
+    };
+
+    setLoading(true);
+    f();
+    setLoading(false);
+  }, [txInfo, txFee]);
 
   return (
     <>
@@ -228,7 +266,12 @@ const ConfirmTx = ({
             Fee:
           </div>
           <div className="flex-1 text-[16px] leading-[20px] font-medium text-dark-100">
-            0.001 CKB{" "}
+            {formatNumber(
+              txFee.mul(account?.threshold!).toNumber() / 10 ** 8,
+              2,
+              8
+            )}{" "}
+            CKB
             {txInfo.is_include_fee && (
               <span className="text-grey-500">(Included Fee)</span>
             )}

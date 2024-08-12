@@ -16,11 +16,13 @@ const useMultisigBalance = () => {
     }
 
     (async () => {
-      const mulAddress = await ccc.Address.fromString(
-        account?.multi_sig_address!,
-        signer.client
-      );
-      setBalance(await signer.client.getBalance([mulAddress.script]));
+      if (account) {
+        const mulAddress = await ccc.Address.fromString(
+          account.multi_sig_address,
+          signer.client
+        );
+        setBalance(await signer.client.getBalance([mulAddress.script]));
+      }
     })();
   }, [signer, account]);
 
