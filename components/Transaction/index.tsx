@@ -97,22 +97,28 @@ const Transaction = ({
         )}
         onClick={() => setIsShow(!isShow)}
       >
-        <div className="flex gap-2 items-center w-[30%] pr-2">
-          <IcnSend className="w-4" />
-          <p className="text-[16px] leading-[20px] font-medium text-dark-100">
-            Send
-          </p>
-        </div>
-        <div className="w-[30%] text-[16px] leading-[20px] font-medium text-grey-400 grid grid-cols-2 gap-4 pl-2">
-          <p>
+        <div className="flex gap-2 justify-between w-[45%] pr-10">
+          <div className="flex gap-2 items-center">
+            <IcnSend className="w-4" />
+            <p className="text-[16px] leading-[20px] font-medium text-dark-100">
+              Send
+            </p>
+          </div>
+
+          <p className="text-[16px] leading-[20px] font-medium text-grey-400">
             -
             {formatNumber(
               new Decimal(transaction.amount).div(10 ** 8).toNumber()
             )}{" "}
             CKB
           </p>
+        </div>
+        <div className="w-[15%] text-[16px] leading-[20px] font-medium text-grey-400 grid gap-4 pl-2">
           <p>
-            {formatDistanceStrict(new Date(transaction.created_at * 1000), new Date())}
+            {formatDistanceStrict(
+              new Date(transaction.created_at * 1000),
+              new Date()
+            )}
           </p>
         </div>
         <div className="w-[40%] flex items-center gap-3 pl-4">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Pagination } from "antd";
 
 import cn from "@/utils/cn";
 
@@ -8,14 +9,110 @@ import Transaction from "@/components/Transaction";
 import IcnSpinner from "@/public/icons/icn-spinner.svg";
 import IcnReload from "@/public/icons/icn-reload.svg";
 import useTransactions from "@/hooks/useTransactions";
-import { TransactionTab } from "@/types/transaction";
+import { TransactionStatus, TransactionTab } from "@/types/transaction";
 import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
+import { LIMIT_PER_PAGE } from "@/configs/common";
+
+const Skeleton = () => {
+  return (
+    <div className="h-[60px] rounded-lg bg-light-100 px-4 flex items-center">
+      <div className="w-[45%] pr-10 flex justify-between">
+        <div className="rounded-lg bg-grey-300 animate-pulse w-[60px] h-[20px]"></div>
+        <div className="rounded-lg bg-grey-300 animate-pulse w-[80px] h-[20px]"></div>
+      </div>
+      <div className="w-[15%] grid grid-cols-2 gap-4 pl-2">
+        <div className="rounded-lg bg-grey-300 animate-pulse w-[80px] h-[20px]"></div>
+      </div>
+      <div className="w-[40%] flex justify-between pl-4">
+        <div className="rounded-lg bg-grey-300 animate-pulse w-[100px] h-[20px]"></div>
+        <div className="rounded-lg bg-grey-300 animate-pulse w-[80px] h-[20px]"></div>
+      </div>
+    </div>
+  );
+};
+
+const _Transactions = ({ status }: { status: TransactionStatus }) => {
+  const { isLoading, setPage, page, transactions, totalRecords, load } =
+    useTransactions(status);
+
+  const { info: account, isInfoLoading } = useAppSelector(selectAccountInfo);
+
+  const refresh = () => {
+    if (page === 1) load(true);
+    else {
+      setPage(1);
+    }
+  };
+  return (
+    <div className="py-4 px-6 relative">
+      <div className="absolute right-6 top-0 -translate-y-10 flex gap-4">
+        <Pagination
+          disabled={isLoading || isInfoLoading}
+          responsive={true}
+          current={page}
+          defaultCurrent={page}
+          total={totalRecords}
+          showSizeChanger={false}
+          onChange={(val) => setPage(val)}
+          defaultPageSize={LIMIT_PER_PAGE}
+        />
+        <div
+          className={cn(
+            `px-4 py-2 rounded-[6px] bg-grey-300 transition-colors hover:bg-grey-200 cursor-pointer inline-flex`,
+            {
+              "cursor-not-allowed": isLoading,
+            }
+          )}
+          onClick={() => {
+            if (isLoading) return;
+            refresh();
+          }}
+        >
+          <IcnReload
+            className={cn(`w-[14px] stroke-dark-100`, {
+              "animate-spin": isLoading,
+            })}
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-2">
+        {isLoading || isInfoLoading ? (
+          <>
+            {Array(4)
+              .fill(0)
+              .map((z, i) => (
+                <Skeleton key={i} />
+              ))}
+          </>
+        ) : (
+          <>
+            {transactions.length === 0 ? (
+              <div className="py-10 flex justify-center text-[16px] leading-[20px] text-grey-500">
+                {`You don't have any transaction yet`}
+              </div>
+            ) : (
+              transactions.map((z, i) => (
+                <Transaction
+                  key={z.transaction_id}
+                  transaction={z}
+                  accountInfo={account as any}
+                  refresh={() => {
+                    refresh();
+                  }}
+                />
+              ))
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const Transactions = () => {
   const [tab, setTab] = useState<TransactionTab>(TransactionTab.Queue);
-  const { isLoading, queue, history, loadTransactions } = useTransactions();
-  const { info: account, isInfoLoading } = useAppSelector(selectAccountInfo);
 
   return (
     <main className="h-full overflow-y-auto">
@@ -36,69 +133,13 @@ const Transactions = () => {
             </div>
           ))}
         </div>
-        <div
-          className={cn(
-            `px-4 py-2 rounded-[6px] bg-grey-300 transition-colors hover:bg-grey-200 cursor-pointer`,
-            {
-              "cursor-not-allowed": isLoading,
-            }
-          )}
-          onClick={() => {
-            if (isLoading) return;
-            loadTransactions(true);
-          }}
-        >
-          <IcnReload
-            className={cn(`w-[14px] stroke-dark-100`, {
-              "animate-spin": isLoading,
-            })}
-          />
-        </div>
       </div>
-      <div className="py-4 px-6 grid gap-2">
-        {isLoading || isInfoLoading ? (
-          <div className="flex justify-center items-center py-10">
-            <IcnSpinner className="w-10 animate-spin" />
-          </div>
-        ) : (
-          <>
-            {tab === TransactionTab.Queue ? (
-              <>
-                {queue.length === 0 ? (
-                  <div className="py-10 flex justify-center text-[16px] leading-[20px] text-grey-500">
-                    {`You don't have any transaction yet`}
-                  </div>
-                ) : (
-                  queue.map((z, i) => (
-                    <Transaction
-                      key={`queue-${i}`}
-                      transaction={z}
-                      accountInfo={account as any}
-                      refresh={() => loadTransactions(true)}
-                    />
-                  ))
-                )}
-              </>
-            ) : (
-              <>
-                {history.length === 0 ? (
-                  <div className="py-10 flex justify-center text-[16px] leading-[20px] text-grey-500">
-                    {`You don't have any transaction yet`}
-                  </div>
-                ) : (
-                  history.map((z, i) => (
-                    <Transaction
-                      key={`history-${i}`}
-                      transaction={z}
-                      accountInfo={account as any}
-                    />
-                  ))
-                )}
-              </>
-            )}
-          </>
-        )}
-      </div>
+      {tab === TransactionTab.Queue ? (
+        <_Transactions status={TransactionStatus.WaitingSigned} />
+      ) : null}
+      {tab === TransactionTab.History ? (
+        <_Transactions status={TransactionStatus.Sent} />
+      ) : null}
     </main>
   );
 };

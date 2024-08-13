@@ -245,3 +245,7 @@ body {
 .ant-checkbox-wrapper .ant-checkbox-inner {
   border-color: #787575 !important;
 }
+
+.ant-pagination-item-active {
+  border-color: transparent !important;
+}

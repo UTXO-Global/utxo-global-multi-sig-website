@@ -68,6 +68,18 @@ export default function RootLayout({
                 borderRadius: 8,
                 optionSelectedBg: "#EBECEC",
               },
+              Pagination: {
+                colorPrimary: "#0d0d0d",
+                colorPrimaryBgHover: "#2C2C2C",
+                colorPrimaryHover: "#2C2C2C",
+                itemActiveBg: "#F5F5F5",
+                itemBg: "transparent",
+                size: 40,
+                colorText: "#0d0d0d",
+                colorBgTextActive: "#0d0d0d",
+                fontSize: 16,
+                colorTextDisabled: "#A7A7A7",
+              },
             },
           }}
         >

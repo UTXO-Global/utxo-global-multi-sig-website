@@ -1,45 +1,56 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+import api from "@/utils/api";
+import { TransactionStatus, TransactionType } from "@/types/transaction";
 
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
-import { load } from "@/redux/features/transactions/action";
-import { selectTransactions } from "@/redux/features/transactions/reducer";
-import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { TransactionStatus } from "@/types/transaction";
+import { useAppSelector } from "@/redux/hook";
+import { LIMIT_PER_PAGE } from "@/configs/common";
 
-const useTransactions = () => {
+const useTransactions = (status: TransactionStatus) => {
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [page, setPage] = useState<number>(1);
+  const [totalRecords, setTotalRecords] = useState<number>(0);
+
   const { info: account } = useAppSelector(selectAccountInfo);
-  const { data } = useAppSelector(selectTransactions);
 
-  const dispatch = useAppDispatch();
-
-  const queue = useMemo(() => {
-    return data.filter((z) => z.status === TransactionStatus.WaitingSigned);
-  }, [data]);
-
-  const history = useMemo(() => {
-    return data.filter((z) => z.status === TransactionStatus.Sent);
-  }, [data]);
-
-  const loadTransactions = useCallback(
+  const load = useCallback(
     async (isLoading: boolean) => {
-      if (!account) return;
-      setIsLoading(isLoading);
-      await dispatch(load(account?.multi_sig_address));
-      setIsLoading(false);
+      if (isLoading) setIsLoading(isLoading);
+      try {
+        const { data } = await api.get(
+          `/multi-sig/transactions/${account?.multi_sig_address}`,
+          {
+            params: {
+              limit: LIMIT_PER_PAGE,
+              page,
+              status,
+            },
+          }
+        );
+        setTransactions(data.transactions);
+        setTotalRecords(data.pagination.total_records);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
     },
-    [account, dispatch]
+    [account?.multi_sig_address, page, status]
   );
 
   useEffect(() => {
-    loadTransactions(true);
-  }, [loadTransactions]);
+    load(false);
+  }, [load]);
 
   return {
-    queue,
-    history,
+    page,
+    totalRecords,
+    transactions,
+    setPage,
     isLoading,
-    loadTransactions,
+    load,
   };
 };
 

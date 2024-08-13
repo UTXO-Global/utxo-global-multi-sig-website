@@ -53,3 +53,5 @@ export const NAVIGATIONS = [
     isExternal: true,
   },
 ];
+
+export const LIMIT_PER_PAGE = 10;
