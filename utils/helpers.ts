@@ -74,7 +74,7 @@ export const getAddressBookName = (
   addressBooks: AddressBookType[],
   currentAddress: string
 ) => {
-  if (isAddressEqual(currentAddress, address)) return "Me";
+  if (isAddressEqual(currentAddress, address)) return "You";
   const addressBook = addressBooks.find((z) =>
     isAddressEqual(z.signer_address, address)
   );
