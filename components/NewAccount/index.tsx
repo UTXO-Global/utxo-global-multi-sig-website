@@ -28,9 +28,13 @@ const NewAccount = () => {
         signers: signers,
       });
       setAccountCreated(data);
-    } catch (e) {
-      toast.error((e as any).message);
+    } catch (e: any) {
       console.error(e);
+      if (e && e.response && e.response.data && e.response.data.message) {
+        toast.error(e.response.data.message);
+      } else {
+        toast.error((e as any).message);
+      }
     }
   };
 
