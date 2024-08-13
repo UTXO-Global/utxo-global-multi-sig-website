@@ -37,6 +37,7 @@ export type MultiSigAccountType = {
   signers_detail?: SignerDetailType[];
   invites?: InviteType[];
   balance: number;
+  totalTxPending: number;
 };
 
 export type SendTokenType = {

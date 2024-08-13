@@ -11,12 +11,16 @@ export const loadInfo = createAsyncThunk(
       const { data: signersData } = await api.get(
         `/multi-sig/signers/${address}`
       );
+      const { data: summary } = await api.get(
+        `/multi-sig/transactions/${address}/summary`
+      );
       const balance = await getBalance(infoData.multi_sig_address);
       return {
         ...infoData,
         signers_detail: signersData.signers,
         invites: signersData.invites,
         balance,
+        totalTxPending: summary.total_tx_pending,
       };
     } catch (e) {
       console.error(e);
@@ -25,6 +29,8 @@ export const loadInfo = createAsyncThunk(
   }
 );
 
-export const updateAccountName = createAction<string>("account-info/update-account-name")
+export const updateAccountName = createAction<string>(
+  "account-info/update-account-name"
+);
 
 export const reset = createAction("account-info/reset");
