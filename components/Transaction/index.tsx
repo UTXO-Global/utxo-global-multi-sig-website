@@ -201,7 +201,7 @@ const Transaction = ({
             <p className="w-[90px] font-medium">Created:</p>
             <p>
               {format(
-                new Date(transaction.created_at),
+                new Date(transaction.created_at * 1000),
                 "MMM d, yyyy hh:mm:ss a"
               )}
             </p>
