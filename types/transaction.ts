@@ -20,5 +20,5 @@ export type TransactionType = {
   payload: string;
   created_at: number;
   amount: number;
-  errors?: { signer_address: string; errors: string }[];
+  errors?: { signer_address: string; error_msg: string }[];
 };

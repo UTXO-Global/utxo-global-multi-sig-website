@@ -83,9 +83,11 @@ const Transaction = ({
       });
 
       if (data && !!data.transaction_id) {
-        refresh?.();
         toast.success("Transaction has signed");
+      } else if (data && data.message) {
+        toast.error(data.message);
       }
+      refresh?.();
     } catch (e) {
       console.error(e);
     } finally {
@@ -102,9 +104,9 @@ const Transaction = ({
       );
 
       if (data && !!data.result) {
-        refresh?.();
         toast.success("Transaction rejection successful");
       }
+      refresh?.();
     } catch (e) {
       console.error(e);
     } finally {
@@ -451,7 +453,7 @@ const Transaction = ({
                           {z.signer_address.length > 20
                             ? shortAddress(z.signer_address, 5)
                             : z.signer_address}
-                          : {z.errors}
+                          : {z.error_msg}
                         </p>
                       </div>
                     </div>
