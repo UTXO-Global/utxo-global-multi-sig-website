@@ -36,7 +36,7 @@ const Assets = () => {
               <div className="flex items-center w-[60%] justify-start">
                 <img src="/images/nervos.png" alt="ckb" className="w-8" />
                 <p className="text-[14px] leading-[24px] text-dark-100 font-medium ml-2">
-                  Nervos
+                  CKB
                 </p>
               </div>
               <div className="text-base font-medium text-dark-100 w-[20%]">
