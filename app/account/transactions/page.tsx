@@ -32,7 +32,7 @@ const Skeleton = () => {
   );
 };
 
-const _Transactions = ({ status }: { status: TransactionStatus }) => {
+const _Transactions = ({ status }: { status: TransactionStatus[] }) => {
   const { isLoading, setPage, page, transactions, totalRecords, load } =
     useTransactions(status);
 
@@ -135,10 +135,16 @@ const Transactions = () => {
         </div>
       </div>
       {tab === TransactionTab.Queue ? (
-        <_Transactions status={TransactionStatus.WaitingSigned} />
+        <_Transactions status={[TransactionStatus.WaitingSigned]} />
       ) : null}
       {tab === TransactionTab.History ? (
-        <_Transactions status={TransactionStatus.Sent} />
+        <_Transactions
+          status={[
+            TransactionStatus.Sent,
+            TransactionStatus.Rejected,
+            TransactionStatus.Failed,
+          ]}
+        />
       ) : null}
     </main>
   );

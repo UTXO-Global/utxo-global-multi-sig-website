@@ -7,7 +7,7 @@ import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { useAppSelector } from "@/redux/hook";
 import { LIMIT_PER_PAGE } from "@/configs/common";
 
-const useTransactions = (status: TransactionStatus) => {
+const useTransactions = (status: TransactionStatus[]) => {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
@@ -25,7 +25,7 @@ const useTransactions = (status: TransactionStatus) => {
             params: {
               limit: LIMIT_PER_PAGE,
               page,
-              status,
+              status: status.join(","),
             },
           }
         );

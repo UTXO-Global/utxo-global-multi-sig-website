@@ -4,8 +4,10 @@ export enum TransactionTab {
 }
 
 export enum TransactionStatus {
-  Sent = 1,
   WaitingSigned = 0,
+  Sent = 1,
+  Rejected = 2,
+  Failed = 3,
 }
 
 export type TransactionType = {
@@ -13,8 +15,10 @@ export type TransactionType = {
   multi_sig_address: string;
   to_address: string;
   confirmed: string[];
+  rejected: string[];
   status: TransactionStatus;
   payload: string;
   created_at: number;
   amount: number;
+  errors?: { signer_address: string; errors: string }[];
 };
