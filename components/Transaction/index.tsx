@@ -25,8 +25,10 @@ import { BI } from "@ckb-lumos/lumos";
 import { EXPLORER } from "@/configs/common";
 
 const STATUS_TEXT = {
-  [TransactionStatus.Sent]: "Success",
   [TransactionStatus.WaitingSigned]: "Pending",
+  [TransactionStatus.Sent]: "Success",
+  [TransactionStatus.Rejected]: "Rejected",
+  [TransactionStatus.Failed]: "Unsuccess",
 };
 
 const Transaction = ({
@@ -40,6 +42,7 @@ const Transaction = ({
 }) => {
   const [isShow, setIsShow] = useState<boolean>(false);
   const [isConfirmLoading, setIsConfirmLoading] = useState<boolean>(false);
+  const [isRejectLoading, setIsRejectLoading] = useState<boolean>(false);
   const { address } = useContext(AppContext);
   const signer = ccc.useSigner();
 
@@ -50,6 +53,10 @@ const Transaction = ({
 
   const isConfirmed = useMemo(() => {
     return transaction?.confirmed.some((z) => isAddressEqual(z, address));
+  }, [address, transaction]);
+
+  const isRejected = useMemo(() => {
+    return transaction?.rejected.some((z) => isAddressEqual(z, address));
   }, [address, transaction]);
 
   const confirm = async () => {
@@ -76,13 +83,34 @@ const Transaction = ({
       });
 
       if (data && !!data.transaction_id) {
-        refresh?.();
         toast.success("Transaction has signed");
+      } else if (data && data.message) {
+        toast.error(data.message);
       }
+      refresh?.();
     } catch (e) {
       console.error(e);
     } finally {
       setIsConfirmLoading(false);
+    }
+  };
+
+  const onReject = async () => {
+    setIsRejectLoading(true);
+    try {
+      const transactionId = transaction.transaction_id;
+      const { data } = await api.put(
+        `/multi-sig/transactions/${transactionId}/reject`
+      );
+
+      if (data && !!data.result) {
+        toast.success("Transaction rejection successful");
+      }
+      refresh?.();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsRejectLoading(false);
     }
   };
 
@@ -128,9 +156,15 @@ const Transaction = ({
                 <div className="w-6 aspect-square p-[2px]">
                   <IcnChecked className="fill-success-100 w-full" />
                 </div>
-              ) : transaction.status === TransactionStatus.WaitingSigned ? (
-                <IcnUserGroup className="w-6" />
-              ) : null}
+              ) : (
+                <IcnUserGroup
+                  className={cn("w-6", {
+                    "stroke-error-100":
+                      transaction.status === TransactionStatus.Failed ||
+                      transaction.status === TransactionStatus.Rejected,
+                  })}
+                />
+              )}
 
               <p
                 className={cn(
@@ -138,27 +172,38 @@ const Transaction = ({
                   {
                     "text-success-200":
                       transaction.status === TransactionStatus.Sent,
-                    "text-error-100": false,
+                    "text-error-100":
+                      transaction.status === TransactionStatus.Failed ||
+                      transaction.status === TransactionStatus.Rejected,
                   }
                 )}
               >
                 {`${transaction.confirmed.length} out of ${accountInfo.threshold}`}
               </p>
             </div>
-            {!isConfirmed ? (
-              <Button
-                size="small"
-                kind="secondary"
-                className="!py-[5px]"
-                disabled={isConfirmLoading}
-                loading={isConfirmLoading}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  confirm();
-                }}
-              >
-                Confirm
-              </Button>
+            {!isConfirmed &&
+            transaction.status === TransactionStatus.WaitingSigned ? (
+              !isRejected ? (
+                <Button
+                  size="small"
+                  kind="secondary"
+                  className="!py-[5px]"
+                  disabled={isConfirmLoading}
+                  loading={isConfirmLoading}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    confirm();
+                  }}
+                >
+                  Confirm
+                </Button>
+              ) : (
+                <p
+                  className={`text-[16px] leading-[20px] font-medium text-error-100 capitalize`}
+                >
+                  Rejected
+                </p>
+              )
             ) : (
               <p
                 className={cn(
@@ -166,7 +211,9 @@ const Transaction = ({
                   {
                     "text-success-200":
                       transaction.status === TransactionStatus.Sent,
-                    "text-error-100": false,
+                    "text-error-100":
+                      transaction.status === TransactionStatus.Failed ||
+                      transaction.status === TransactionStatus.Rejected,
                     "mr-[9px]":
                       transaction.status === TransactionStatus.WaitingSigned,
                   }
@@ -276,6 +323,24 @@ const Transaction = ({
                   </svg>
                 ) : transaction.status === TransactionStatus.WaitingSigned ? (
                   <div className="border border-grey-500 rounded-full w-4 aspect-square"></div>
+                ) : transaction.rejected.length > 0 ? (
+                  <svg
+                    width="15"
+                    height="14"
+                    viewBox="0 0 15 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      opacity="0.3"
+                      d="M8 14C11.866 14 15 10.866 15 7C15 3.13401 11.866 0 8 0C4.13401 0 1 3.13401 1 7C1 10.866 4.13401 14 8 14Z"
+                      fill="#FF3333"
+                    />
+                    <path
+                      d="M8 12C10.7614 12 13 9.76143 13 7C13 4.23858 10.7614 2 8 2C5.23858 2 3 4.23858 3 7C3 9.76143 5.23858 12 8 12Z"
+                      fill="#FF3333"
+                    />
+                  </svg>
                 ) : null}
 
                 <p className="font-medium text-dark-100">
@@ -313,9 +378,90 @@ const Transaction = ({
                     </div>
                   </div>
                 ))}
+                {transaction.rejected.map((z, i) => (
+                  <div
+                    key={`rejected-${i}`}
+                    className="flex gap-2 items-center"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                    >
+                      <path
+                        d="M8 11C9.65686 11 11 9.65686 11 8C11 6.34315 9.65686 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65686 6.34315 11 8 11Z"
+                        fill="#0D0D0D"
+                      />
+                    </svg>
+                    <div className="flex gap-2">
+                      <p className="text-rejected-100 font-normal text-[14px]">
+                        {shortAddress(z, 14)}
+                      </p>
+                      <div className="px-1 py-[2px] bg-[#FEE7E7] rounded-[4px] text-[10px] leading-[16px] text-error-100">
+                        Rejected
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-            {transaction.status === TransactionStatus.Sent ? (
+            {transaction.status === TransactionStatus.Failed && (
+              <div className="relative">
+                <div className="flex gap-2 items-center bg-light-100">
+                  <svg
+                    width="15"
+                    height="14"
+                    viewBox="0 0 15 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      opacity="0.3"
+                      d="M8 14C11.866 14 15 10.866 15 7C15 3.13401 11.866 0 8 0C4.13401 0 1 3.13401 1 7C1 10.866 4.13401 14 8 14Z"
+                      fill="#FF3333"
+                    />
+                    <path
+                      d="M8 12C10.7614 12 13 9.76143 13 7C13 4.23858 10.7614 2 8 2C5.23858 2 3 4.23858 3 7C3 9.76143 5.23858 12 8 12Z"
+                      fill="#FF3333"
+                    />
+                  </svg>
+
+                  <p className="font-medium text-error-100">Errors </p>
+                </div>
+                <div className="grid gap-4 mt-5">
+                  {transaction.errors?.map((z, i) => (
+                    <div
+                      key={`confirmed-${i}`}
+                      className="flex gap-2 items-center"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                      >
+                        <path
+                          d="M8 11C9.65686 11 11 9.65686 11 8C11 6.34315 9.65686 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65686 6.34315 11 8 11Z"
+                          fill="#0D0D0D"
+                        />
+                      </svg>
+                      <div className="flex gap-2">
+                        <p className="text-error-100 font-normal text-[14px]">
+                          {z.signer_address.length > 20
+                            ? shortAddress(z.signer_address, 5)
+                            : z.signer_address}
+                          : {z.error_msg}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {transaction.status === TransactionStatus.Sent && (
               <div className="flex gap-2 items-center bg-light-100 relative">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -335,27 +481,56 @@ const Transaction = ({
                 </svg>
                 <p className="font-medium text-dark-100">Completed</p>
               </div>
-            ) : transaction.status === TransactionStatus.WaitingSigned ? (
+            )}
+            {transaction.status === TransactionStatus.WaitingSigned && (
               <div className="flex gap-2 items-center bg-light-100 relative">
                 <div className="border border-grey-500 rounded-full w-4 aspect-square"></div>
                 <p className="font-medium text-grey-400">Completed</p>
               </div>
-            ) : null}
+            )}
+
+            {(transaction.status === TransactionStatus.Rejected ||
+              transaction.status === TransactionStatus.Failed) && (
+              <div className="flex gap-2 items-center bg-light-100 relative">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="#ff3333"
+                  className="size-4"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+
+                <p className="font-medium text-error-100">Not completed</p>
+              </div>
+            )}
           </div>
           {transaction.status === TransactionStatus.WaitingSigned ? (
             <div className="grid grid-cols-2 gap-2 mt-6">
               <Button
                 fullWidth
                 size="small"
-                disabled={isConfirmed || isConfirmLoading}
+                disabled={isConfirmed || isConfirmLoading || isRejected}
                 loading={isConfirmLoading}
                 onClick={confirm}
               >
                 Confirm
               </Button>
-              {/* <Button fullWidth size="small" kind="danger-outline">
-                Reject
-              </Button> */}
+              {!isConfirmed && (
+                <Button
+                  fullWidth
+                  size="small"
+                  kind="danger-outline"
+                  disabled={isRejectLoading || isRejected}
+                  onClick={onReject}
+                >
+                  Reject
+                </Button>
+              )}
             </div>
           ) : null}
         </div>
