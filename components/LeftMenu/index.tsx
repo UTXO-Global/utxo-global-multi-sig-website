@@ -7,6 +7,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 
 import Button from "../Common/Button";
 import ReceiveTokens from "../ReceiveTokens";
+import Faucet from "./Faucet";
 
 import cn from "@/utils/cn";
 import IcnCopyBold from "@/public/icons/icn-copy-bold.svg";
@@ -114,6 +115,7 @@ const LeftMenu = () => {
           >
             <IcnExternalLinkBold className="w-4" />
           </Link>
+          <Faucet address={account?.multi_sig_address} />
         </div>
         <Link href={`/account/new-transaction/?address=${address}`}>
           <Button className="" size="small" fullWidth>

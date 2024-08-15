@@ -1,3 +1,6 @@
+const { version } = require("./package.json");
+const { format } = require("date-fns");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
@@ -11,6 +14,9 @@ const nextConfig = {
     });
     return config;
   },
+  env: {
+    version: `v${version}#${format(new Date(), "yyyyMMdd")}`,
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
