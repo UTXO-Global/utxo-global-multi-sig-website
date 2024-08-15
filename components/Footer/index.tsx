@@ -31,43 +31,44 @@ const Footer = () => {
             Contact Us
           </Link>
         </div>
-        <p className="text-[14px] leading-[140%] text-grey-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          Powered By{" "}
-          <Link
-            href={MAIN_SITE_URL}
-            target="_blank"
-            className="hover:text-orange-100 transition-colors"
-          >
-            UTXO GLOBAL
-          </Link>{" "}
-          Team
-        </p>
-        <div className="flex items-center gap-[6px]">
-          <p className="text-xs text-grey-400 pr-4 border-r border-grey-400">{`Version: ${process.env.version}`}</p>
-          <div className="flex gap-4">
+        <div className="text-[14px] leading-[140%] text-grey-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+          <div>
+            Powered By{" "}
             <Link
-              href={TWITTER_LINK}
+              href={MAIN_SITE_URL}
               target="_blank"
-              className="p-[10px] rounded-lg hover:bg-grey-200 transition-colors"
+              className="hover:text-orange-100 transition-colors"
             >
-              <IcnTwitter className="w-6" />
-            </Link>
-            <Link
-              href={TELEGRAM_LINK}
-              target="_blank"
-              className="p-[10px] rounded-lg hover:bg-grey-200 transition-colors"
-            >
-              <IcnTelegram className="w-6" />
-            </Link>
-
-            <Link
-              href={SUBSTACK_LINK}
-              target="_blank"
-              className="p-[10px] rounded-lg hover:bg-grey-200 transition-colors"
-            >
-              <IcnDocs className="w-6" />
-            </Link>
+              UTXO GLOBAL
+            </Link>{" "}
+            Team
           </div>
+          <p className="text-grey-400 pl-2 ml-2 border-l border-grey-400">{process.env.version}</p>
+        </div>
+
+        <div className="flex gap-4">
+          <Link
+            href={TWITTER_LINK}
+            target="_blank"
+            className="p-[10px] rounded-lg hover:bg-grey-200 transition-colors"
+          >
+            <IcnTwitter className="w-6" />
+          </Link>
+          <Link
+            href={TELEGRAM_LINK}
+            target="_blank"
+            className="p-[10px] rounded-lg hover:bg-grey-200 transition-colors"
+          >
+            <IcnTelegram className="w-6" />
+          </Link>
+
+          <Link
+            href={SUBSTACK_LINK}
+            target="_blank"
+            className="p-[10px] rounded-lg hover:bg-grey-200 transition-colors"
+          >
+            <IcnDocs className="w-6" />
+          </Link>
         </div>
       </div>
     </footer>

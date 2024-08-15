@@ -15,7 +15,7 @@ const nextConfig = {
     return config;
   },
   env: {
-    version: `v${version}#${format(new Date(), "yyyyMMdd")}`,
+    version: `v${version}#${format(new Date(), "yyyyMMdd-HHmmss")}`,
   },
 };
 
