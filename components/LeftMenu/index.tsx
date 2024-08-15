@@ -115,7 +115,7 @@ const LeftMenu = () => {
           >
             <IcnExternalLinkBold className="w-4" />
           </Link>
-          <Faucet address={account?.multi_sig_address} />
+          <Faucet />
         </div>
         <Link href={`/account/new-transaction/?address=${address}`}>
           <Button className="" size="small" fullWidth>
