@@ -9,6 +9,7 @@ export const CONTACT_MAIL = "contact@utxo.global";
 export const EXTENTSION_GITHUB =
   "https://github.com/UTXO-Global/utxo-wallet-extension";
 export const SUBSTACK_LINK = "https://utxoglobal.substack.com/";
+export const DOC_LINK = "https://utxo-global.gitbook.io/utxo-global";
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACIKING_ID;
 export const NETWORK = process.env.NEXT_PUBLIC_NETWORK || "nervos_testnet";
 export const EXPLORER =

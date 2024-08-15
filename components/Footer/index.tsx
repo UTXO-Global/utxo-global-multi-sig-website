@@ -5,6 +5,7 @@ import {
   SUBSTACK_LINK,
   MAIN_SITE_URL,
   FEATURE_REQUEST_LINK,
+  DOC_LINK,
 } from "@/configs/common";
 import { TELEGRAM_LINK, TWITTER_LINK } from "@/configs/social";
 
@@ -43,7 +44,9 @@ const Footer = () => {
             </Link>{" "}
             Team
           </div>
-          <p className="text-grey-400 pl-2 ml-2 border-l border-grey-400">{process.env.version}</p>
+          <p className="text-grey-400 pl-2 ml-2 border-l border-grey-400">
+            {process.env.version}
+          </p>
         </div>
 
         <div className="flex gap-4">
@@ -63,7 +66,7 @@ const Footer = () => {
           </Link>
 
           <Link
-            href={SUBSTACK_LINK}
+            href={DOC_LINK}
             target="_blank"
             className="p-[10px] rounded-lg hover:bg-grey-200 transition-colors"
           >
