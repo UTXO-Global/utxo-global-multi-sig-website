@@ -520,7 +520,7 @@ const Transaction = ({
               >
                 Confirm
               </Button>
-              {!isConfirmed && (
+              {/* {!isConfirmed && (
                 <Button
                   fullWidth
                   size="small"
@@ -530,7 +530,7 @@ const Transaction = ({
                 >
                   Reject
                 </Button>
-              )}
+              )} */}
             </div>
           ) : null}
         </div>
