@@ -14,7 +14,7 @@ import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
 import { NETWORK } from "@/configs/common";
 
-const CKB_MIN_TRANSFER = 61; // 61 CKB
+const CKB_MIN_TRANSFER = 63; // 63 CKB
 const CreateTx = ({
   txInfo,
   setTxInfo,
@@ -33,7 +33,7 @@ const CreateTx = ({
   const isValidTx = useMemo(() => {
     return (
       txInfo.send_to !== "" &&
-      txInfo.amount > CKB_MIN_TRANSFER &&
+      txInfo.amount >= CKB_MIN_TRANSFER &&
       txInfo.amount <= balanceN
     );
   }, [txInfo, balanceN]);
