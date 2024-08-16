@@ -1,0 +1,68 @@
+/* eslint-disable @next/next/no-img-element */
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useMemo } from "react";
+
+import AccountModal from "../AccountModal";
+import SwitchNetwork from "../SwitchNetwork";
+import { useAppSelector } from "@/redux/hook";
+import { selectAccountInfo } from "@/redux/features/account-info/reducer";
+
+const PAGE_TITLE: { [key: string]: string } = {
+  "/account/new-transaction/": "New Transaction",
+  "/account/transactions/": "Transactions",
+  "/account/": "Assets",
+  "/account/info/": "Account Info",
+};
+
+const Header = () => {
+  const pathname = usePathname();
+
+  const { info: account } = useAppSelector(selectAccountInfo);
+
+  const isDashboardLayout = useMemo(() => {
+    return pathname.includes("/account");
+  }, [pathname]);
+
+  const pageTitle = useMemo(() => {
+    return PAGE_TITLE[pathname];
+  }, [pathname]);
+
+  return (
+    <header className="bg-light-100 border-b border-grey-200 sticky top-0 z-[5]">
+      {isDashboardLayout ? (
+        <div className="flex items-center">
+          <div className="w-[230px] flex justify-center items-center border-r border-grey-200 py-4 ">
+            <Link href="/">
+              <img src="/logo.png" alt="utxo global" className="w-[80px]" />
+            </Link>
+          </div>
+          <div className="flex-1 flex justify-between items-center px-6">
+            <p className="text-[24px] leading-[28px] font-bold text-dark-100">
+              {!!account ? pageTitle : ""}
+            </p>
+            <div className="flex">
+              <AccountModal />
+
+              <SwitchNetwork />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="px-6 py-4 flex justify-between">
+          <Link href="/">
+            <img src="/logo.png" alt="utxo global" className="w-[80px]" />
+          </Link>
+
+          <div className="flex">
+            <AccountModal />
+            <SwitchNetwork />
+          </div>
+        </div>
+      )}
+    </header>
+  );
+};
+
+export default Header;

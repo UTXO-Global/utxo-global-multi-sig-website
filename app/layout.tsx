@@ -1,0 +1,109 @@
+import type { Metadata } from "next";
+import Script from "next/script";
+import "./globals.css";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
+import { ConfigProvider } from "antd";
+
+import { ReduxProvider } from "@/redux/Provider";
+import CCCProvider from "@/providers/ccc";
+import { AppProvider } from "@/providers/app";
+
+import MainLayout from "@/layouts/MainLayout";
+
+import {
+  SITE_DESCRIPTION,
+  SITE_TITLE,
+  SITE_URL,
+  SITE_IMAGE_URL,
+  GA_TRACKING_ID,
+} from "@/configs/common";
+
+export const metadata: Metadata = {
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    images: [{ url: SITE_IMAGE_URL }],
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    siteName: SITE_TITLE,
+    url: SITE_URL,
+  },
+  twitter: {
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: SITE_IMAGE_URL,
+    site: SITE_URL,
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+      />
+      <Script id="google-analytics">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+ 
+          gtag('config', '${GA_TRACKING_ID}');
+        `}
+      </Script>
+      <body>
+        <ConfigProvider
+          theme={{
+            token: {
+              fontFamily: `"Satoshi", sans-serif`,
+            },
+            components: {
+              Select: {
+                selectorBg: "#F5F5F5",
+                borderRadius: 8,
+                optionSelectedBg: "#EBECEC",
+              },
+              Pagination: {
+                colorPrimary: "#0d0d0d",
+                colorPrimaryBgHover: "#2C2C2C",
+                colorPrimaryHover: "#2C2C2C",
+                itemActiveBg: "#F5F5F5",
+                itemBg: "transparent",
+                size: 40,
+                colorText: "#0d0d0d",
+                colorBgTextActive: "#0d0d0d",
+                fontSize: 16,
+                colorTextDisabled: "#A7A7A7",
+              },
+            },
+          }}
+        >
+          <ReduxProvider>
+            <CCCProvider>
+              <AppProvider>
+                <MainLayout>{children}</MainLayout>
+              </AppProvider>
+
+              <ToastContainer
+                autoClose={5000}
+                closeOnClick
+                draggable={false}
+                hideProgressBar={true}
+                newestOnTop={false}
+                pauseOnFocusLoss={false}
+                pauseOnHover={false}
+                position="top-right"
+                rtl={false}
+              />
+            </CCCProvider>
+          </ReduxProvider>
+        </ConfigProvider>
+      </body>
+    </html>
+  );
+}
