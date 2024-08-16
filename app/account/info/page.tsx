@@ -46,7 +46,7 @@ const Info = () => {
           <>
             <div className="p-6 pb-2 rounded-lg bg-light-100">
               <h3 className="text-[18px] leading-[24px] font-medium text-dark-100">
-                Manage Account Signers
+                Signers Information
               </h3>
               <div className="mt-4">
                 {account.signers_detail?.map((z, i) => (
@@ -91,6 +91,7 @@ const Info = () => {
                           </div>
                           <Link
                             href={`${EXPLORER}/address/${z.signer_address}`}
+                            target="_blank"
                             className="p-1 hover:bg-grey-300 cursor-pointer transition-colors rounded-full"
                           >
                             <IcnExternalLink className="w-4" />
@@ -98,11 +99,11 @@ const Info = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    {/* <div className="flex gap-2">
                       <div className="p-2 rounded-full transition-colors hover:bg-grey-300 cursor-pointer">
                         <IcnPencil className="w-4 fill-grey-400" />
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 ))}
                 {invites?.map((z, i) => (
@@ -123,7 +124,11 @@ const Info = () => {
                       />
                       <div>
                         <p className="text-[16px] leading-[20px] font-medium">
-                          {getAddressBookName(z.signer_address, addressBooks, currentAddress)}
+                          {getAddressBookName(
+                            z.signer_address,
+                            addressBooks,
+                            currentAddress
+                          )}
                         </p>
                         <div className="flex items-center">
                           <p className="text-[14px] leading-[18px] text-grey-400">
