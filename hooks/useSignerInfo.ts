@@ -7,10 +7,8 @@ const useSignerInfo = () => {
   const { address } = useContext(AppContext);
   const [balance, setBalance] = useState(0);
 
-  const signer = ccc.useSigner();
-
   useEffect(() => {
-    if (!signer) {
+    if (!address) {
       setBalance(0);
       return;
     }
@@ -18,7 +16,7 @@ const useSignerInfo = () => {
     (async () => {
       setBalance(await getBalance(address));
     })();
-  }, [address, signer]);
+  }, [address]);
 
   return {
     address,
