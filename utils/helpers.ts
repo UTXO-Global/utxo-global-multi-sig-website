@@ -5,6 +5,7 @@ import { BI } from "@ckb-lumos/lumos";
 
 import { InviteStatus, SignerDetailType } from "@/types/account";
 import { AddressBookType } from "@/types/address-book";
+import { NETWORK } from "@/configs/common";
 
 import { EXPLORER_API } from "@/configs/common";
 import { ccc } from "@ckb-ccc/connector-react";
@@ -84,8 +85,9 @@ export const getAddressBookName = (
 
 export const getBalance = async (address: string) => {
   try {
+    const network = NETWORK === "nervos" ? "mainnet" : "testnet"
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/ckb/v1/addresses/${address}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/ckb/${network}/v1/addresses/${address}`,
       {
         headers: {
           Accept: "application/vnd.api+json",
