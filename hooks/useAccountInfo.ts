@@ -9,7 +9,7 @@ const useAccountInfo = () => {
   const searchParams = useSearchParams();
   const address = searchParams.get("address");
 
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
   const { isLoggedIn } = useAuthenticate();
 
@@ -17,7 +17,6 @@ const useAccountInfo = () => {
     if (!address || !isLoggedIn) return;
     dispatch(loadInfo(address as any));
   }, [address, dispatch, isLoggedIn]);
-
 };
 
 export default useAccountInfo;
