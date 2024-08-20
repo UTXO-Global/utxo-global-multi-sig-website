@@ -8,6 +8,7 @@ import { AddressBookType } from "@/types/address-book";
 
 import { EXPLORER_API } from "@/configs/common";
 import { ccc } from "@ckb-ccc/connector-react";
+import { TransactionSkeletonType } from "@ckb-lumos/lumos/helpers";
 
 export const comingSoonMsg = () => {
   toast.info("Coming Soon!");
@@ -83,7 +84,6 @@ export const getAddressBookName = (
 
 export const getBalance = async (address: string) => {
   try {
-
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/ckb/v1/addresses/${address}`,
       {
@@ -94,8 +94,8 @@ export const getBalance = async (address: string) => {
       }
     );
     const data = await res.json();
-    const balance = new Decimal(data.data[0].attributes.balance).div(10 ** 8)
-   
+    const balance = new Decimal(data.data[0].attributes.balance).div(10 ** 8);
+
     return balance.toNumber();
   } catch (e) {
     console.error(e);
