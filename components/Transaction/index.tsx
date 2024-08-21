@@ -23,6 +23,9 @@ import api from "@/utils/api";
 import { toast } from "react-toastify";
 import { BI } from "@ckb-lumos/lumos";
 import { EXPLORER } from "@/configs/common";
+import { useAppDispatch } from "@/redux/hook";
+import { loadInfo } from "@/redux/features/account-info/action";
+import { useSearchParams } from "next/navigation";
 
 const STATUS_TEXT = {
   [TransactionStatus.WaitingSigned]: "Pending",
@@ -44,6 +47,9 @@ const Transaction = ({
   const [isConfirmLoading, setIsConfirmLoading] = useState<boolean>(false);
   const [isRejectLoading, setIsRejectLoading] = useState<boolean>(false);
   const { address } = useContext(AppContext);
+  const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
+  const multisigAddress = searchParams.get("address");
   const signer = ccc.useSigner();
 
   const statusTxt = useMemo(() => {
@@ -83,16 +89,17 @@ const Transaction = ({
       });
 
       if (data && !!data.transaction_id) {
-        toast.success("Transaction has signed");
-      } else if (data && data.message) {
-        toast.error(data.message);
+        toast.success("Transaction signed successfully");
       }
-      refresh?.();
     } catch (e) {
       console.error(e);
+      toast.error("Failed to send transaction");
     } finally {
       setIsConfirmLoading(false);
     }
+
+    await dispatch(loadInfo(multisigAddress as any));
+    refresh?.();
   };
 
   const onReject = async () => {

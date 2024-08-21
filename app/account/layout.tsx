@@ -12,7 +12,6 @@ import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 
 const _AccountLayout = ({ children }: { children: React.ReactNode }) => {
   useAccountInfo();
-
   const { info: account, isInfoLoading } = useAppSelector(selectAccountInfo);
 
   if (!isInfoLoading && !account)
