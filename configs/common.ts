@@ -12,6 +12,7 @@ export const SUBSTACK_LINK = "https://utxoglobal.substack.com/";
 export const DOC_LINK = "https://utxo-global.gitbook.io/utxo-global";
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACIKING_ID;
 export const NETWORK = process.env.NEXT_PUBLIC_NETWORK || "nervos_testnet";
+export const IS_TESTNET = NETWORK === "nervos_testnet";
 export const EXPLORER =
   NETWORK === "nervos_testnet"
     ? "https://pudge.explorer.nervos.org/en"

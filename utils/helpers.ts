@@ -9,6 +9,7 @@ import { NETWORK } from "@/configs/common";
 
 import { EXPLORER_API } from "@/configs/common";
 import { ccc } from "@ckb-ccc/connector-react";
+import { TransactionSkeletonType } from "@ckb-lumos/lumos/helpers";
 
 export const comingSoonMsg = () => {
   toast.info("Coming Soon!");
@@ -95,8 +96,8 @@ export const getBalance = async (address: string) => {
       }
     );
     const data = await res.json();
-    const balance = new Decimal(data.data[0].attributes.balance).div(10 ** 8)
-   
+    const balance = new Decimal(data.data[0].attributes.balance).div(10 ** 8);
+
     return balance.toNumber();
   } catch (e) {
     console.error(e);

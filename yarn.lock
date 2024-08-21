@@ -1172,6 +1172,17 @@
     "@joyid/ckb" "^1.0.1"
     "@joyid/common" "^0.2.0"
 
+"@ckb-ccc/lumos-patches@^0.0.10-alpha.7":
+  version "0.0.10-alpha.7"
+  resolved "https://registry.yarnpkg.com/@ckb-ccc/lumos-patches/-/lumos-patches-0.0.10-alpha.7.tgz#88dd423c5e7cfd284d68c7a5be5af7f64711ba75"
+  integrity sha512-7vRHoGRKKV2TJBOXt5Sx3P4OOR8kHmOamEaZFKEKnQbHFdQsUsq6R1SFOLd25b/piW0j0h88ODYepcvcBT8JRQ==
+  dependencies:
+    "@ckb-lumos/base" "^0.24.0-next.1"
+    "@ckb-lumos/codec" "^0.24.0-next.1"
+    "@ckb-lumos/common-scripts" "^0.24.0-next.1"
+    "@ckb-lumos/config-manager" "^0.24.0-next.1"
+    "@joyid/ckb" "^1.0.1"
+
 "@ckb-ccc/nip07@0.0.11-alpha.1":
   version "0.0.11-alpha.1"
   resolved "https://registry.yarnpkg.com/@ckb-ccc/nip07/-/nip07-0.0.11-alpha.1.tgz#5be3051ce9acfc1dc68a6768f00d80e666d1b81c"
@@ -1230,6 +1241,19 @@
     js-xxhash "^1.0.4"
     lodash.isequal "^4.5.0"
 
+"@ckb-lumos/base@0.24.0-next.2", "@ckb-lumos/base@^0.24.0-next.1":
+  version "0.24.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/base/-/base-0.24.0-next.2.tgz#de5e15578fd42f815f745d5547850e042d3eeebd"
+  integrity sha512-VCXYpykJ+OhjbcCp3imwt9rk3Ie2T8jyCjSXExkoyKY+QT+EI856p37KBbBdO4r7gguVtADnJS+WLIZoNm5Bvw==
+  dependencies:
+    "@ckb-lumos/bi" "0.24.0-next.2"
+    "@ckb-lumos/codec" "0.24.0-next.2"
+    "@ckb-lumos/toolkit" "0.24.0-next.2"
+    "@types/blake2b" "^2.1.0"
+    "@types/lodash.isequal" "^4.5.5"
+    blake2b "^2.1.3"
+    js-xxhash "^1.0.4"
+
 "@ckb-lumos/bi@0.22.2":
   version "0.22.2"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/bi/-/bi-0.22.2.tgz#af3f3b9afdaf363bc33a168ec4fefc5579029093"
@@ -1241,6 +1265,13 @@
   version "0.23.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/bi/-/bi-0.23.0.tgz#8439d712b823234b858bffff2636ffc21d98199f"
   integrity sha512-KAy+lyVpL+Al4XD+c9tHrA9DSpHkMusyXtTS81aNZi5MyL6F9jrVmFcqLorhfyfl8Fsv2sEjMe5Neo2Y+w/RJQ==
+  dependencies:
+    jsbi "^4.1.0"
+
+"@ckb-lumos/bi@0.24.0-next.2":
+  version "0.24.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/bi/-/bi-0.24.0-next.2.tgz#e277939dc4575bd30858c7fac6b256dc5f27ad1f"
+  integrity sha512-KGRv2M0EsZw08qIjauew43VBoG8X6IPiPrW7Bn5nnrqWh0i+JE8ZC4fsS6kGmAhUMw3OcTzinU7cQ318CjaC3Q==
   dependencies:
     jsbi "^4.1.0"
 
@@ -1271,6 +1302,13 @@
   dependencies:
     "@ckb-lumos/bi" "0.23.0"
 
+"@ckb-lumos/codec@0.24.0-next.2", "@ckb-lumos/codec@^0.24.0-next.1":
+  version "0.24.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/codec/-/codec-0.24.0-next.2.tgz#3be436d846e1d8bbec7578760b124ac67daf1e3f"
+  integrity sha512-yPrAwJyLJw4jf2GMMcJHRE2Z/I9ZD0e7VzzHA0rwTNaaXHpjZWdR5ffBqHGjNAobIrIlJlv9FVDLZTukO1RohA==
+  dependencies:
+    "@ckb-lumos/bi" "0.24.0-next.2"
+
 "@ckb-lumos/common-scripts@0.23.0":
   version "0.23.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/common-scripts/-/common-scripts-0.23.0.tgz#ccb04214ca7186829036ddcbb0dc1b5326127a90"
@@ -1283,6 +1321,23 @@
     "@ckb-lumos/helpers" "0.23.0"
     "@ckb-lumos/rpc" "0.23.0"
     "@ckb-lumos/toolkit" "0.23.0"
+    bech32 "^2.0.0"
+    bs58 "^5.0.0"
+    immutable "^4.3.0"
+
+"@ckb-lumos/common-scripts@^0.24.0-next.1":
+  version "0.24.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/common-scripts/-/common-scripts-0.24.0-next.2.tgz#3d481ce2ecaf1dadd5e1ea034996d194854bcb6f"
+  integrity sha512-wPaAHYWoxOuYLkkfRImtTxaElfMuL5mYA/L5nSCTCkMCncvt3loMjbYlBZY6IBMMclwobTfMPej5Bg5cUpHadA==
+  dependencies:
+    "@ckb-lumos/base" "0.24.0-next.2"
+    "@ckb-lumos/bi" "0.24.0-next.2"
+    "@ckb-lumos/codec" "0.24.0-next.2"
+    "@ckb-lumos/config-manager" "0.24.0-next.2"
+    "@ckb-lumos/crypto" "0.24.0-next.2"
+    "@ckb-lumos/helpers" "0.24.0-next.2"
+    "@ckb-lumos/rpc" "0.24.0-next.2"
+    "@ckb-lumos/toolkit" "0.24.0-next.2"
     bech32 "^2.0.0"
     bs58 "^5.0.0"
     immutable "^4.3.0"
@@ -1311,6 +1366,26 @@
     "@types/deep-freeze-strict" "^1.1.0"
     deep-freeze-strict "^1.1.1"
 
+"@ckb-lumos/config-manager@0.24.0-next.2", "@ckb-lumos/config-manager@^0.24.0-next.1":
+  version "0.24.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/config-manager/-/config-manager-0.24.0-next.2.tgz#c6121f35ba46df109508bef17cc9146473a48268"
+  integrity sha512-/HL0fjFXFnTaJNRyZqHk6/MiioDWeB6bVcm6MO97E6tJVBxTJjIe/cvRjqohEAO3SRst9X81vh2WIB7lCIBjfA==
+  dependencies:
+    "@ckb-lumos/base" "0.24.0-next.2"
+    "@ckb-lumos/bi" "0.24.0-next.2"
+    "@ckb-lumos/codec" "0.24.0-next.2"
+    "@ckb-lumos/rpc" "0.24.0-next.2"
+    "@types/deep-freeze-strict" "^1.1.0"
+    deep-freeze-strict "^1.1.1"
+
+"@ckb-lumos/crypto@0.24.0-next.2":
+  version "0.24.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/crypto/-/crypto-0.24.0-next.2.tgz#dde4dce70310a926cca21dc256bf50ff2306f041"
+  integrity sha512-wJ1gE5ThZX15q45wRLX0oUoZ/qyE3jIIBnM7wuOWjAVEdp7LVRgNDoYHd7pFCYDH2j6rJwLNhJW41o1f7Aqqlg==
+  dependencies:
+    "@noble/ciphers" "^0.5.3"
+    "@noble/hashes" "^1.4.0"
+
 "@ckb-lumos/hd@0.23.0":
   version "0.23.0"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/hd/-/hd-0.23.0.tgz#97ddf6e291bdb44b7b8d61bcf437c3a1b17d0182"
@@ -1334,6 +1409,19 @@
     "@ckb-lumos/codec" "0.23.0"
     "@ckb-lumos/config-manager" "0.23.0"
     "@ckb-lumos/toolkit" "0.23.0"
+    bech32 "^2.0.0"
+    immutable "^4.3.0"
+
+"@ckb-lumos/helpers@0.24.0-next.2":
+  version "0.24.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/helpers/-/helpers-0.24.0-next.2.tgz#e8ed91741fcfd57c7245e2bb616f6b276b274a05"
+  integrity sha512-yHn1Ty1lyOTRKyEKGzH88eBE4iio7iDpoyejsWVZVk6Eetkv1XS/zNA2J5w7KVhjOzbNK7GUUU9v/3kzYWpG0A==
+  dependencies:
+    "@ckb-lumos/base" "0.24.0-next.2"
+    "@ckb-lumos/bi" "0.24.0-next.2"
+    "@ckb-lumos/codec" "0.24.0-next.2"
+    "@ckb-lumos/config-manager" "0.24.0-next.2"
+    "@ckb-lumos/toolkit" "0.24.0-next.2"
     bech32 "^2.0.0"
     immutable "^4.3.0"
 
@@ -1399,6 +1487,16 @@
     abort-controller "^3.0.0"
     cross-fetch "^3.1.5"
 
+"@ckb-lumos/rpc@0.24.0-next.2":
+  version "0.24.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/rpc/-/rpc-0.24.0-next.2.tgz#1d58ec91a261c99997ac065d967c60de43088edc"
+  integrity sha512-C/Vjvbh+GStxA/9vcj6oI1apZQRoydIvc8T1DR5Dh3F9K1q8NUSnJ43bLNOcwusdMWDkRNNS0jyoKirtLJy5Hg==
+  dependencies:
+    "@ckb-lumos/base" "0.24.0-next.2"
+    "@ckb-lumos/bi" "0.24.0-next.2"
+    abort-controller "^3.0.0"
+    cross-fetch "^3.1.5"
+
 "@ckb-lumos/toolkit@0.22.2":
   version "0.22.2"
   resolved "https://registry.yarnpkg.com/@ckb-lumos/toolkit/-/toolkit-0.22.2.tgz#54087a8947ae4de7cd0e91d955f273accca37d30"
@@ -1412,6 +1510,13 @@
   integrity sha512-7LTsUFfoNCBWJLgh+V/QFnemjGw+y4mmLeQvubwYuJqIPIhIpwKUuKRzkvVG8snA8xVQSfjSSQOs5m3mKp66Kg==
   dependencies:
     "@ckb-lumos/bi" "0.23.0"
+
+"@ckb-lumos/toolkit@0.24.0-next.2":
+  version "0.24.0-next.2"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/toolkit/-/toolkit-0.24.0-next.2.tgz#63423faa12f59d27a2d0acb23f6fc90790f806c2"
+  integrity sha512-faqOZpj0H21vsqfQXfzRRQUEgF3vZ9i3PcqyF7hNbrNeR6VUcIzJL8QskhjFhBusxAvKf56QbX0/T06/PAgbfg==
+  dependencies:
+    "@ckb-lumos/bi" "0.24.0-next.2"
 
 "@ckb-lumos/transaction-manager@0.23.0":
   version "0.23.0"
@@ -5559,8 +5664,16 @@ string-convert@^0.2.0:
   resolved "https://registry.yarnpkg.com/string-convert/-/string-convert-0.2.1.tgz#6982cc3049fbb4cd85f8b24568b9d9bf39eeff97"
   integrity sha512-u/1tdPl4yQnPBjnVrmdLo9gtuLvELKsAoRapekWggdiQNvvvum+jYF329d84NAa660KQw7pB2n36KrIKVoXa3A==
 
-"string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0:
-  name string-width-cjs
+"string-width-cjs@npm:string-width@^4.2.0":
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
+  integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
+  dependencies:
+    emoji-regex "^8.0.0"
+    is-fullwidth-code-point "^3.0.0"
+    strip-ansi "^6.0.1"
+
+string-width@^4.1.0:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -5639,8 +5752,14 @@ string_decoder@^1.1.1:
   dependencies:
     safe-buffer "~5.2.0"
 
-"strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
-  name strip-ansi-cjs
+"strip-ansi-cjs@npm:strip-ansi@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
+  integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
+  dependencies:
+    ansi-regex "^5.0.1"
+
+strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==

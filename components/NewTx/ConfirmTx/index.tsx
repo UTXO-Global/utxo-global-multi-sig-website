@@ -13,16 +13,15 @@ import {
   helpers,
   commons,
 } from "@ckb-lumos/lumos";
-import { predefined } from "@ckb-lumos/config-manager";
 import { bytes, blockchain } from "@ckb-lumos/lumos/codec";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { cccA } from "@ckb-ccc/connector-react/advanced";
 import { useRouter } from "next/navigation";
-import { CKB_RPC } from "@/configs/common";
+import { CKB_RPC, IS_TESTNET } from "@/configs/common";
+import { AGGRON4, LINA } from "@/utils/lumos-config";
 
-const { AGGRON4 } = predefined;
 const ConfirmTx = ({
   txInfo,
   onBack,
@@ -82,17 +81,20 @@ const ConfirmTx = ({
   useEffect(() => {
     const f = async () => {
       if (!txInfo || !account) return;
-
       let txSkeleton = helpers.TransactionSkeleton({
         cellProvider: indexer,
       });
 
+      const lumosConfig = IS_TESTNET ? AGGRON4 : LINA;
+
       const fromScript = helpers.parseAddress(txInfo.send_from, {
-        config: AGGRON4,
+        config: lumosConfig,
       });
 
+      console.log("txInfo", txInfo, fromScript);
+
       const toScript = helpers.parseAddress(txInfo.send_to, {
-        config: AGGRON4,
+        config: lumosConfig,
       });
 
       let toAmount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
@@ -106,6 +108,15 @@ const ConfirmTx = ({
 
       const collector = indexer.collector({ lock: fromScript, type: "empty" });
       for await (const cell of collector.collect()) {
+        if (
+          !bytes.equal(
+            blockchain.Script.pack(cell.cellOutput.lock),
+            blockchain.Script.pack(fromScript)
+          )
+        ) {
+          continue;
+        }
+
         collectedSum = collectedSum.add(cell.cellOutput.capacity);
         collected.push(cell);
         if (collectedSum.gte(neededCapacity)) break;
@@ -141,13 +152,26 @@ const ConfirmTx = ({
       );
 
       txSkeleton = txSkeleton.update("cellDeps", (cellDeps) =>
-        cellDeps.push({
-          outPoint: {
-            txHash: AGGRON4.SCRIPTS.SECP256K1_BLAKE160_MULTISIG.TX_HASH,
-            index: AGGRON4.SCRIPTS.SECP256K1_BLAKE160_MULTISIG.INDEX,
-          },
-          depType: AGGRON4.SCRIPTS.SECP256K1_BLAKE160_MULTISIG.DEP_TYPE,
-        })
+        cellDeps.push(
+          ...[
+            {
+              outPoint: {
+                txHash:
+                  lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.TX_HASH!,
+                index: lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.INDEX!,
+              },
+              depType:
+                lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.DEP_TYPE!,
+            },
+            {
+              outPoint: {
+                txHash: lumosConfig.SCRIPTS.DAO?.TX_HASH!,
+                index: "0x3",
+              },
+              depType: lumosConfig.SCRIPTS.DAO?.DEP_TYPE!,
+            },
+          ]
+        )
       );
 
       const firstIndex = txSkeleton
@@ -214,7 +238,7 @@ const ConfirmTx = ({
         [txInfo.send_from],
         txFee,
         undefined,
-        { config: AGGRON4 }
+        { config: lumosConfig }
       );
 
       const tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
