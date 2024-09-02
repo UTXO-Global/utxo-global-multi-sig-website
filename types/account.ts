@@ -33,7 +33,7 @@ export type MultiSigAccountType = {
   threshold: number;
   signers: number;
   name: string;
-  mutli_sig_witness_data: string;
+  multi_sig_witness_data: string;
   signers_detail?: SignerDetailType[];
   invites?: InviteType[];
   balance: number;

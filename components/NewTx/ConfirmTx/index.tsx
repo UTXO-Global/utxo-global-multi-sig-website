@@ -14,7 +14,7 @@ import {
   commons,
 } from "@ckb-lumos/lumos";
 import { bytes, blockchain } from "@ckb-lumos/lumos/codec";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { cccA } from "@ckb-ccc/connector-react/advanced";
@@ -38,7 +38,9 @@ const ConfirmTx = ({
   const router = useRouter();
   const { info: account } = useAppSelector(selectAccountInfo);
   const signer = ccc.useSigner();
-  const indexer = new Indexer(CKB_RPC);
+  const indexer = useMemo(() => {
+    return new Indexer(CKB_RPC);
+  }, []);
   const [error, setError] = useState("");
 
   const onSign = async () => {
@@ -196,7 +198,7 @@ const ConfirmTx = ({
         let newWitnessArgs: WitnessArgs = {
           lock:
             "0x" +
-            account?.mutli_sig_witness_data +
+            account?.multi_sig_witness_data +
             SECP_SIGNATURE_PLACEHOLDER.repeat(account?.threshold!),
         };
 
@@ -248,7 +250,7 @@ const ConfirmTx = ({
     setLoading(true);
     f();
     setLoading(false);
-  }, [txInfo, txFee]);
+  }, [txInfo, txFee, account, indexer]);
 
   return (
     <>
