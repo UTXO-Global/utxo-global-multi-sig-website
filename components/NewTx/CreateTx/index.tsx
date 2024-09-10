@@ -7,12 +7,13 @@ import { NumericFormat } from "react-number-format";
 import SwitchNetwork from "@/components/SwitchNetwork";
 import Button from "@/components/Common/Button";
 import { SendTokenType } from "@/types/account";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
 import { formatNumber } from "@/utils/helpers";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
 import { NETWORK } from "@/configs/common";
+import { BI } from "@ckb-lumos/lumos";
 
 const CKB_MIN_TRANSFER = 63; // 63 CKB
 const CreateTx = ({
@@ -29,6 +30,13 @@ const CreateTx = ({
   const balanceN = useMemo(() => {
     return Number(ccc.fixedPointToString(balance));
   }, [txInfo, balance]);
+
+  useEffect(() => {
+    if (txInfo.amount === 0 || balanceN === 0) return;
+    if (txInfo.amount >= balanceN) {
+      setTxInfo({ ...txInfo, is_include_fee: true });
+    }
+  }, [balanceN, txInfo.amount]);
 
   const isValidTx = useMemo(() => {
     return (
@@ -113,7 +121,7 @@ const CreateTx = ({
         <div className="flex gap-2 items-center">
           <p className="text-base text-grey-400">Include Fee In The Amount</p>
           <Switch
-            defaultChecked={txInfo.is_include_fee}
+            value={txInfo.is_include_fee}
             onChange={(isChecked) => {
               setTxInfo({ ...txInfo, is_include_fee: isChecked });
             }}
