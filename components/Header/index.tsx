@@ -44,7 +44,6 @@ const Header = () => {
             </p>
             <div className="flex">
               <AccountModal />
-
               <SwitchNetwork />
             </div>
           </div>

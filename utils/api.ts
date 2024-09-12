@@ -2,6 +2,8 @@ import Axios, { AxiosRequestConfig, AxiosRequestHeaders } from "axios";
 import { toast } from "react-toastify";
 import { reset } from "@/redux/features/storage/action";
 import { isAddressEqual } from "./helpers";
+import { CkbNetwork } from "@/types/common";
+import { MAINNET_CONFIG, TESTNET_CONFIG } from "@/configs/network";
 
 interface AdaptAxiosRequestConfig extends AxiosRequestConfig {
   headers: AxiosRequestHeaders;
@@ -12,7 +14,10 @@ export const injectStore = (_store: any) => {
   store = _store;
 };
 
-const api = Axios.create({ baseURL: process.env.NEXT_PUBLIC_API_URL });
+let api = Axios.create();
+export const setBaseAPIURL = (baseURL: string) => {
+  api = Axios.create({ baseURL });
+};
 
 api.interceptors.request.use(
   async (config) => {
@@ -26,8 +31,7 @@ api.interceptors.request.use(
       store.dispatch(reset());
       return Promise.reject({
         response: {
-          data:
-            "Your account has been changed. Please reconnect your wallet.",
+          data: "Your account has been changed. Please reconnect your wallet.",
         },
       });
     }
@@ -39,8 +43,7 @@ api.interceptors.request.use(
         store.dispatch(reset());
         return Promise.reject({
           response: {
-            data:
-              "Your account has been changed. Please reconnect your wallet.",
+            data: "Your account has been changed. Please reconnect your wallet.",
           },
         });
       }

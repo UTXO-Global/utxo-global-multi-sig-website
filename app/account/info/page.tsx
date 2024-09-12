@@ -15,7 +15,7 @@ import {
   inviteStatus,
   getAddressBookName,
 } from "@/utils/helpers";
-import { EXPLORER } from "@/configs/common";
+
 import cn from "@/utils/cn";
 
 import { useAppSelector } from "@/redux/hook";
@@ -23,11 +23,14 @@ import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { InviteStatus } from "@/types/account";
 import { selectAddressBook } from "@/redux/features/address-book/reducer";
 import { AppContext } from "@/providers/app";
+import { selectApp } from "@/redux/features/app/reducer";
 
 const Info = () => {
   const { address: currentAddress } = useContext(AppContext);
   const { info: account, isInfoLoading: isLoading } =
     useAppSelector(selectAccountInfo);
+
+  const { config } = useAppSelector(selectApp);
 
   const { data: addressBooks } = useAppSelector(selectAddressBook);
 
@@ -90,7 +93,7 @@ const Info = () => {
                             <IcnCopy className="w-4" />
                           </div>
                           <Link
-                            href={`${EXPLORER}/address/${z.signer_address}`}
+                            href={`${config.explorer}/address/${z.signer_address}`}
                             target="_blank"
                             className="p-1 hover:bg-grey-300 cursor-pointer transition-colors rounded-full"
                           >
@@ -141,7 +144,7 @@ const Info = () => {
                             <IcnCopy className="w-4" />
                           </div>
                           <Link
-                            href={`${EXPLORER}/address/${z.signer_address}`}
+                            href={`${config.explorer}/address/${z.signer_address}`}
                             className="p-1 hover:bg-grey-300 cursor-pointer transition-colors rounded-full"
                           >
                             <IcnExternalLink className="w-4" />

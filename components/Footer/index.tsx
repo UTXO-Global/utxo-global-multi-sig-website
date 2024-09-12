@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   CONTACT_MAIL,
   SUBSTACK_LINK,
-  MAIN_SITE_URL,
+  SITE_URL,
   FEATURE_REQUEST_LINK,
   DOC_LINK,
 } from "@/configs/common";
@@ -36,7 +36,7 @@ const Footer = () => {
           <div>
             Powered By{" "}
             <Link
-              href={MAIN_SITE_URL}
+              href={SITE_URL}
               target="_blank"
               className="hover:text-orange-100 transition-colors"
             >

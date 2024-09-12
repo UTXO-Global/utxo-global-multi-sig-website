@@ -1109,41 +1109,40 @@
     "@babel/helper-validator-identifier" "^7.24.7"
     to-fast-properties "^2.0.0"
 
-"@ckb-ccc/ccc@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@ckb-ccc/ccc/-/ccc-0.0.13.tgz#ff95c98e09a608c59951562fc2d3711b8ab83658"
-  integrity sha512-lB1g1QLvCp1PFdS77Nz4JcVQCWL82VpPFoY5zvhtgLnDRP5bWkpZxhrD+SEcpb6irtB2KGtXa0+PtR05GXc0tw==
+"@ckb-ccc/ccc@0.0.14-alpha.0":
+  version "0.0.14-alpha.0"
+  resolved "https://registry.yarnpkg.com/@ckb-ccc/ccc/-/ccc-0.0.14-alpha.0.tgz#fda1028f0dde58175b909d04a9f4283937dc3be0"
+  integrity sha512-VuLcfPjmqEgOm9j4unKU8/00MmDlC7jPQVClkxuDf7Ne+JpVK1y1MCNNoHwjotVfqrQxhr4zHjsL6BRrWYAO7w==
   dependencies:
-    "@ckb-ccc/core" "0.0.13"
-    "@ckb-ccc/eip6963" "0.0.13"
-    "@ckb-ccc/joy-id" "0.0.13"
-    "@ckb-ccc/nip07" "0.0.13"
-    "@ckb-ccc/okx" "0.0.13"
-    "@ckb-ccc/rei" "0.0.13"
-    "@ckb-ccc/uni-sat" "0.0.13"
-    "@ckb-ccc/utxo-global" "0.0.13"
+    "@ckb-ccc/core" "0.0.14-alpha.0"
+    "@ckb-ccc/eip6963" "0.0.14-alpha.0"
+    "@ckb-ccc/joy-id" "0.0.14-alpha.0"
+    "@ckb-ccc/nip07" "0.0.14-alpha.0"
+    "@ckb-ccc/okx" "0.0.14-alpha.0"
+    "@ckb-ccc/rei" "0.0.14-alpha.0"
+    "@ckb-ccc/uni-sat" "0.0.14-alpha.0"
+    "@ckb-ccc/utxo-global" "0.0.14-alpha.0"
 
-"@ckb-ccc/connector-react@^0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@ckb-ccc/connector-react/-/connector-react-0.0.13.tgz#17b9a9f43e381f8897d253d3c4900c7f0a0766e7"
-  integrity sha512-JX+iMmmoMGz0516lSHYCmypUUl95DBDmrUnrCEF4SazJeGBykJtztoXFkT5FaANJBJUQKdZiOeRN6wqCQxDbdg==
+"@ckb-ccc/connector-react@^0.0.14-alpha.0":
+  version "0.0.14-alpha.0"
+  resolved "https://registry.yarnpkg.com/@ckb-ccc/connector-react/-/connector-react-0.0.14-alpha.0.tgz#8c65fb6484a28dd8d354ad47db55fe4cf833f72f"
+  integrity sha512-JCtc0xvVm5JZwleU+i+KG8LPbPRM1lsovozdntw+Axg9M3tDACJ9PkJGkkfw/yu6ae4XPJ72l6WlrWrqexp4uQ==
   dependencies:
-    "@ckb-ccc/connector" "0.0.13"
+    "@ckb-ccc/connector" "0.0.14-alpha.0"
     "@lit/react" "^1.0.5"
-    react "^18"
 
-"@ckb-ccc/connector@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@ckb-ccc/connector/-/connector-0.0.13.tgz#aa554a7e6d0422b619f3adcb5b0bed72d6c8543d"
-  integrity sha512-FFUK519ZvGI9nnIiwf2xbrhQ2nGP3mha+ZKOwykbu2tt2psC9zzBOWgqWsvNUMwj9gh4347ooN76Ht2Jf1ZwdA==
+"@ckb-ccc/connector@0.0.14-alpha.0":
+  version "0.0.14-alpha.0"
+  resolved "https://registry.yarnpkg.com/@ckb-ccc/connector/-/connector-0.0.14-alpha.0.tgz#b0c36b1c383bda35aca010e0c349f2f12949db3e"
+  integrity sha512-w81Y7cokBkEXtILExVjN3/KY/U0hUD317T9IH8zmHqkUki05Jn5XiSEz6gkL9k5x3GjBEkfFkbrjRAsNciQiUQ==
   dependencies:
-    "@ckb-ccc/ccc" "0.0.13"
+    "@ckb-ccc/ccc" "0.0.14-alpha.0"
     lit "^3.1.3"
 
-"@ckb-ccc/core@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@ckb-ccc/core/-/core-0.0.13.tgz#41462f85c186a6c39c03d616b7c6304e3022bee0"
-  integrity sha512-gsGw9UjJH1wbqjVQe0l3YMy/zLCoYCkoHD8TGqd761O9SENJPwt0cq8lGapUsBB8JphgLq6O8SP5kLjQ5JEuWA==
+"@ckb-ccc/core@0.0.14-alpha.0":
+  version "0.0.14-alpha.0"
+  resolved "https://registry.yarnpkg.com/@ckb-ccc/core/-/core-0.0.14-alpha.0.tgz#b9ec6e143472c90be54c0e39e2fc323070ec1739"
+  integrity sha512-kKMah5xWzLt48YE9Asc1KfDfN5lX7c7IE09X/7/ozVqWRNEyY1u6UmSQXyOV5LwP2fgvJmkkRD54H2RRAtNVoA==
   dependencies:
     "@joyid/ckb" "^1.0.1"
     "@noble/ciphers" "^0.5.3"
@@ -1158,28 +1157,28 @@
     isomorphic-ws "^5.0.0"
     ws "^8.18.0"
 
-"@ckb-ccc/eip6963@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@ckb-ccc/eip6963/-/eip6963-0.0.13.tgz#7d6875743b4bce664ab42f560f495016b9740ee2"
-  integrity sha512-tphbiEGcVaGfduf2UgXggEuq2XIioY5fQV1OMhHSpm9sHcC6BR403qMK/dhxxq98sXmSmM9nqsWQ9mbhfnSmCA==
+"@ckb-ccc/eip6963@0.0.14-alpha.0":
+  version "0.0.14-alpha.0"
+  resolved "https://registry.yarnpkg.com/@ckb-ccc/eip6963/-/eip6963-0.0.14-alpha.0.tgz#39b49d33b1edcb019fc33d1b5304074ac59c0806"
+  integrity sha512-qphoFzZIy7u8ssXraZBboM7pcQkvjdm/bOmRsdTu+pjRlRLJeC9wHKA7fbYmjw2wUPphBW9TmY4oxnEaUdkofw==
   dependencies:
-    "@ckb-ccc/core" "0.0.13"
+    "@ckb-ccc/core" "0.0.14-alpha.0"
 
-"@ckb-ccc/joy-id@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@ckb-ccc/joy-id/-/joy-id-0.0.13.tgz#1e53828fc2655b34c081b08485af4beb088175a5"
-  integrity sha512-b8mm8X1i3yoG1pPbTl5ajQW7C0aio//5L1MgbJtVY+UzowoWFRcGRN7SG+TZ2lzEHQUgr46dNsX0ilzSnK9Yag==
+"@ckb-ccc/joy-id@0.0.14-alpha.0":
+  version "0.0.14-alpha.0"
+  resolved "https://registry.yarnpkg.com/@ckb-ccc/joy-id/-/joy-id-0.0.14-alpha.0.tgz#edf4885daa6d70b11adedefaecd716eb23e87375"
+  integrity sha512-AEKLDYhTxkwgf0XM0naVp2gpAFvs3SQXwYyXApQBsoByQFJ57lRbBlAWHuyVmxCa682IKKy3nJ7SEC6AqqbfkA==
   dependencies:
-    "@ckb-ccc/core" "0.0.13"
+    "@ckb-ccc/core" "0.0.14-alpha.0"
     "@joyid/ckb" "^1.0.1"
     "@joyid/common" "^0.2.0"
 
-"@ckb-ccc/lumos-patches@^0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@ckb-ccc/lumos-patches/-/lumos-patches-0.0.13.tgz#9707cc6e855ce3b4582de082d60223912726456f"
-  integrity sha512-gXtU4g6jV5NmySSOfQfF3YsayY8Ag7wTx0veiNif8XeIWR/uwK+y56c1ezhalFULS/rOLn2++EyM8dsspZivRw==
+"@ckb-ccc/lumos-patches@^0.0.14-alpha.0":
+  version "0.0.14-alpha.0"
+  resolved "https://registry.yarnpkg.com/@ckb-ccc/lumos-patches/-/lumos-patches-0.0.14-alpha.0.tgz#a4f0c6be1fc9b4bb79f0c0fe8c5a50320fb1c3fb"
+  integrity sha512-R9r/1vy8NdDwFT7OaPw8WsnW6Y39YXKJ+qOzIQ/8nAaMsb4yX0VK4EIlPsNuLVDYAHtHRNYBOrKzSU66jz2mmQ==
   dependencies:
-    "@ckb-ccc/core" "0.0.13"
+    "@ckb-ccc/core" "0.0.14-alpha.0"
     "@ckb-lumos/base" "^0.24.0-next.1"
     "@ckb-lumos/codec" "^0.24.0-next.1"
     "@ckb-lumos/common-scripts" "^0.24.0-next.1"
@@ -1187,42 +1186,42 @@
     "@ckb-lumos/helpers" "^0.24.0-next.1"
     "@joyid/ckb" "^1.0.1"
 
-"@ckb-ccc/nip07@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@ckb-ccc/nip07/-/nip07-0.0.13.tgz#72c010c906350c82d6f5b90770b1929a7c1727b6"
-  integrity sha512-XxczVAAYGbQfgrRwC9+DL4TO+i7sTOl/l3VyURnkoEgX9RH+Oa7uKRvKLYVbUL1a2N362ybxUcmBeHk2cMVLiQ==
+"@ckb-ccc/nip07@0.0.14-alpha.0":
+  version "0.0.14-alpha.0"
+  resolved "https://registry.yarnpkg.com/@ckb-ccc/nip07/-/nip07-0.0.14-alpha.0.tgz#b09fcbaecdecfb72d3c91a031e66d0d7b383a5ba"
+  integrity sha512-acC9kld+ySGn04h17G2xYSU1rPs3y7M9uIltjoxac2IwL3Kzl7ADSPe3GufE9lvMdOMjkJvCByycDSh7gbjDsQ==
   dependencies:
-    "@ckb-ccc/core" "0.0.13"
+    "@ckb-ccc/core" "0.0.14-alpha.0"
 
-"@ckb-ccc/okx@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@ckb-ccc/okx/-/okx-0.0.13.tgz#ce7004a7f872d77df95bfff57070716ccdb10bad"
-  integrity sha512-ebtbiKuoTIAkQ03JvZR/+bor7n3ORXfDXeugWIQGj5IP8wtmLMlZBoraB4DQbYhLxZh54m5vLeo09MiIj/lqcA==
+"@ckb-ccc/okx@0.0.14-alpha.0":
+  version "0.0.14-alpha.0"
+  resolved "https://registry.yarnpkg.com/@ckb-ccc/okx/-/okx-0.0.14-alpha.0.tgz#9403c3f157fa47598edbe2836fa007a046621099"
+  integrity sha512-g0fRgZurF+KCX6QbReQAYEfv8fuJXeDK3iV8elccI4sxvnfIcdUW3akt0092804fBnHoinPX466wl4Tzt9KiKw==
   dependencies:
-    "@ckb-ccc/core" "0.0.13"
-    "@ckb-ccc/nip07" "0.0.13"
-    "@ckb-ccc/uni-sat" "0.0.13"
+    "@ckb-ccc/core" "0.0.14-alpha.0"
+    "@ckb-ccc/nip07" "0.0.14-alpha.0"
+    "@ckb-ccc/uni-sat" "0.0.14-alpha.0"
 
-"@ckb-ccc/rei@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@ckb-ccc/rei/-/rei-0.0.13.tgz#0be28bc2fa2a27d828d960e00c413323d414be28"
-  integrity sha512-JBarh6yMSDUwXSHv9tbV9xQJSh3BKWumMu+hZgHlO7E/9DWCSl+/Dgw+Oj+I5vnNR9xZtGRuhBsFgm0HR16SGA==
+"@ckb-ccc/rei@0.0.14-alpha.0":
+  version "0.0.14-alpha.0"
+  resolved "https://registry.yarnpkg.com/@ckb-ccc/rei/-/rei-0.0.14-alpha.0.tgz#5f9175efa5ad7c9fba921e7c85c0d076423ce7aa"
+  integrity sha512-vfhS7GXVEFqsjlLctIX3VxjqpVihlAKX4SmTSda/PED9vLBNuy2k9b0x0dH67o/xXAsgdRmoc9REnN6ChgqCnA==
   dependencies:
-    "@ckb-ccc/core" "0.0.13"
+    "@ckb-ccc/core" "0.0.14-alpha.0"
 
-"@ckb-ccc/uni-sat@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@ckb-ccc/uni-sat/-/uni-sat-0.0.13.tgz#e6fdd7693cafac0d14826e90a4aa2dfee4ca2c88"
-  integrity sha512-f6jmSIsAqz4BBZUnRUcP2S/bM0NQfPrfkTuZvxkm4SlrIsvHE2EYJWmQ1oRppuhP2msK1wEVQgm6vH/UyQgIgQ==
+"@ckb-ccc/uni-sat@0.0.14-alpha.0":
+  version "0.0.14-alpha.0"
+  resolved "https://registry.yarnpkg.com/@ckb-ccc/uni-sat/-/uni-sat-0.0.14-alpha.0.tgz#86e77caa6bb145d56001b863f342c3edd162a9ab"
+  integrity sha512-557Fca/lNIdp/qagJnyT5bhh59oFcsfRjHF4YvEsuvzPwD+TEQ1V1V+6TxY+S0a2M0+qTR57i+NyXEOsa8VmWQ==
   dependencies:
-    "@ckb-ccc/core" "0.0.13"
+    "@ckb-ccc/core" "0.0.14-alpha.0"
 
-"@ckb-ccc/utxo-global@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@ckb-ccc/utxo-global/-/utxo-global-0.0.13.tgz#974238c6aa63eb3e98b605c2d7661fa5abe7a8e5"
-  integrity sha512-NIcSfw0gyDufSw/YNqYFl8TMF5qMfHs4v5YbcMYIjwEjNYncxYcB8mPFHLDYYPyrAZiKSmAGbh9MSim7nI2tQA==
+"@ckb-ccc/utxo-global@0.0.14-alpha.0":
+  version "0.0.14-alpha.0"
+  resolved "https://registry.yarnpkg.com/@ckb-ccc/utxo-global/-/utxo-global-0.0.14-alpha.0.tgz#815430dc3afc54d9139b3b0c1593366ab9d60606"
+  integrity sha512-AFW5WEF8aSTt0NorUhd4C9rdhvrKqptDWJDvSISY/3n0ELnotkQbLRppTj0WYIgBy/NJmKZE/tXqFE6YXzWZPw==
   dependencies:
-    "@ckb-ccc/core" "0.0.13"
+    "@ckb-ccc/core" "0.0.14-alpha.0"
 
 "@ckb-lumos/base@0.23.0":
   version "0.23.0"

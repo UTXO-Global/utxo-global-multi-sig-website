@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useState, useEffect, useCallback } from "react";
-import {ccc} from "@ckb-ccc/connector-react"
+import { ccc } from "@ckb-ccc/connector-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -17,7 +17,10 @@ import { selectStorage } from "@/redux/features/storage/reducer";
 import { isAddressEqual } from "@/utils/helpers";
 import ConnectedRequired from "@/components/ConnectedRequired";
 import useSupportedScreen from "@/hooks/useSupportedScreen";
-import { reset } from "@/redux/features/storage/action";
+import { reset, setNetwork } from "@/redux/features/storage/action";
+import { setNetworkConfig } from "@/redux/features/app/action";
+import { DEFAULT_NETWORK } from "@/configs/common";
+import { CkbNetwork } from "@/types/common";
 
 const defaultValue = {
   address: "",
@@ -30,9 +33,8 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [address, setAddress] = useState<string>("");
   const { isSupported } = useSupportedScreen();
 
-  const signer = ccc.useSigner()
-
-  const { addressLogged } = useAppSelector(selectStorage);
+  const signer = ccc.useSigner();
+  const { addressLogged, network } = useAppSelector(selectStorage);
   const dispatch = useAppDispatch();
 
   const checkIsLoggedIn = useCallback(async () => {
@@ -69,6 +71,19 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     if (isAddressEqual(address, addressLogged)) return;
     dispatch(reset());
   }, [address, addressLogged, dispatch]);
+
+  useEffect(() => {
+    if (network) {
+      dispatch(setNetworkConfig(network));
+    } else {
+      const _network =
+        DEFAULT_NETWORK === CkbNetwork.MiranaMainnet
+          ? CkbNetwork.MiranaMainnet
+          : CkbNetwork.PudgeTestnet;
+      dispatch(setNetwork(_network));
+      dispatch(setNetworkConfig(_network));
+    }
+  }, [network]);
 
   if (!isSupported) return <NotSupportedScreen />;
 

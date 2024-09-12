@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Popover } from "antd";
 
 import cn from "@/utils/cn";
@@ -11,8 +11,9 @@ import IcnChevron from "@/public/icons/icn-chevron.svg";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { selectStorage } from "@/redux/features/storage/reducer";
 import { setNetwork } from "@/redux/features/storage/action";
-import { NETWORK } from "@/configs/common";
+import { DEFAULT_NETWORK } from "@/configs/common";
 import { NETWORK_NAME } from "@/configs/network";
+import { setNetworkConfig } from "@/redux/features/app/action";
 
 const SwitchNetwork = ({
   iconClassname,
@@ -26,12 +27,22 @@ const SwitchNetwork = ({
   const dispatch = useAppDispatch();
   const { network } = useAppSelector(selectStorage);
 
+  const defaultNetwork = useMemo(() => {
+    if (network) return network;
+    if (DEFAULT_NETWORK === CkbNetwork.MiranaMainnet) {
+      return CkbNetwork.MiranaMainnet;
+    }
+
+    return CkbNetwork.PudgeTestnet;
+  }, [network]);
+
   const hide = () => {
     setOpen(false);
   };
 
   const changeNetwork = (network: CkbNetwork) => {
     dispatch(setNetwork(network));
+    dispatch(setNetworkConfig(network));
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -41,7 +52,10 @@ const SwitchNetwork = ({
     <div className="py-1 bg-light-100 text-[14px] leading-[20px] rounded-lg overflow-hidden font-medium text-dark-100">
       <div
         className="px-4 py-[10px] flex gap-2 cursor-not-allowed transition-colors items-center"
-        onClick={() => {}}
+        onClick={() => {
+          changeNetwork(CkbNetwork.MiranaMainnet);
+          hide();
+        }}
       >
         <img
           src="/images/nervos.png"
@@ -85,7 +99,7 @@ const SwitchNetwork = ({
           />
           <div>
             <p className="text-[14px] leading-[24px] font-medium text-dark-100">
-              {NETWORK_NAME[NETWORK]}
+              {NETWORK_NAME[defaultNetwork]}
             </p>
             {customEl}
           </div>

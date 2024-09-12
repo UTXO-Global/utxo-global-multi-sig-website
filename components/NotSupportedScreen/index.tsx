@@ -1,9 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import {
-  CONTACT_MAIL,
-  FEATURE_REQUEST_LINK,
-  MAIN_SITE_URL,
-} from "@/configs/common";
+import { CONTACT_MAIL, FEATURE_REQUEST_LINK, SITE_URL } from "@/configs/common";
 import Link from "next/link";
 
 const NotSupportedScreen = () => {
@@ -34,7 +30,7 @@ const NotSupportedScreen = () => {
         </p>
         <div className="text-[16px] leading-[20px] text-grey-400 flex justify-center gap-2 items-center mt-10">
           <Link
-            href={MAIN_SITE_URL}
+            href={SITE_URL}
             target="_blank"
             className="hover:text-orange-100 transition-colors"
           >
