@@ -61,6 +61,7 @@ const SwitchNetwork = ({
     <div className="py-1 bg-light-100 text-[14px] leading-[20px] rounded-lg overflow-hidden font-medium text-dark-100">
       {NETWORK.map((n) => (
         <div
+          key={`network-${n.network}`}
           className={cn(
             "px-4 py-[10px] flex gap-2 cursor-pointer transition-colors items-center",
             {
