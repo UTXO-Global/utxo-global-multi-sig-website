@@ -94,8 +94,6 @@ const ConfirmTx = ({
         config: lumosConfig,
       });
 
-      console.log("txInfo", txInfo, fromScript);
-
       const toScript = helpers.parseAddress(txInfo.send_to, {
         config: lumosConfig,
       });

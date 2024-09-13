@@ -11,10 +11,25 @@ import IcnChevron from "@/public/icons/icn-chevron.svg";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { selectStorage } from "@/redux/features/storage/reducer";
 import { setNetwork } from "@/redux/features/storage/action";
-import { DEFAULT_NETWORK } from "@/configs/common";
 import { NETWORK_NAME } from "@/configs/network";
 import { setNetworkConfig } from "@/redux/features/app/action";
+import { selectApp } from "@/redux/features/app/reducer";
+import { useRouter } from "next/navigation";
+import { disconnect } from "process";
 
+const NETWORK = [
+  {
+    icon: "/images/nervos.png",
+    name: "Mirana Mainnet",
+    network: CkbNetwork.MiranaMainnet,
+  },
+  {
+    icon: "/images/nervos.png",
+    name: "Pudge Testnet",
+    network: CkbNetwork.PudgeTestnet,
+    isTestnet: true,
+  },
+];
 const SwitchNetwork = ({
   iconClassname,
   customEl,
@@ -22,19 +37,11 @@ const SwitchNetwork = ({
   iconClassname?: string;
   customEl?: React.ReactNode;
 }) => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const dispatch = useAppDispatch();
-  const { network } = useAppSelector(selectStorage);
-
-  const defaultNetwork = useMemo(() => {
-    if (network) return network;
-    if (DEFAULT_NETWORK === CkbNetwork.MiranaMainnet) {
-      return CkbNetwork.MiranaMainnet;
-    }
-
-    return CkbNetwork.PudgeTestnet;
-  }, [network]);
+  const { config } = useAppSelector(selectApp);
 
   const hide = () => {
     setOpen(false);
@@ -43,6 +50,8 @@ const SwitchNetwork = ({
   const changeNetwork = (network: CkbNetwork) => {
     dispatch(setNetwork(network));
     dispatch(setNetworkConfig(network));
+    disconnect();
+    router.push("/");
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -50,34 +59,25 @@ const SwitchNetwork = ({
   };
   const content = (
     <div className="py-1 bg-light-100 text-[14px] leading-[20px] rounded-lg overflow-hidden font-medium text-dark-100">
-      <div
-        className="px-4 py-[10px] flex gap-2 cursor-not-allowed transition-colors items-center"
-        onClick={() => {
-          changeNetwork(CkbNetwork.MiranaMainnet);
-          hide();
-        }}
-      >
-        <img
-          src="/images/nervos.png"
-          alt="nervos"
-          className="w-6 rounded-full"
-        />
-        <p>Mirana Mainnet</p>
-      </div>
-      <div
-        className="px-4 py-[10px] flex gap-2 bg-grey-300 transition-colors items-center cursor-pointer"
-        onClick={() => {
-          changeNetwork(CkbNetwork.PudgeTestnet);
-          hide();
-        }}
-      >
-        <img
-          src="/images/nervos.png"
-          alt="nervos"
-          className="w-6 rounded-full"
-        />
-        <p>Pudge Testnet</p>
-      </div>
+      {NETWORK.map((n) => (
+        <div
+          className={cn(
+            "px-4 py-[10px] flex gap-2 cursor-pointer transition-colors items-center",
+            {
+              "bg-grey-300 cursor-not-allowed": config.network === n.network,
+            }
+          )}
+          onClick={() => {
+            if (n.network !== config.network) {
+              changeNetwork(n.network);
+              hide();
+            }
+          }}
+        >
+          <img src={n.icon} alt="nervos" className="w-6 rounded-full" />
+          <p>{n.name}</p>
+        </div>
+      ))}
     </div>
   );
 
@@ -99,7 +99,7 @@ const SwitchNetwork = ({
           />
           <div>
             <p className="text-[14px] leading-[24px] font-medium text-dark-100">
-              {NETWORK_NAME[defaultNetwork]}
+              {NETWORK_NAME[config.network]}
             </p>
             {customEl}
           </div>

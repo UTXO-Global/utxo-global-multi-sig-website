@@ -21,7 +21,7 @@ export const AGGRON4: Config = {
 export const LINA: Config = {
   ...predefined.LINA,
   SCRIPTS: {
-    ...predefined.AGGRON4.SCRIPTS,
+    ...predefined.LINA.SCRIPTS,
     SECP256K1_BLAKE160_MULTISIG: {
       CODE_HASH:
         "0xd1a9f877aed3f5e07cb9c52b61ab96d06f250ae6883cc7f0a2423db0976fc821",
@@ -29,7 +29,7 @@ export const LINA: Config = {
       TX_HASH:
         "0x0a13d8d9c83c3374196ee43d4f0116dac497b0fec3e71c04f7cb7780abc455d8",
       INDEX: "0x0",
-      DEP_TYPE: "depGroup",
+      DEP_TYPE: "code",
       SHORT_ID: 1,
     },
   },

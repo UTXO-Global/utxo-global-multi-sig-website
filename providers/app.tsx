@@ -34,6 +34,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const { isSupported } = useSupportedScreen();
 
   const signer = ccc.useSigner();
+  const { setClient } = ccc.useCcc();
   const { addressLogged, network } = useAppSelector(selectStorage);
   const dispatch = useAppDispatch();
 
@@ -67,23 +68,51 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   }, [checkIsLoggedIn]);
 
   useEffect(() => {
-    if (!address) return;
+    if (!address && !!addressLogged) {
+      setAddress(addressLogged);
+      return;
+    }
     if (isAddressEqual(address, addressLogged)) return;
     dispatch(reset());
   }, [address, addressLogged, dispatch]);
 
   useEffect(() => {
-    if (network) {
-      dispatch(setNetworkConfig(network));
-    } else {
-      const _network =
+    let _network = network;
+    if (!network) {
+      _network =
         DEFAULT_NETWORK === CkbNetwork.MiranaMainnet
           ? CkbNetwork.MiranaMainnet
           : CkbNetwork.PudgeTestnet;
-      dispatch(setNetwork(_network));
-      dispatch(setNetworkConfig(_network));
     }
-  }, [network]);
+
+    dispatch(setNetwork(_network));
+    dispatch(setNetworkConfig(_network));
+
+    setClient(
+      _network === CkbNetwork.MiranaMainnet
+        ? new ccc.ClientPublicMainnet()
+        : new ccc.ClientPublicTestnet()
+    );
+  }, [network, setClient]);
+
+  useEffect(() => {
+    let _network = network;
+    if (!_network) {
+      _network =
+        DEFAULT_NETWORK === CkbNetwork.MiranaMainnet
+          ? CkbNetwork.MiranaMainnet
+          : CkbNetwork.PudgeTestnet;
+    }
+
+    dispatch(setNetwork(_network));
+    dispatch(setNetworkConfig(_network));
+
+    setClient(
+      _network === CkbNetwork.MiranaMainnet
+        ? new ccc.ClientPublicMainnet()
+        : new ccc.ClientPublicTestnet()
+    );
+  }, [network, setClient]);
 
   if (!isSupported) return <NotSupportedScreen />;
 

@@ -2,8 +2,8 @@ import Axios, { AxiosRequestConfig, AxiosRequestHeaders } from "axios";
 import { toast } from "react-toastify";
 import { reset } from "@/redux/features/storage/action";
 import { isAddressEqual } from "./helpers";
-import { CkbNetwork } from "@/types/common";
 import { MAINNET_CONFIG, TESTNET_CONFIG } from "@/configs/network";
+import { DEFAULT_NETWORK } from "@/configs/common";
 
 interface AdaptAxiosRequestConfig extends AxiosRequestConfig {
   headers: AxiosRequestHeaders;
@@ -14,9 +14,35 @@ export const injectStore = (_store: any) => {
   store = _store;
 };
 
-let api = Axios.create();
+const getDefaultBaseURL = () => {
+  try {
+    let data = null;
+    if (typeof window !== "undefined") {
+      data = localStorage.getItem("persist:utxo-global-multi-sig");
+    }
+
+    let network = DEFAULT_NETWORK;
+    if (!!data) {
+      const config = JSON.parse(data);
+      const storage = JSON.parse(config?.storage || "{}");
+      if (!!storage.network) {
+        network = storage.network;
+      }
+    }
+
+    if (network === "nervos") {
+      return MAINNET_CONFIG.apiURL;
+    }
+    return TESTNET_CONFIG.apiURL;
+  } catch (e) {
+    console.log("Get default network failed", e);
+  }
+};
+
+let api = Axios.create({ baseURL: getDefaultBaseURL()! });
+
 export const setBaseAPIURL = (baseURL: string) => {
-  api = Axios.create({ baseURL });
+  api.defaults.baseURL = baseURL;
 };
 
 api.interceptors.request.use(

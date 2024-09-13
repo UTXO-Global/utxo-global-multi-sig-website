@@ -1,11 +1,13 @@
 import Link from "next/link";
 
-import { NETWORK } from "@/configs/common";
 import IcnWaterTap from "@/public/icons/icn-water-tap.svg";
+import { useAppSelector } from "@/redux/hook";
+import { selectApp } from "@/redux/features/app/reducer";
+import { CkbNetwork } from "@/types/common";
 
 const Faucet = () => {
-
-  if (NETWORK === "nervos") return null;
+  const { config } = useAppSelector(selectApp);
+  if (config.network === CkbNetwork.MiranaMainnet) return null;
 
   return (
     <Link

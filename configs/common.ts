@@ -4,7 +4,7 @@ export const SITE_DESCRIPTION =
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "";
 export const SITE_IMAGE_URL =
   "https://config.utxo.global/images/preview-site.png";
-export const CONTACT_EMAIL = "contact@utxo.global";
+export const CONTACT_MAIL = "contact@utxo.global";
 export const EXTENSION_URL =
   "https://chromewebstore.google.com/detail/utxo-global-wallet/lnamkkidoonpeknminiadpgjiofpdmle";
 export const EXTENTSION_GITHUB =
