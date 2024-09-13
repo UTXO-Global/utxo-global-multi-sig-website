@@ -3,7 +3,7 @@ const { format } = require("date-fns");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  //output: "export",
+  output: "export",
   images: { unoptimized: true },
   reactStrictMode: false,
   trailingSlash: true,
