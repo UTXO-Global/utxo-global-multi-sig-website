@@ -28,7 +28,7 @@ export const TESTNET_CONFIG: INetworkConfig = {
 
 export const MAINNET_CONFIG: INetworkConfig = {
   network: "nervos",
-  apiURL: "http://localhost:8080", // "https://api.utxo.global",
+  apiURL: "https://api.utxo.global",
   explorer: "https://explorer.nervos.org/en",
   explorerAPI: "https://mainnet-api.explorer.nervos.org",
   ckbRPC: "https://mainnet.ckb.dev/rpc",
