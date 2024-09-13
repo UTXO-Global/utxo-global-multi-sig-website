@@ -12,15 +12,11 @@ import {
   setTokenExpired,
 } from "@/redux/features/storage/action";
 import { selectApp } from "@/redux/features/app/reducer";
-import { selectStorage } from "@/redux/features/storage/reducer";
-import { AppContext } from "@/providers/app";
 
 const useLogin = () => {
   const { isLoggedIn } = useAuthenticate();
   const signer = ccc.useSigner();
   const { config } = useAppSelector(selectApp);
-  const { network, addressLogged } = useAppSelector(selectStorage);
-  const { address } = useContext(AppContext);
 
   const dispatch = useAppDispatch();
 
@@ -79,6 +75,7 @@ const useLogin = () => {
     if (signature) {
       await _login(signature, address);
     }
+
     return;
   }, [signer, isLoggedIn, _getNonce, _signMessage, _login]);
 

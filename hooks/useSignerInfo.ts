@@ -19,7 +19,7 @@ const useSignerInfo = () => {
     (async () => {
       setBalance(await getBalance(address, config));
     })();
-  }, [address]);
+  }, [address, config]);
 
   return {
     address,

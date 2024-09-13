@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { Popover } from "antd";
 
 import cn from "@/utils/cn";
@@ -9,13 +9,13 @@ import { CkbNetwork } from "@/types/common";
 
 import IcnChevron from "@/public/icons/icn-chevron.svg";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { selectStorage } from "@/redux/features/storage/reducer";
-import { setNetwork } from "@/redux/features/storage/action";
+import { reset, setNetwork } from "@/redux/features/storage/action";
 import { NETWORK_NAME } from "@/configs/network";
 import { setNetworkConfig } from "@/redux/features/app/action";
 import { selectApp } from "@/redux/features/app/reducer";
+import { reset as restAccountInfo } from "@/redux/features/account-info/action";
+import { ccc } from "@ckb-ccc/connector-react";
 import { useRouter } from "next/navigation";
-import { disconnect } from "process";
 
 const NETWORK = [
   {
@@ -37,20 +37,23 @@ const SwitchNetwork = ({
   iconClassname?: string;
   customEl?: React.ReactNode;
 }) => {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const dispatch = useAppDispatch();
   const { config } = useAppSelector(selectApp);
+  const { disconnect } = ccc.useCcc();
+  const router = useRouter();
 
   const hide = () => {
     setOpen(false);
   };
 
   const changeNetwork = (network: CkbNetwork) => {
+    disconnect();
     dispatch(setNetwork(network));
     dispatch(setNetworkConfig(network));
-    disconnect();
+    dispatch(reset());
+    dispatch(restAccountInfo());
     router.push("/");
   };
 

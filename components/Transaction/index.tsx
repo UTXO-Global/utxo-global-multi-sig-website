@@ -98,7 +98,9 @@ const Transaction = ({
       setIsConfirmLoading(false);
     }
 
-    await dispatch(loadInfo(multisigAddress as any));
+    await dispatch(
+      loadInfo({ address: multisigAddress!, networkConfig: config })
+    );
     refresh?.();
   };
 
