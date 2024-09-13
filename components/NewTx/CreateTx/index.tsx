@@ -31,7 +31,7 @@ const CreateTx = ({
 
   const balanceN = useMemo(() => {
     return Number(ccc.fixedPointToString(balance));
-  }, [txInfo, balance]);
+  }, [balance]);
 
   useEffect(() => {
     if (txInfo.amount === 0 || balanceN === 0) return;

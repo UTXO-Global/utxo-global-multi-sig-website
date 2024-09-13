@@ -79,7 +79,7 @@ const Step02 = ({
         address: isValidCKBAddress(z.address, config.network),
       }))
     );
-  }, [signers]);
+  }, [signers, config.network]);
 
   const _isDuplicateSigner = () => {
     const set = new Set(signers.map((z) => z.address.toLowerCase()));

@@ -20,9 +20,9 @@ const NewTx = () => {
 
   useEffect(() => {
     if (account) {
-      txInfo.send_from = account.multi_sig_address;
+      setTxInfo((prev) => ({ ...prev, send_from: account.multi_sig_address }));
     }
-  }, [account]);
+  }, [account, setTxInfo]);
   return (
     <>
       <div className="w-full h-1 bg-[#D9D9D9] absolute top-0 left-0"></div>

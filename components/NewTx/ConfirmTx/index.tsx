@@ -36,13 +36,13 @@ const ConfirmTx = ({
   const [txFee, setTxFee] = useState(BI.from(100000)); // Set fee = 0.001
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [error, setError] = useState("");
   const { info: account } = useAppSelector(selectAccountInfo);
   const { config: appConfig } = useAppSelector(selectApp);
   const signer = ccc.useSigner();
   const indexer = useMemo(() => {
     return new Indexer(appConfig.ckbRPC);
-  }, []);
-  const [error, setError] = useState("");
+  }, [appConfig.ckbRPC]);
 
   const onSign = async () => {
     if (!signer) {
@@ -249,7 +249,7 @@ const ConfirmTx = ({
     setLoading(true);
     f();
     setLoading(false);
-  }, [txInfo, txFee, account, indexer]);
+  }, [txInfo, txFee, account, indexer, appConfig.isTestnet]);
 
   return (
     <>
