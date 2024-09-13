@@ -12,8 +12,9 @@ import { ccc } from "@ckb-ccc/connector-react";
 import { formatNumber } from "@/utils/helpers";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
-import { NETWORK } from "@/configs/common";
 import { BI } from "@ckb-lumos/lumos";
+import { useAppSelector } from "@/redux/hook";
+import { selectApp } from "@/redux/features/app/reducer";
 
 const CKB_MIN_TRANSFER = 63; // 63 CKB
 const CreateTx = ({
@@ -25,6 +26,7 @@ const CreateTx = ({
   setTxInfo: (info: SendTokenType) => void;
   onNext: () => void;
 }) => {
+  const { config } = useAppSelector(selectApp);
   const { balance } = useMultisigBalance();
 
   const balanceN = useMemo(() => {
@@ -58,7 +60,7 @@ const CreateTx = ({
             <div className="flex items-center gap-2">
               <div className="w-10 aspect-square rounded-full bg-grey-200"></div>
               <p className="text-[16px] leading-[20px] font-medium text-grey-500">
-                {SHORT_NETWORK_NAME[NETWORK]}:
+                {SHORT_NETWORK_NAME[config.network]}:
               </p>
             </div>
             <input

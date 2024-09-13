@@ -19,8 +19,8 @@ import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { cccA } from "@ckb-ccc/connector-react/advanced";
 import { useRouter } from "next/navigation";
-import { CKB_RPC, IS_TESTNET } from "@/configs/common";
 import { AGGRON4, LINA } from "@/utils/lumos-config";
+import { selectApp } from "@/redux/features/app/reducer";
 
 const ConfirmTx = ({
   txInfo,
@@ -37,9 +37,10 @@ const ConfirmTx = ({
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { info: account } = useAppSelector(selectAccountInfo);
+  const { config: appConfig } = useAppSelector(selectApp);
   const signer = ccc.useSigner();
   const indexer = useMemo(() => {
-    return new Indexer(CKB_RPC);
+    return new Indexer(appConfig.ckbRPC);
   }, []);
   const [error, setError] = useState("");
 
@@ -87,13 +88,11 @@ const ConfirmTx = ({
         cellProvider: indexer,
       });
 
-      const lumosConfig = IS_TESTNET ? AGGRON4 : LINA;
+      const lumosConfig = appConfig.isTestnet ? AGGRON4 : LINA;
 
       const fromScript = helpers.parseAddress(txInfo.send_from, {
         config: lumosConfig,
       });
-
-      console.log("txInfo", txInfo, fromScript);
 
       const toScript = helpers.parseAddress(txInfo.send_to, {
         config: lumosConfig,

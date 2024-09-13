@@ -1,22 +1,26 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
 
 import useAuthenticate from "./useAuthenticate";
 import api from "@/utils/api";
-import { useAppDispatch } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   setAddressLogged,
   setToken,
   setTokenExpired,
 } from "@/redux/features/storage/action";
-import { NETWORK } from "@/configs/common";
+import { selectApp } from "@/redux/features/app/reducer";
+import { selectStorage } from "@/redux/features/storage/reducer";
+import { AppContext } from "@/providers/app";
 
 const useLogin = () => {
   const { isLoggedIn } = useAuthenticate();
   const signer = ccc.useSigner();
-  const { client } = ccc.useCcc();
+  const { config } = useAppSelector(selectApp);
+  const { network, addressLogged } = useAppSelector(selectStorage);
+  const { address } = useContext(AppContext);
 
   const dispatch = useAppDispatch();
 
@@ -60,23 +64,29 @@ const useLogin = () => {
   );
 
   const login = useCallback(async () => {
-    const currentNetwork = await (window as any).utxoGlobal.getNetwork();
-    const isNetworkEqual = currentNetwork === NETWORK;
+    const currentNetwork = await (
+      window as any
+    ).utxoGlobal.ckbSigner.getNetwork();
+    const isNetworkEqual = currentNetwork === config.network;
     if (!isNetworkEqual) {
-      await (window as any).utxoGlobal.switchNetwork(NETWORK);
+      await (window as any).utxoGlobal.ckbSigner.switchNetwork(config.network);
       return login();
     }
     const address = (await signer?.getInternalAddress()) as string;
     if (isLoggedIn) return;
     const nonce = await _getNonce(address);
     const signature = (await _signMessage(nonce)) as string;
-    await _login(signature, address);
+    if (signature) {
+      await _login(signature, address);
+    }
     return;
   }, [signer, isLoggedIn, _getNonce, _signMessage, _login]);
 
   useEffect(() => {
-    login();
-  }, [login]);
+    if (signer && !!signer.getInternalAddress()) {
+      login();
+    }
+  }, [login, signer, signer?.getInternalAddress()]);
 };
 
 export default useLogin;

@@ -8,7 +8,8 @@ import useRejectInvitation from "@/hooks/useRejectInvitation";
 import cn from "@/utils/cn";
 import { shortAddress } from "@/utils/helpers";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
-import { NETWORK } from "@/configs/common";
+import { useAppSelector } from "@/redux/hook";
+import { selectApp } from "@/redux/features/app/reducer";
 
 const InvitationAccount = ({
   account,
@@ -21,6 +22,7 @@ const InvitationAccount = ({
 }) => {
   const { isLoading: isAcceptLoading, accept } = useAcceptInvitation();
   const { isLoading: isRejectLoading, reject } = useRejectInvitation();
+  const { config } = useAppSelector(selectApp);
 
   return (
     <div className="px-4 py-3 rounded-lg border border-grey-300 hover:bg-grey-300 transition-colors flex justify-between items-center">
@@ -58,13 +60,15 @@ const InvitationAccount = ({
             {account.account_name}
           </p>
           <p
-              className={cn(`text-[14px] leading-[24px] text-grey-400`, {
-                "text-[12px] leading-[16px]": isSmall,
-              })}
-            >
-              <span className="text-dark-100">{SHORT_NETWORK_NAME[NETWORK]}: </span>
-              {shortAddress(account.multisig_address, 5)}
-            </p>
+            className={cn(`text-[14px] leading-[24px] text-grey-400`, {
+              "text-[12px] leading-[16px]": isSmall,
+            })}
+          >
+            <span className="text-dark-100">
+              {SHORT_NETWORK_NAME[config.network]}:{" "}
+            </span>
+            {shortAddress(account.multisig_address, 5)}
+          </p>
         </div>
       </div>
       <div

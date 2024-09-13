@@ -2,33 +2,18 @@ export const SITE_TITLE = "UTXO Global Multi-Sig";
 export const SITE_DESCRIPTION =
   "Safeguard your UTXO assets with many private keys adding an extra layer of security.";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "";
-export const MAIN_SITE_URL = process.env.NEXT_PUBLIC_MAIN_SITE_URL || "";
 export const SITE_IMAGE_URL =
   "https://config.utxo.global/images/preview-site.png";
 export const CONTACT_MAIL = "contact@utxo.global";
+export const EXTENSION_URL =
+  "https://chromewebstore.google.com/detail/utxo-global-wallet/lnamkkidoonpeknminiadpgjiofpdmle";
 export const EXTENTSION_GITHUB =
   "https://github.com/UTXO-Global/utxo-wallet-extension";
 export const SUBSTACK_LINK = "https://utxoglobal.substack.com/";
 export const DOC_LINK = "https://utxo-global.gitbook.io/utxo-global";
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACIKING_ID;
-export const NETWORK = process.env.NEXT_PUBLIC_NETWORK || "nervos_testnet";
-export const IS_TESTNET = NETWORK === "nervos_testnet";
-export const EXPLORER =
-  NETWORK === "nervos_testnet"
-    ? "https://pudge.explorer.nervos.org/en"
-    : "https://explorer.nervos.org/en";
-export const EXPLORER_API =
-  NETWORK === "nervos_testnet"
-    ? "https://testnet-api.explorer.nervos.org"
-    : "https://mainnet-api.explorer.nervos.org";
-export const FEATURE_REQUEST_LINK =
-  "https://docs.google.com/forms/d/e/1FAIpQLSeUC9e8ka0iSAFXR1gPjepQEcygdLgwKbtnAWfc_2IRqL1pqw/viewform";
-
-export const CKB_RPC =
-  NETWORK === "nervos_testnet"
-    ? "https://testnet.ckb.dev/rpc"
-    : "https://mainnet.ckb.dev/rpc";
-
+export const DEFAULT_NETWORK =
+  process.env.NEXT_PUBLIC_NETWORK_DEFAULT || "nervos_testnet";
 export const NAVIGATIONS = [
   {
     id: "about-us",
@@ -51,9 +36,10 @@ export const NAVIGATIONS = [
   {
     id: "github",
     label: "GitHub",
-    href: EXTENTSION_GITHUB,
+    href: "https://github.com/UTXO-Global/utxo-wallet-extension",
     isExternal: true,
   },
 ];
-
+export const FEATURE_REQUEST_LINK =
+  "https://docs.google.com/forms/d/e/1FAIpQLSeUC9e8ka0iSAFXR1gPjepQEcygdLgwKbtnAWfc_2IRqL1pqw/viewform";
 export const LIMIT_PER_PAGE = 10;
