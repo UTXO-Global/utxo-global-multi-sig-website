@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { Popover } from "antd";
 
 import cn from "@/utils/cn";
@@ -9,11 +9,27 @@ import { CkbNetwork } from "@/types/common";
 
 import IcnChevron from "@/public/icons/icn-chevron.svg";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { selectStorage } from "@/redux/features/storage/reducer";
-import { setNetwork } from "@/redux/features/storage/action";
-import { NETWORK } from "@/configs/common";
+import { reset, setNetwork } from "@/redux/features/storage/action";
 import { NETWORK_NAME } from "@/configs/network";
+import { setNetworkConfig } from "@/redux/features/app/action";
+import { selectApp } from "@/redux/features/app/reducer";
+import { reset as restAccountInfo } from "@/redux/features/account-info/action";
+import { ccc } from "@ckb-ccc/connector-react";
+import { useRouter } from "next/navigation";
 
+const NETWORK = [
+  {
+    icon: "/images/nervos.png",
+    name: "Mirana Mainnet",
+    network: CkbNetwork.MiranaMainnet,
+  },
+  {
+    icon: "/images/nervos.png",
+    name: "Pudge Testnet",
+    network: CkbNetwork.PudgeTestnet,
+    isTestnet: true,
+  },
+];
 const SwitchNetwork = ({
   iconClassname,
   customEl,
@@ -24,14 +40,21 @@ const SwitchNetwork = ({
   const [open, setOpen] = useState(false);
 
   const dispatch = useAppDispatch();
-  const { network } = useAppSelector(selectStorage);
+  const { config } = useAppSelector(selectApp);
+  const { disconnect } = ccc.useCcc();
+  const router = useRouter();
 
   const hide = () => {
     setOpen(false);
   };
 
   const changeNetwork = (network: CkbNetwork) => {
+    disconnect();
     dispatch(setNetwork(network));
+    dispatch(setNetworkConfig(network));
+    dispatch(reset());
+    dispatch(restAccountInfo());
+    router.push("/");
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -39,31 +62,26 @@ const SwitchNetwork = ({
   };
   const content = (
     <div className="py-1 bg-light-100 text-[14px] leading-[20px] rounded-lg overflow-hidden font-medium text-dark-100">
-      <div
-        className="px-4 py-[10px] flex gap-2 cursor-not-allowed transition-colors items-center"
-        onClick={() => {}}
-      >
-        <img
-          src="/images/nervos.png"
-          alt="nervos"
-          className="w-6 rounded-full"
-        />
-        <p>Mirana Mainnet</p>
-      </div>
-      <div
-        className="px-4 py-[10px] flex gap-2 bg-grey-300 transition-colors items-center cursor-pointer"
-        onClick={() => {
-          changeNetwork(CkbNetwork.PudgeTestnet);
-          hide();
-        }}
-      >
-        <img
-          src="/images/nervos.png"
-          alt="nervos"
-          className="w-6 rounded-full"
-        />
-        <p>Pudge Testnet</p>
-      </div>
+      {NETWORK.map((n) => (
+        <div
+          key={`network-${n.network}`}
+          className={cn(
+            "px-4 py-[10px] flex gap-2 cursor-pointer transition-colors items-center",
+            {
+              "bg-grey-300 cursor-not-allowed": config.network === n.network,
+            }
+          )}
+          onClick={() => {
+            if (n.network !== config.network) {
+              changeNetwork(n.network);
+              hide();
+            }
+          }}
+        >
+          <img src={n.icon} alt="nervos" className="w-6 rounded-full" />
+          <p>{n.name}</p>
+        </div>
+      ))}
     </div>
   );
 
@@ -85,7 +103,7 @@ const SwitchNetwork = ({
           />
           <div>
             <p className="text-[14px] leading-[24px] font-medium text-dark-100">
-              {NETWORK_NAME[NETWORK]}
+              {NETWORK_NAME[config.network]}
             </p>
             {customEl}
           </div>

@@ -12,7 +12,8 @@ import useSignerInfo from "@/hooks/useSignerInfo";
 import { isValidCKBAddress, shortAddress, isValidName } from "@/utils/helpers";
 import cn from "@/utils/cn";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
-import { NETWORK } from "@/configs/common";
+import { useAppSelector } from "@/redux/hook";
+import { selectApp } from "@/redux/features/app/reducer";
 
 const Step02 = ({
   onNext,
@@ -32,6 +33,7 @@ const Step02 = ({
   const { address, balance } = useSignerInfo();
   const [errors, setErrors] = useState<any[]>([]);
   const [isSubmit, setIsSubmit] = useState<boolean>(false);
+  const { config } = useAppSelector(selectApp);
 
   const isValidSigners = useMemo(() => {
     return errors.every((z) => z.name && z.address);
@@ -74,10 +76,10 @@ const Step02 = ({
     setErrors(
       signers.map((z, i) => ({
         name: isValidName(z.name),
-        address: isValidCKBAddress(z.address, NETWORK),
+        address: isValidCKBAddress(z.address, config.network),
       }))
     );
-  }, [signers]);
+  }, [signers, config.network]);
 
   const _isDuplicateSigner = () => {
     const set = new Set(signers.map((z) => z.address.toLowerCase()));
@@ -154,14 +156,14 @@ const Step02 = ({
                       {i === 0 ? (
                         <p className="text-[18px] leading-[24px] text-dark-100 truncate flex gap-2 items-center">
                           <span className="text-grey-500">
-                            {SHORT_NETWORK_NAME[NETWORK]}:
+                            {SHORT_NETWORK_NAME[config.network]}:
                           </span>{" "}
                           <span>{shortAddress(address, 14)}</span>
                         </p>
                       ) : (
                         <div className="text-[18px] leading-[24px] text-dark-100 flex items-center gap-2 flex-1">
                           <span className="text-grey-500">
-                            {SHORT_NETWORK_NAME[NETWORK]}:
+                            {SHORT_NETWORK_NAME[config.network]}:
                           </span>{" "}
                           <input
                             type="text"

@@ -11,7 +11,6 @@ import IcnTimesCircle from "@/public/icons/icn-times-circle.svg";
 
 import { isAddressEqual, isValidName, shortAddress } from "@/utils/helpers";
 import { MultiSigAccountType } from "@/types/account";
-import { NETWORK } from "@/configs/common";
 import { NETWORK_NAME, SHORT_NETWORK_NAME } from "@/configs/network";
 
 import api from "@/utils/api";
@@ -19,6 +18,7 @@ import cn from "@/utils/cn";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { updateAccountName } from "@/redux/features/account-info/action";
+import { selectApp } from "@/redux/features/app/reducer";
 
 const EditName = ({
   isModalOpen,
@@ -171,6 +171,7 @@ const Account = ({
 }) => {
   const [isShowEditName, setIsShowEditName] = useState<boolean>(false);
   const router = useRouter();
+  const { config } = useAppSelector(selectApp);
 
   return (
     <>
@@ -222,7 +223,9 @@ const Account = ({
                 "text-[12px] leading-[16px]": isSmall,
               })}
             >
-              <span className="text-dark-100">{SHORT_NETWORK_NAME[NETWORK]}: </span>
+              <span className="text-dark-100">
+                {SHORT_NETWORK_NAME[config.network]}:{" "}
+              </span>
               {shortAddress(account.multi_sig_address, 5)}
             </p>
           </div>
@@ -265,7 +268,7 @@ const Account = ({
                 }
               )}
             >
-              {NETWORK_NAME[NETWORK]}
+              {NETWORK_NAME[config.network]}
             </p>
           </div>
           <IcnPencil

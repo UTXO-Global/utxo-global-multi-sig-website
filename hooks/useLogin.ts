@@ -1,33 +1,37 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
 
 import useAuthenticate from "./useAuthenticate";
 import api from "@/utils/api";
-import { useAppDispatch } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   setAddressLogged,
   setToken,
   setTokenExpired,
 } from "@/redux/features/storage/action";
-import { NETWORK } from "@/configs/common";
+import { selectApp } from "@/redux/features/app/reducer";
+import { toast } from "react-toastify";
 
 const useLogin = () => {
+  const [mounted, setMounted] = useState(false);
   const { isLoggedIn } = useAuthenticate();
   const signer = ccc.useSigner();
-  const { client } = ccc.useCcc();
+  const { disconnect } = ccc.useCcc();
+  const { config } = useAppSelector(selectApp);
 
   const dispatch = useAppDispatch();
 
   const _getNonce = useCallback(async (address: string) => {
     try {
       const { data } = await api.get(`/users/nonce/${address}`);
-      return data.nonce;
+      return data.nonce as string;
     } catch (e) {
-      console.error(e);
-      return null;
+      disconnect();
+      toast.error("Unable to connect to the wallet. Please try again");
     }
+    return undefined;
   }, []);
 
   const _signMessage = useCallback(
@@ -60,23 +64,36 @@ const useLogin = () => {
   );
 
   const login = useCallback(async () => {
-    const currentNetwork = await (window as any).utxoGlobal.getNetwork();
-    const isNetworkEqual = currentNetwork === NETWORK;
+    const currentNetwork = await (
+      window as any
+    ).utxoGlobal.ckbSigner.getNetwork();
+    const isNetworkEqual = currentNetwork === config.network;
     if (!isNetworkEqual) {
-      await (window as any).utxoGlobal.switchNetwork(NETWORK);
+      await (window as any).utxoGlobal.ckbSigner.switchNetwork(config.network);
       return login();
     }
     const address = (await signer?.getInternalAddress()) as string;
     if (isLoggedIn) return;
+
     const nonce = await _getNonce(address);
+    if (!nonce) return;
+
     const signature = (await _signMessage(nonce)) as string;
-    await _login(signature, address);
+    if (signature) {
+      await _login(signature, address);
+    }
+
     return;
   }, [signer, isLoggedIn, _getNonce, _signMessage, _login]);
 
   useEffect(() => {
-    login();
-  }, [login]);
+    setMounted(true);
+  }, []);
+  useEffect(() => {
+    if (signer && !!signer.getInternalAddress() && mounted) {
+      login();
+    }
+  }, [login, signer, signer?.getInternalAddress, mounted]);
 };
 
 export default useLogin;

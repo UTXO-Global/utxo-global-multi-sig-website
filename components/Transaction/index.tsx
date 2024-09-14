@@ -21,11 +21,10 @@ import { ccc } from "@ckb-ccc/connector-react";
 import { cccA } from "@ckb-ccc/connector-react/advanced";
 import api from "@/utils/api";
 import { toast } from "react-toastify";
-import { BI } from "@ckb-lumos/lumos";
-import { EXPLORER } from "@/configs/common";
-import { useAppDispatch } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { loadInfo } from "@/redux/features/account-info/action";
 import { useSearchParams } from "next/navigation";
+import { selectApp } from "@/redux/features/app/reducer";
 
 const STATUS_TEXT = {
   [TransactionStatus.WaitingSigned]: "Pending",
@@ -46,6 +45,7 @@ const Transaction = ({
   const [isShow, setIsShow] = useState<boolean>(false);
   const [isConfirmLoading, setIsConfirmLoading] = useState<boolean>(false);
   const [isRejectLoading, setIsRejectLoading] = useState<boolean>(false);
+  const { config } = useAppSelector(selectApp);
   const { address } = useContext(AppContext);
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
@@ -98,7 +98,9 @@ const Transaction = ({
       setIsConfirmLoading(false);
     }
 
-    await dispatch(loadInfo(multisigAddress as any));
+    await dispatch(
+      loadInfo({ address: multisigAddress!, networkConfig: config })
+    );
     refresh?.();
   };
 
@@ -269,7 +271,7 @@ const Transaction = ({
             <div className="flex gap-8 text-[16px] leading-[20px] text-grey-400">
               <p className="w-[90px] font-medium">Explorer:</p>
               <Link
-                href={`${EXPLORER}/transaction/0x${transaction.transaction_id}`}
+                href={`${config.explorer}/transaction/0x${transaction.transaction_id}`}
                 target="_blank"
               >
                 <IcnExternalLink className="w-[16px] stroke-grey-400 transition-colors hover:stroke-dark-100" />

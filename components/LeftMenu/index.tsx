@@ -17,11 +17,10 @@ import AccountManagement from "./AccountManagement";
 import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { shortAddress, copy, formatNumber } from "@/utils/helpers";
-import { EXPLORER } from "@/configs/common";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { ccc } from "@ckb-ccc/connector-react";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
-import { NETWORK } from "@/configs/common";
+import { selectApp } from "@/redux/features/app/reducer";
 
 const LeftMenu = () => {
   const pathname = usePathname();
@@ -33,6 +32,7 @@ const LeftMenu = () => {
 
   const { info: account, isInfoLoading } = useAppSelector(selectAccountInfo);
   const { balance: multisigBalance } = useMultisigBalance();
+  const { config } = useAppSelector(selectApp);
 
   return (
     <div className="w-[230px] bg-light-100 border-r border-grey-200 relative">
@@ -83,7 +83,7 @@ const LeftMenu = () => {
                 </p>
                 <p className="text-[14px] leading-[20px] font-medium text-grey-400 mt-[2px]">
                   <span className="text-dark-100">
-                    {SHORT_NETWORK_NAME[NETWORK]}:{" "}
+                    {SHORT_NETWORK_NAME[config.network]}:{" "}
                   </span>
                   {shortAddress(account?.multi_sig_address, 5)}
                 </p>
@@ -109,7 +109,7 @@ const LeftMenu = () => {
             <IcnCopyBold className="w-4" />
           </div>
           <Link
-            href={`${EXPLORER}/address/${account?.multi_sig_address}`}
+            href={`${config.explorer}/address/${account?.multi_sig_address}`}
             target="_blank"
             className="w-8 aspect-square rounded-[4px] transition-colors hover:bg-grey-200 bg-grey-300 flex justify-center items-center cursor-pointer"
           >

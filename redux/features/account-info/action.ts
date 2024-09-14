@@ -2,10 +2,18 @@ import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
 
 import api from "@/utils/api";
 import { getBalance } from "@/utils/helpers";
+import { store } from "@/redux/store";
+import { INetworkConfig, MAINNET_CONFIG } from "@/configs/network";
 
 export const loadInfo = createAsyncThunk(
   "account-info/load-info",
-  async (address: string, _) => {
+  async (
+    {
+      address,
+      networkConfig,
+    }: { address: string; networkConfig: INetworkConfig },
+    _
+  ) => {
     try {
       const { data: infoData } = await api.get(`/multi-sig/info/${address}`);
       const { data: signersData } = await api.get(
@@ -14,7 +22,10 @@ export const loadInfo = createAsyncThunk(
       const { data: summary } = await api.get(
         `/multi-sig/transactions/${address}/summary`
       );
-      const balance = await getBalance(infoData.multi_sig_address);
+      const balance = await getBalance(
+        infoData.multi_sig_address,
+        networkConfig
+      );
       return {
         ...infoData,
         signers_detail: signersData.signers,

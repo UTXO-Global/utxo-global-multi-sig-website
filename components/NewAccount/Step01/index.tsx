@@ -4,7 +4,7 @@ import Link from "next/link";
 import Button from "@/components/Common/Button";
 import SwitchNetwork from "@/components/SwitchNetwork";
 
-import { MAIN_SITE_URL } from "@/configs/common";
+import { SITE_URL } from "@/configs/common";
 import { isValidName } from "@/utils/helpers";
 import cn from "@/utils/cn";
 
@@ -75,7 +75,7 @@ const Step01 = ({
           <p className="text-[16px] leading-[20px] text-dark-100">
             By continuing, you agree to our{" "}
             <Link
-              href={`${MAIN_SITE_URL}/terms-and-conditions`}
+              href={`${SITE_URL}/terms-and-conditions`}
               target="_blank"
               className="text-orange-100 underline"
             >
@@ -83,7 +83,7 @@ const Step01 = ({
             </Link>{" "}
             and{" "}
             <Link
-              href={`${MAIN_SITE_URL}/privacy-policy`}
+              href={`${SITE_URL}/privacy-policy`}
               target="_blank"
               className="text-orange-100 underline"
             >

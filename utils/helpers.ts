@@ -1,15 +1,14 @@
 import { toast } from "react-toastify";
 import Decimal from "decimal.js";
 import { AddressPrefix } from "@nervosnetwork/ckb-sdk-utils";
-import { BI } from "@ckb-lumos/lumos";
+import { helpers } from "@ckb-lumos/lumos";
 
 import { InviteStatus, SignerDetailType } from "@/types/account";
 import { AddressBookType } from "@/types/address-book";
-import { NETWORK } from "@/configs/common";
 
-import { EXPLORER_API } from "@/configs/common";
 import { ccc } from "@ckb-ccc/connector-react";
-import { TransactionSkeletonType } from "@ckb-lumos/lumos/helpers";
+import { AGGRON4, LINA } from "./lumos-config";
+import { INetworkConfig } from "@/configs/network";
 
 export const comingSoonMsg = () => {
   toast.info("Coming Soon!");
@@ -44,6 +43,15 @@ export const copy = (value: string) => {
 };
 
 export const isValidCKBAddress = (address: string, network: string) => {
+  if (address.length < 97) return true;
+  const lumosConfig = network === "nervos" ? LINA : AGGRON4;
+
+  const toScript = helpers.parseAddress(address, {
+    config: lumosConfig,
+  });
+
+  if (ccc.bytesFrom(toScript.args).length > 20) return false;
+
   try {
     // const script = addressToScript(address);
     // const reconstructedAddress = scriptToAddress(script);
@@ -83,11 +91,11 @@ export const getAddressBookName = (
   return addressBook ? addressBook.signer_name : "--";
 };
 
-export const getBalance = async (address: string) => {
+export const getBalance = async (address: string, config: INetworkConfig) => {
   try {
-    const network = NETWORK === "nervos" ? "mainnet" : "testnet"
+    const network = config.network === "nervos" ? "mainnet" : "testnet";
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/ckb/${network}/v1/addresses/${address}`,
+      `${config.apiURL}/ckb/${network}/v1/addresses/${address}`,
       {
         headers: {
           Accept: "application/vnd.api+json",

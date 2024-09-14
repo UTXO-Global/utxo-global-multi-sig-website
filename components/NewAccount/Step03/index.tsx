@@ -8,7 +8,8 @@ import { SignerType } from "@/types/account";
 import { shortAddress, copy } from "@/utils/helpers";
 
 import { NETWORK_NAME } from "@/configs/network";
-import { EXPLORER, NETWORK } from "@/configs/common";
+import { selectApp } from "@/redux/features/app/reducer";
+import { useAppSelector } from "@/redux/hook";
 
 const Step03 = ({
   onCreate,
@@ -23,6 +24,7 @@ const Step03 = ({
   signers: SignerType[];
   threshold: number;
 }) => {
+  const { config } = useAppSelector(selectApp);
   return (
     <div>
       <h6 className="text-[24px] leading-[28px] font-medium text-center px-16 text-orange-100">
@@ -49,7 +51,7 @@ const Step03 = ({
             </div>
             <div className="flex-1 text-base text-dark-100 font-medium flex gap-[10px] items-center">
               <img src="/images/nervos.png" alt="nervos" className="w-[38px]" />
-              <p>{NETWORK_NAME[NETWORK]}</p>
+              <p>{NETWORK_NAME[config.network]}</p>
             </div>
           </div>
 
@@ -79,7 +81,7 @@ const Step03 = ({
                     </div>
 
                     <Link
-                      href={`${EXPLORER}/address/${z.address}`}
+                      href={`${config.explorer}/address/${z.address}`}
                       target="_blank"
                       className="p-2 rounded-full transition-colors hover:bg-grey-300 cursor-pointer"
                     >
