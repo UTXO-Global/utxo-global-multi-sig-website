@@ -51,7 +51,7 @@ const CreateTx = ({
   return (
     <>
       <p className="text-[24px] leading-[28px] font-medium text-dark-100 px-6 border-b border-grey-300 pb-4">
-        Send Tokens
+        Send CKB
       </p>
       <div className="pt-4 px-6 grid gap-4">
         <div className="grid gap-2">

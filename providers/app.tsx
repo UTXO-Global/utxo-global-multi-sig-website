@@ -121,7 +121,8 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AppContext.Provider value={{ address }}>
       <Header />
-      <TestnetModeActivated />
+      {network === CkbNetwork.PudgeTestnet ? <TestnetModeActivated /> : null}
+
       {address ? children : <ConnectedRequired />}
       <Footer />
     </AppContext.Provider>
