@@ -15,6 +15,7 @@ import { SHORT_NETWORK_NAME } from "@/configs/network";
 import { BI } from "@ckb-lumos/lumos";
 import { useAppSelector } from "@/redux/hook";
 import { selectApp } from "@/redux/features/app/reducer";
+import { toast } from "react-toastify";
 
 const CKB_MIN_TRANSFER = 63; // 63 CKB
 const CreateTx = ({
@@ -40,13 +41,29 @@ const CreateTx = ({
     }
   }, [balanceN, txInfo.amount]);
 
-  const isValidTx = useMemo(() => {
-    return (
-      txInfo.send_to !== "" &&
-      txInfo.amount >= CKB_MIN_TRANSFER &&
-      txInfo.amount <= balanceN
-    );
-  }, [txInfo, balanceN]);
+  const isValidBalance = useMemo(() => {
+    const _amount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
+    const _balance = BI.from(ccc.fixedPointFrom(balanceN.toString()));
+    return txInfo.is_include_fee
+      ? _amount.lte(_balance)
+      : _amount.add(100000).lte(_balance);
+  }, [balanceN, txInfo.amount, txInfo.is_include_fee]);
+
+  const isValidAmount = useMemo(() => {
+    return txInfo.amount >= CKB_MIN_TRANSFER;
+  }, [txInfo.amount]);
+
+  const isValidSendTo = useMemo(() => {
+    return txInfo.send_to !== "";
+  }, [txInfo.send_to]);
+
+  // const isValidTx = useMemo(() => {
+  //   return (
+  //     txInfo.send_to !== "" &&
+  //     txInfo.amount >= CKB_MIN_TRANSFER &&
+  //     isValidBalance
+  //   );
+  // }, [txInfo.send_to, txInfo.amount, isValidBalance]);
 
   return (
     <>
@@ -133,8 +150,15 @@ const CreateTx = ({
       <div className="px-6 mt-6">
         <Button
           fullWidth
-          onClick={() => isValidTx && onNext()}
-          disabled={!isValidTx}
+          onClick={() => {
+            if (!isValidSendTo)
+              return toast.warning("Please enter the recipient's address!");
+            if (!isValidAmount)
+              return toast.warning("The minimum amount is 63 CKB!");
+            if (!isValidBalance) return toast.warning("Insufficient balance!");
+            onNext();
+          }}
+          // disabled={!isValidTx}
         >
           Next
         </Button>
