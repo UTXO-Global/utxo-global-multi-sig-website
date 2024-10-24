@@ -82,10 +82,15 @@ const CreateTx = ({
     if (!isValidSendTo())
       return toast.warning("Please enter the recipient's address.");
 
-    const lumosConfig = network === CkbNetwork.PudgeTestnet ? AGGRON4 : LINA;
-    const toScript = helpers.parseAddress(txInfo.send_to, {
-      config: lumosConfig,
-    });
+    let toScript: any;
+    try {
+      const lumosConfig = network === CkbNetwork.PudgeTestnet ? AGGRON4 : LINA;
+      toScript = helpers.parseAddress(txInfo.send_to, {
+        config: lumosConfig,
+      });
+    } catch (e) {
+      return toast.warning("Recipient's address is invalid.");
+    }
 
     const isAddressTypeJoy = ccc.bytesFrom(toScript.args).length > 20;
     const ckbMinTransfer = isAddressTypeJoy ? 63 : 61;
