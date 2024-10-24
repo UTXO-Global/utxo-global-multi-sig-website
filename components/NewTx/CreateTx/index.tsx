@@ -7,17 +7,19 @@ import { NumericFormat } from "react-number-format";
 import SwitchNetwork from "@/components/SwitchNetwork";
 import Button from "@/components/Common/Button";
 import { SendTokenType } from "@/types/account";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
 import { formatNumber } from "@/utils/helpers";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
-import { BI } from "@ckb-lumos/lumos";
+import { BI, helpers } from "@ckb-lumos/lumos";
 import { useAppSelector } from "@/redux/hook";
 import { selectApp } from "@/redux/features/app/reducer";
 import { toast } from "react-toastify";
+import { selectStorage } from "@/redux/features/storage/reducer";
+import { CkbNetwork } from "@/types/common";
+import { AGGRON4, LINA } from "@/utils/lumos-config";
 
-const CKB_MIN_TRANSFER = 63; // 63 CKB
 const CreateTx = ({
   txInfo,
   setTxInfo,
@@ -28,6 +30,7 @@ const CreateTx = ({
   onNext: () => void;
 }) => {
   const { config } = useAppSelector(selectApp);
+  const { network } = useAppSelector(selectStorage);
   const { balance } = useMultisigBalance();
 
   const balanceN = useMemo(() => {
@@ -41,7 +44,7 @@ const CreateTx = ({
     }
   }, [balanceN, txInfo.amount]);
 
-  const isValidBalance = useMemo(() => {
+  const isValidBalance = useCallback(() => {
     const _amount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
     const _balance = BI.from(ccc.fixedPointFrom(balanceN.toString()));
     return txInfo.is_include_fee
@@ -49,21 +52,66 @@ const CreateTx = ({
       : _amount.add(100000).lte(_balance);
   }, [balanceN, txInfo.amount, txInfo.is_include_fee]);
 
-  const isValidAmount = useMemo(() => {
-    return txInfo.amount >= CKB_MIN_TRANSFER;
-  }, [txInfo.amount]);
+  const isValidAmount = useCallback(
+    (ckbMinTransfer: number) => {
+      return txInfo.amount >= ckbMinTransfer;
+    },
+    [txInfo.amount]
+  );
 
-  const isValidSendTo = useMemo(() => {
+  const isValidSendTo = useCallback(() => {
     return txInfo.send_to !== "";
   }, [txInfo.send_to]);
 
-  // const isValidTx = useMemo(() => {
-  //   return (
-  //     txInfo.send_to !== "" &&
-  //     txInfo.amount >= CKB_MIN_TRANSFER &&
-  //     isValidBalance
-  //   );
-  // }, [txInfo.send_to, txInfo.amount, isValidBalance]);
+  const isValidRemainingBalance = useCallback(
+    (ckbMinTransfer: number) => {
+      const _amount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString())).add(
+        txInfo.is_include_fee ? 0 : 100000
+      );
+
+      const _balance = BI.from(ccc.fixedPointFrom(balanceN.toString()));
+
+      const _remaining = BI.from(_balance).sub(_amount);
+
+      return _remaining.lte(0) || _remaining.gte(ckbMinTransfer * 100_000_000);
+    },
+    [balanceN, txInfo.amount, txInfo.is_include_fee]
+  );
+
+  const next = useCallback(() => {
+    if (!isValidSendTo())
+      return toast.warning("Please enter the recipient's address.");
+
+    const lumosConfig = network === CkbNetwork.PudgeTestnet ? AGGRON4 : LINA;
+    const toScript = helpers.parseAddress(txInfo.send_to, {
+      config: lumosConfig,
+    });
+
+    const isAddressTypeJoy = ccc.bytesFrom(toScript.args).length > 20;
+    const ckbMinTransfer = isAddressTypeJoy ? 63 : 61;
+
+    if (!isValidAmount(ckbMinTransfer))
+      return toast.warning(`The minimum amount is ${ckbMinTransfer} CKB.`);
+
+    if (!isValidRemainingBalance(ckbMinTransfer))
+      return toast.warning(
+        `The remaining balance in the multi-sig wallet must be at least ${ckbMinTransfer} CKB after sending the amount plus fee.`
+      );
+
+    if (!isValidBalance())
+      return toast.warning(
+        `Insufficient balance: Total amount plus fee exceeds available CKB in the multi-sig wallet.`
+      );
+    onNext();
+  }, [
+    isValidAmount,
+    isValidBalance,
+    isValidRemainingBalance,
+    isValidSendTo,
+    network,
+    onNext,
+    txInfo.send_to,
+  ]);
 
   return (
     <>
@@ -150,14 +198,7 @@ const CreateTx = ({
       <div className="px-6 mt-6">
         <Button
           fullWidth
-          onClick={() => {
-            if (!isValidSendTo)
-              return toast.warning("Please enter the recipient's address!");
-            if (!isValidAmount)
-              return toast.warning("The minimum amount is 63 CKB!");
-            if (!isValidBalance) return toast.warning("Insufficient balance!");
-            onNext();
-          }}
+          onClick={next}
           // disabled={!isValidTx}
         >
           Next
