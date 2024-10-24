@@ -113,7 +113,17 @@ const CreateTx = ({
         )} CKB in the ${shortAddress(address, 5)} wallet.`
       );
     onNext();
-  }, [address, balance, isValidAmount, isValidBalance, isValidRemainingBalance, isValidSendTo, network, onNext, txInfo.send_to]);
+  }, [
+    address,
+    balance,
+    isValidAmount,
+    isValidBalance,
+    isValidRemainingBalance,
+    isValidSendTo,
+    network,
+    onNext,
+    txInfo.send_to,
+  ]);
 
   return (
     <>
@@ -125,7 +135,12 @@ const CreateTx = ({
           <p className="text-[16px] leading-[20px] text-grey-400">Send To</p>
           <div className="rounded-lg border border-grey-200 py-[11px] px-4 flex items-center gap-2">
             <div className="flex items-center gap-2">
-              <div className="w-10 aspect-square rounded-full bg-grey-200"></div>
+              <img
+                src="/images/account.png"
+                alt="account"
+                className="w-10 aspect-square rounded-full"
+              />
+
               <p className="text-[16px] leading-[20px] font-medium text-grey-500">
                 {SHORT_NETWORK_NAME[config.network]}:
               </p>
