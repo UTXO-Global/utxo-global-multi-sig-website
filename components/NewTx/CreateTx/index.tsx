@@ -9,7 +9,7 @@ import Button from "@/components/Common/Button";
 import { SendTokenType } from "@/types/account";
 import { useCallback, useEffect, useMemo } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
-import { formatNumber } from "@/utils/helpers";
+import { formatNumber, shortAddress } from "@/utils/helpers";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
 import { BI, helpers } from "@ckb-lumos/lumos";
@@ -31,7 +31,7 @@ const CreateTx = ({
 }) => {
   const { config } = useAppSelector(selectApp);
   const { network } = useAppSelector(selectStorage);
-  const { balance } = useMultisigBalance();
+  const { balance, address } = useMultisigBalance();
 
   const balanceN = useMemo(() => {
     return Number(ccc.fixedPointToString(balance));
@@ -100,23 +100,20 @@ const CreateTx = ({
 
     if (!isValidRemainingBalance(ckbMinTransfer))
       return toast.warning(
-        `The remaining balance in the multi-sig wallet must be at least ${ckbMinTransfer} CKB after sending the amount plus fee.`
+        `The remaining balance in the ${shortAddress(
+          address,
+          5
+        )} wallet must be at least ${ckbMinTransfer} CKB after sending the amount plus fee.`
       );
 
     if (!isValidBalance())
       return toast.warning(
-        `Insufficient balance: Total amount plus fee exceeds available CKB in the multi-sig wallet.`
+        `Insufficient balance: Total amount plus fee exceeds ${formatNumber(
+          Number(ccc.fixedPointToString(balance))
+        )} CKB in the ${shortAddress(address, 5)} wallet.`
       );
     onNext();
-  }, [
-    isValidAmount,
-    isValidBalance,
-    isValidRemainingBalance,
-    isValidSendTo,
-    network,
-    onNext,
-    txInfo.send_to,
-  ]);
+  }, [address, balance, isValidAmount, isValidBalance, isValidRemainingBalance, isValidSendTo, network, onNext, txInfo.send_to]);
 
   return (
     <>
