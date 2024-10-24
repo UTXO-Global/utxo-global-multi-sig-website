@@ -7,16 +7,19 @@ import { NumericFormat } from "react-number-format";
 import SwitchNetwork from "@/components/SwitchNetwork";
 import Button from "@/components/Common/Button";
 import { SendTokenType } from "@/types/account";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
-import { formatNumber } from "@/utils/helpers";
+import { formatNumber, shortAddress } from "@/utils/helpers";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
-import { BI } from "@ckb-lumos/lumos";
+import { BI, helpers } from "@ckb-lumos/lumos";
 import { useAppSelector } from "@/redux/hook";
 import { selectApp } from "@/redux/features/app/reducer";
+import { toast } from "react-toastify";
+import { selectStorage } from "@/redux/features/storage/reducer";
+import { CkbNetwork } from "@/types/common";
+import { AGGRON4, LINA } from "@/utils/lumos-config";
 
-const CKB_MIN_TRANSFER = 63; // 63 CKB
 const CreateTx = ({
   txInfo,
   setTxInfo,
@@ -27,7 +30,8 @@ const CreateTx = ({
   onNext: () => void;
 }) => {
   const { config } = useAppSelector(selectApp);
-  const { balance } = useMultisigBalance();
+  const { network } = useAppSelector(selectStorage);
+  const { balance, address } = useMultisigBalance();
 
   const balanceN = useMemo(() => {
     return Number(ccc.fixedPointToString(balance));
@@ -40,13 +44,86 @@ const CreateTx = ({
     }
   }, [balanceN, txInfo.amount]);
 
-  const isValidTx = useMemo(() => {
-    return (
-      txInfo.send_to !== "" &&
-      txInfo.amount >= CKB_MIN_TRANSFER &&
-      txInfo.amount <= balanceN
-    );
-  }, [txInfo, balanceN]);
+  const isValidBalance = useCallback(() => {
+    const _amount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
+    const _balance = BI.from(ccc.fixedPointFrom(balanceN.toString()));
+    return txInfo.is_include_fee
+      ? _amount.lte(_balance)
+      : _amount.add(100000).lte(_balance);
+  }, [balanceN, txInfo.amount, txInfo.is_include_fee]);
+
+  const isValidAmount = useCallback(
+    (ckbMinTransfer: number) => {
+      return txInfo.amount >= ckbMinTransfer;
+    },
+    [txInfo.amount]
+  );
+
+  const isValidSendTo = useCallback(() => {
+    return txInfo.send_to !== "";
+  }, [txInfo.send_to]);
+
+  const isValidRemainingBalance = useCallback(
+    (ckbMinTransfer: number) => {
+      const _amount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString())).add(
+        txInfo.is_include_fee ? 0 : 100000
+      );
+
+      const _balance = BI.from(ccc.fixedPointFrom(balanceN.toString()));
+
+      const _remaining = BI.from(_balance).sub(_amount);
+
+      return _remaining.lte(0) || _remaining.gte(ckbMinTransfer * 100_000_000);
+    },
+    [balanceN, txInfo.amount, txInfo.is_include_fee]
+  );
+
+  const next = useCallback(() => {
+    if (!isValidSendTo())
+      return toast.warning("Please enter the recipient's address.");
+
+    let toScript: any;
+    try {
+      const lumosConfig = network === CkbNetwork.PudgeTestnet ? AGGRON4 : LINA;
+      toScript = helpers.parseAddress(txInfo.send_to, {
+        config: lumosConfig,
+      });
+    } catch (e) {
+      return toast.warning("Recipient's address is invalid.");
+    }
+
+    const isAddressTypeJoy = ccc.bytesFrom(toScript.args).length > 20;
+    const ckbMinTransfer = isAddressTypeJoy ? 63 : 61;
+
+    if (!isValidAmount(ckbMinTransfer))
+      return toast.warning(`The minimum amount is ${ckbMinTransfer} CKB.`);
+
+    if (!isValidRemainingBalance(ckbMinTransfer))
+      return toast.warning(
+        `The remaining balance in the ${shortAddress(
+          address,
+          5
+        )} wallet must be at least ${ckbMinTransfer} CKB after sending the amount plus fee.`
+      );
+
+    if (!isValidBalance())
+      return toast.warning(
+        `Insufficient balance: Total amount plus fee exceeds ${formatNumber(
+          Number(ccc.fixedPointToString(balance))
+        )} CKB in the ${shortAddress(address, 5)} wallet.`
+      );
+    onNext();
+  }, [
+    address,
+    balance,
+    isValidAmount,
+    isValidBalance,
+    isValidRemainingBalance,
+    isValidSendTo,
+    network,
+    onNext,
+    txInfo.send_to,
+  ]);
 
   return (
     <>
@@ -58,7 +135,12 @@ const CreateTx = ({
           <p className="text-[16px] leading-[20px] text-grey-400">Send To</p>
           <div className="rounded-lg border border-grey-200 py-[11px] px-4 flex items-center gap-2">
             <div className="flex items-center gap-2">
-              <div className="w-10 aspect-square rounded-full bg-grey-200"></div>
+              <img
+                src="/images/account.png"
+                alt="account"
+                className="w-10 aspect-square rounded-full"
+              />
+
               <p className="text-[16px] leading-[20px] font-medium text-grey-500">
                 {SHORT_NETWORK_NAME[config.network]}:
               </p>
@@ -133,8 +215,8 @@ const CreateTx = ({
       <div className="px-6 mt-6">
         <Button
           fullWidth
-          onClick={() => isValidTx && onNext()}
-          disabled={!isValidTx}
+          onClick={next}
+          // disabled={!isValidTx}
         >
           Next
         </Button>

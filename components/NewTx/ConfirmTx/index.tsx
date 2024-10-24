@@ -100,7 +100,7 @@ const ConfirmTx = ({
 
       let toAmount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
       if (txInfo.is_include_fee) {
-        toAmount = toAmount.sub(txFee.mul(account.threshold));
+        toAmount = toAmount.sub(txFee);
       }
 
       const neededCapacity = toAmount.add(txFee);
@@ -138,7 +138,7 @@ const ConfirmTx = ({
 
       const changeOutput: Cell = {
         cellOutput: {
-          capacity: collectedSum.sub(neededCapacity).toHexString(),
+          capacity: collectedSum.sub(toAmount).toHexString(),
           lock: fromScript,
         },
         data: "0x",
@@ -287,7 +287,7 @@ const ConfirmTx = ({
           </div>
           <div className="flex-1 text-[16px] leading-[20px] font-medium text-dark-100">
             {formatNumber(
-              txFee.mul(account?.threshold!).toNumber() / 10 ** 8,
+              txFee.toNumber() / 10 ** 8,
               2,
               8
             )}{" "}
