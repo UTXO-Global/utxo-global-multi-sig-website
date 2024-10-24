@@ -182,8 +182,13 @@ const Account = ({
             "bg-grey-300": isActive,
           }
         )}
-        onClick={() =>
-          router.push(`/account/?address=${account.multi_sig_address}`)
+        onClick={
+          () =>
+            window.open(
+              `/account/?address=${account.multi_sig_address}`,
+              "_blank"
+            )
+          // router.push(`/account/?address=${account.multi_sig_address}`)
         }
       >
         <div
