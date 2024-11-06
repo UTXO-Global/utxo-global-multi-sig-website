@@ -84,7 +84,7 @@ const CreateTx = ({
 
     let toScript: any;
     try {
-      const lumosConfig = network === CkbNetwork.PudgeTestnet ? AGGRON4 : LINA;
+      const lumosConfig = network === CkbNetwork.MeepoTestnet ? AGGRON4 : LINA;
       toScript = helpers.parseAddress(txInfo.send_to, {
         config: lumosConfig,
       });

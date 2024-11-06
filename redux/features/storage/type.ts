@@ -12,6 +12,6 @@ export const defaultStorageReducer: StorageReducerType = {
   addressLogged: "",
   token: "",
   tokenExpired: 0,
-  network: CkbNetwork.PudgeTestnet,
+  network: CkbNetwork.MeepoTestnet,
   isDontShowAgainTestnetPopup: false,
 };
