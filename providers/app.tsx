@@ -82,7 +82,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
       _network =
         DEFAULT_NETWORK === CkbNetwork.MiranaMainnet
           ? CkbNetwork.MiranaMainnet
-          : CkbNetwork.PudgeTestnet;
+          : CkbNetwork.MeepoTestnet;
     }
 
     dispatch(setNetwork(_network));
@@ -101,7 +101,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
       _network =
         DEFAULT_NETWORK === CkbNetwork.MiranaMainnet
           ? CkbNetwork.MiranaMainnet
-          : CkbNetwork.PudgeTestnet;
+          : CkbNetwork.MeepoTestnet;
     }
 
     dispatch(setNetwork(_network));
@@ -121,7 +121,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AppContext.Provider value={{ address }}>
       <Header />
-      {network === CkbNetwork.PudgeTestnet ? <TestnetModeActivated /> : null}
+      {network === CkbNetwork.MeepoTestnet ? <TestnetModeActivated /> : null}
 
       {address ? children : <ConnectedRequired />}
       <Footer />

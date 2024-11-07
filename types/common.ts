@@ -1,9 +1,9 @@
 export enum CkbNetwork {
-  PudgeTestnet = "nervos_testnet",
+  MeepoTestnet = "nervos_testnet",
   MiranaMainnet = "nervos",
 }
 
 export enum AddressPrefix {
-  "Pudge Testnet" = "ckt",
+  "Meepo Testnet" = "ckt",
   "Mirana Mainnet" = "ckb",
 }

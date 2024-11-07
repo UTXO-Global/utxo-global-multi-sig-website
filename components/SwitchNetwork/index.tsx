@@ -25,8 +25,8 @@ const NETWORK = [
   },
   {
     icon: "/images/nervos.png",
-    name: "Pudge Testnet",
-    network: CkbNetwork.PudgeTestnet,
+    name: "Meepo Testnet",
+    network: CkbNetwork.MeepoTestnet,
     isTestnet: true,
   },
 ];

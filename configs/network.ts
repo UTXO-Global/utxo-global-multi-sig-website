@@ -1,10 +1,10 @@
 export const NETWORK_NAME: { [key: string]: string } = {
-  nervos_testnet: "Pudge Testnet",
+  nervos_testnet: "Meepo Testnet",
   nervos: "Mirana Mainnet",
 };
 
 export const SHORT_NETWORK_NAME: { [key: string]: string } = {
-  nervos_testnet: "Pud",
+  nervos_testnet: "Mee",
   nervos: "Mir",
 };
 
@@ -20,7 +20,7 @@ export interface INetworkConfig {
 export const TESTNET_CONFIG: INetworkConfig = {
   network: "nervos_testnet",
   apiURL: "https://staging-api-720a.utxo.global",
-  explorer: "https://pudge.explorer.nervos.org/en",
+  explorer: "https://testnet.explorer.nervos.org/en",
   explorerAPI: "https://testnet-api.explorer.nervos.org",
   ckbRPC: "https://testnet.ckb.dev/rpc",
   isTestnet: true,
