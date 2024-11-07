@@ -95,7 +95,7 @@ export const getBalance = async (address: string, config: INetworkConfig) => {
   try {
     const network = config.network === "nervos" ? "mainnet" : "testnet";
     const res = await fetch(
-      `https://${network}-api.explorer.nervos.org/api/v1/addresses/${address}`,
+      `${config.apiURL}/ckb/${network}/v1/addresses/${address}`,
       {
         headers: {
           Accept: "application/vnd.api+json",
