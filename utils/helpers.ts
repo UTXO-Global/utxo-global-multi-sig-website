@@ -1,12 +1,13 @@
 import { toast } from "react-toastify";
 import Decimal from "decimal.js";
 import { AddressPrefix } from "@nervosnetwork/ckb-sdk-utils";
-import { helpers } from "@ckb-lumos/lumos";
+import { BI, helpers } from "@ckb-lumos/lumos";
+import { TransactionSkeleton } from "@ckb-lumos/helpers";
 
 import { InviteStatus, SignerDetailType } from "@/types/account";
 import { AddressBookType } from "@/types/address-book";
 
-import { ccc } from "@ckb-ccc/connector-react";
+import { ccc, LumosTransactionSkeletonType } from "@ckb-ccc/connector-react";
 import { AGGRON4, LINA } from "./lumos-config";
 import { INetworkConfig } from "@/configs/network";
 
@@ -26,7 +27,7 @@ export function shortAddress(address?: string, len = 5) {
 }
 
 export const formatNumber = (
-  number: number,
+  number: number | BI,
   minPrecision = 2,
   maxPrecision = 8
 ) => {
@@ -116,3 +117,25 @@ export const getBalance = async (address: string, config: INetworkConfig) => {
 export const camelToSnakeCase = (str: string) => {
   return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 };
+
+// https://explorer.nervos.org/fee-rate-tracker
+export const FIXED_FEE_RATE = 1000; // shannons/kB
+export const INOUT_SIZE_BYTE = 500; // Bytes
+
+export function getOutputsCapacity(tx: LumosTransactionSkeletonType): BI {
+  return tx.outputs
+    .toArray()
+    .reduce(
+      (acc, output) => acc.add(BI.from(output.cellOutput.capacity)),
+      BI.from(0)
+    );
+}
+
+export function getInputsCapacity(tx: LumosTransactionSkeletonType): BI {
+  return tx.inputs
+    .toArray()
+    .reduce(
+      (acc, intput) => acc.add(BI.from(intput.cellOutput.capacity)),
+      BI.from(0)
+    );
+}

@@ -2,7 +2,6 @@ import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
 
 import api from "@/utils/api";
 import { getBalance } from "@/utils/helpers";
-import { store } from "@/redux/store";
 import { INetworkConfig, MAINNET_CONFIG } from "@/configs/network";
 
 export const loadInfo = createAsyncThunk(
