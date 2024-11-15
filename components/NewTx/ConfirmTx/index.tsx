@@ -3,7 +3,14 @@
 import Button from "@/components/Common/Button";
 import { SendTokenType } from "@/types/account";
 import api from "@/utils/api";
-import { formatNumber, shortAddress } from "@/utils/helpers";
+import {
+  FIXED_FEE_RATE,
+  formatNumber,
+  getInputsCapacity,
+  getOutputsCapacity,
+  INOUT_SIZE_BYTE,
+  shortAddress,
+} from "@/utils/helpers";
 import { ccc } from "@ckb-ccc/connector-react";
 import {
   BI,
@@ -12,6 +19,7 @@ import {
   WitnessArgs,
   helpers,
   commons,
+  Script,
 } from "@ckb-lumos/lumos";
 import { bytes, blockchain } from "@ckb-lumos/lumos/codec";
 import { useEffect, useMemo, useState } from "react";
@@ -33,7 +41,7 @@ const ConfirmTx = ({
     undefined
   );
 
-  const [txFee, setTxFee] = useState(BI.from(100000)); // Set fee = 0.001
+  const [txFee, setTxFee] = useState(BI.from(100000)); // TODO: Set dynamic fee = 0.001
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [error, setError] = useState("");
@@ -98,82 +106,251 @@ const ConfirmTx = ({
         config: lumosConfig,
       });
 
-      let toAmount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
-      if (txInfo.is_include_fee) {
-        toAmount = toAmount.sub(txFee);
-      }
+      if (txInfo.token) {
+        let toAmount = txInfo.amount * 10 ** txInfo.token.decimal;
 
-      const neededCapacity = toAmount.add(txFee);
-      let collectedSum = BI.from(0);
-      const collected: Cell[] = [];
+        // xUDT transfer
+        const { args, code_hash, hash_type } = txInfo.token.typeScript;
+        const xUdtType = {
+          codeHash: code_hash,
+          hashType: hash_type,
+          args,
+        } as Script;
 
-      const collector = indexer.collector({ lock: fromScript, type: "empty" });
-      for await (const cell of collector.collect()) {
-        if (
-          !bytes.equal(
-            blockchain.Script.pack(cell.cellOutput.lock),
-            blockchain.Script.pack(fromScript)
-          )
-        ) {
-          continue;
+        const xudtCollector = indexer.collector({
+          type: xUdtType,
+          lock: fromScript,
+        });
+
+        const tokensCell: Cell[] = [];
+        const totalTokenBalanceNeeed = BI.from(toAmount);
+        let totalTokenBalance = BI.from(0);
+
+        for await (const cell of xudtCollector.collect()) {
+          const balNum = ccc.numFromBytes(cell.data);
+          totalTokenBalance = totalTokenBalance.add(BI.from(balNum));
+          tokensCell.push(cell);
+
+          if (totalTokenBalance.gte(totalTokenBalanceNeeed)) {
+            break;
+          }
         }
 
-        collectedSum = collectedSum.add(cell.cellOutput.capacity);
-        collected.push(cell);
-        if (collectedSum.gte(neededCapacity)) break;
-      }
+        // Validate
+        if (tokensCell.length === 0) {
+          const errorMsg =
+            "Owner do not have an xUDT cell yet, please call mint first";
+          setError(errorMsg);
+          throw new Error(errorMsg);
+        }
 
-      if (collectedSum.lt(neededCapacity)) {
-        setError("Not enough CKB");
-        throw new Error("Not enough CKB");
-      }
+        const xUDTCapacity = BI.from(tokensCell[0].cellOutput.capacity);
+        if (totalTokenBalance.lt(totalTokenBalanceNeeed)) {
+          const errorMsg = `${txInfo.token.symbol} insufficient balance`;
+          setError(errorMsg);
+          throw new Error(errorMsg);
+        }
 
-      const transferOutput: Cell = {
-        cellOutput: {
-          capacity: toAmount.toHexString(),
-          lock: toScript,
-        },
-        data: "0x",
-      };
+        // Create Tx Skeleton
+        txSkeleton = txSkeleton
+          .update("inputs", (inputs) => inputs.push(...tokensCell))
+          .update("outputs", (outputs) => {
+            // Transfer Output
+            outputs = outputs.push({
+              cellOutput: {
+                capacity: xUDTCapacity.toHexString(),
+                lock: toScript,
+                type: xUdtType,
+              },
+              data: ccc.hexFrom(
+                ccc.numLeToBytes(totalTokenBalanceNeeed.toBigInt(), 16)
+              ),
+            });
 
-      const changeOutput: Cell = {
-        cellOutput: {
-          capacity: collectedSum.sub(toAmount).toHexString(),
+            // Change Amount
+            const diff = totalTokenBalance.sub(totalTokenBalanceNeeed);
+            if (diff.gt(BI.from(0))) {
+              outputs = outputs.push({
+                cellOutput: {
+                  capacity: xUDTCapacity.toHexString(),
+                  lock: fromScript,
+                  type: xUdtType,
+                },
+                data: ccc.hexFrom(ccc.numLeToBytes(diff.toBigInt(), 16)),
+              });
+            }
+
+            return outputs;
+          })
+          .update("cellDeps", (cellDeps) =>
+            cellDeps.push(
+              ...[
+                {
+                  outPoint: {
+                    txHash:
+                      lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.TX_HASH!,
+                    index:
+                      lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.INDEX!,
+                  },
+                  depType:
+                    lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.DEP_TYPE!,
+                },
+                {
+                  outPoint: {
+                    txHash: lumosConfig.SCRIPTS.XUDT!.TX_HASH,
+                    index: lumosConfig.SCRIPTS.XUDT!.INDEX,
+                  },
+                  depType: lumosConfig.SCRIPTS.XUDT!.DEP_TYPE,
+                },
+                {
+                  outPoint: {
+                    txHash: lumosConfig.SCRIPTS.DAO?.TX_HASH!,
+                    index: "0x3",
+                  },
+                  depType: lumosConfig.SCRIPTS.DAO?.DEP_TYPE!,
+                },
+              ]
+            )
+          );
+
+        // Calculate Fee and Add more CKB input for paying gas fee
+        let fee =
+          ccc.Transaction.fromLumosSkeleton(txSkeleton).estimateFee(
+            FIXED_FEE_RATE
+          );
+        let inputCapacity = getInputsCapacity(txSkeleton).add(fee);
+        let outputCapacity = getOutputsCapacity(txSkeleton);
+
+        if (inputCapacity.lt(outputCapacity)) {
+          const emptyTypeCellCollector = indexer.collector({
+            lock: fromScript,
+            data: "0x",
+            type: "empty",
+          });
+
+          // Assume these append inputs and outputs has size = 500 bytes = INOUT_SIZE_BYTE
+          // => Fee increase = INOUT_SIZE_BYTE * FIXED_FEE_RATE / 1024
+          const feeCapacityForeachInout = Math.ceil(
+            (INOUT_SIZE_BYTE * FIXED_FEE_RATE) / 1024
+          );
+
+          for await (const cell of emptyTypeCellCollector.collect()) {
+            if (inputCapacity.gt(outputCapacity)) {
+              const changeCapacity = inputCapacity.sub(outputCapacity);
+              // Ignore if change amount is too small
+              if (changeCapacity.gt(feeCapacityForeachInout)) {
+                txSkeleton = txSkeleton.update("outputs", (outputs) =>
+                  outputs.push({
+                    cellOutput: {
+                      capacity: changeCapacity
+                        .sub(feeCapacityForeachInout)
+                        .toHexString(),
+                      lock: fromScript,
+                    },
+                    data: "0x",
+                  })
+                );
+              }
+              break;
+            } else {
+              txSkeleton = txSkeleton.update("inputs", (inputs) =>
+                inputs.push(cell)
+              );
+              inputCapacity = inputCapacity
+                .add(cell.cellOutput.capacity)
+                .add(BI.from(feeCapacityForeachInout));
+            }
+          }
+        }
+
+        // Recalculate Fee Again
+        fee =
+          ccc.Transaction.fromLumosSkeleton(txSkeleton).estimateFee(
+            FIXED_FEE_RATE
+          );
+        setTxFee(BI.from(fee));
+      } else {
+        // CKB transfer
+        let toAmount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
+        if (txInfo.is_include_fee) {
+          toAmount = toAmount.sub(txFee);
+        }
+        const neededCapacity = toAmount.add(txFee);
+
+        let collectedSum = BI.from(0);
+        const collected: Cell[] = [];
+        const collector = indexer.collector({
           lock: fromScript,
-        },
-        data: "0x",
-      };
+          type: "empty",
+        });
+        for await (const cell of collector.collect()) {
+          if (
+            !bytes.equal(
+              blockchain.Script.pack(cell.cellOutput.lock),
+              blockchain.Script.pack(fromScript)
+            )
+          ) {
+            continue;
+          }
 
-      txSkeleton = txSkeleton.update("inputs", (inputs) =>
-        inputs.push(...collected)
-      );
+          collectedSum = collectedSum.add(cell.cellOutput.capacity);
+          collected.push(cell);
+          if (collectedSum.gte(neededCapacity)) break;
+        }
 
-      txSkeleton = txSkeleton.update("outputs", (outputs) =>
-        outputs.push(transferOutput, changeOutput)
-      );
+        // Validate
+        if (collectedSum.lt(neededCapacity)) {
+          setError("Not enough CKB");
+          throw new Error("Not enough CKB");
+        }
 
-      txSkeleton = txSkeleton.update("cellDeps", (cellDeps) =>
-        cellDeps.push(
-          ...[
-            {
-              outPoint: {
-                txHash:
-                  lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.TX_HASH!,
-                index: lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.INDEX!,
+        // Create Tx Skeleton
+        txSkeleton = txSkeleton
+          .update("inputs", (inputs) => inputs.push(...collected))
+          .update("outputs", (outputs) =>
+            outputs.push(
+              // Transfer Output
+              {
+                cellOutput: {
+                  capacity: toAmount.toHexString(),
+                  lock: toScript,
+                },
+                data: "0x",
               },
-              depType:
-                lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.DEP_TYPE!,
-            },
-            {
-              outPoint: {
-                txHash: lumosConfig.SCRIPTS.DAO?.TX_HASH!,
-                index: "0x3",
-              },
-              depType: lumosConfig.SCRIPTS.DAO?.DEP_TYPE!,
-            },
-          ]
-        )
-      );
+              // Change Output
+              {
+                cellOutput: {
+                  capacity: collectedSum.sub(toAmount).toHexString(),
+                  lock: fromScript,
+                },
+                data: "0x",
+              }
+            )
+          )
+          .update("cellDeps", (cellDeps) =>
+            cellDeps.push(
+              ...[
+                {
+                  outPoint: {
+                    txHash:
+                      lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.TX_HASH!,
+                    index:
+                      lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.INDEX!,
+                  },
+                  depType:
+                    lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.DEP_TYPE!,
+                },
+                {
+                  outPoint: {
+                    txHash: lumosConfig.SCRIPTS.DAO?.TX_HASH!,
+                    index: "0x3",
+                  },
+                  depType: lumosConfig.SCRIPTS.DAO?.DEP_TYPE!,
+                },
+              ]
+            )
+          );
+      }
 
       const firstIndex = txSkeleton
         .get("inputs")
@@ -249,7 +426,7 @@ const ConfirmTx = ({
     setLoading(true);
     f();
     setLoading(false);
-  }, [txInfo, txFee, account, indexer, appConfig.isTestnet]);
+  }, [txInfo, account, indexer, appConfig.isTestnet]);
 
   return (
     <>
@@ -278,7 +455,7 @@ const ConfirmTx = ({
             Amount:
           </div>
           <div className="flex-1 text-[16px] leading-[20px] font-medium text-dark-100">
-            {formatNumber(txInfo.amount)} CKB
+            {formatNumber(txInfo.amount)} {txInfo.token?.symbol ?? "CKB"}
           </div>
         </div>
         <div className="pb-6 border-b border-grey-300 flex gap-4 items-center">
@@ -286,13 +463,8 @@ const ConfirmTx = ({
             Fee:
           </div>
           <div className="flex-1 text-[16px] leading-[20px] font-medium text-dark-100">
-            {formatNumber(
-              txFee.toNumber() / 10 ** 8,
-              2,
-              8
-            )}{" "}
-            CKB
-            {txInfo.is_include_fee && (
+            {formatNumber(txFee.toNumber() / 10 ** 8, 2, 8)} CKB
+            {!txInfo.token && txInfo.is_include_fee && (
               <span className="text-grey-500"> (Included Fee)</span>
             )}
           </div>

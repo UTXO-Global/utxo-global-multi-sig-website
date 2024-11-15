@@ -1,3 +1,5 @@
+import { UdtBalanceType } from "@/redux/features/assets/type";
+
 export type SignerType = {
   name: string;
   address: string;
@@ -46,6 +48,7 @@ export type SendTokenType = {
   amount: number;
   network: string;
   is_include_fee: boolean;
+  token?: UdtBalanceType & { typeHash: string };
 };
 
 export type TransactionType = {

@@ -1,6 +1,5 @@
 import { CkbNetwork } from "@/types/common";
 import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { time } from "console";
 
 const getPriceFromCachhe = () => {
   try {

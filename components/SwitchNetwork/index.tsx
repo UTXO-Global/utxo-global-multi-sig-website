@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useContext, useMemo, useState } from "react";
+import { useState } from "react";
 import { Popover } from "antd";
 
 import cn from "@/utils/cn";

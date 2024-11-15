@@ -4,10 +4,9 @@
 import { Switch } from "antd";
 import { NumericFormat } from "react-number-format";
 
-import SwitchNetwork from "@/components/SwitchNetwork";
 import Button from "@/components/Common/Button";
 import { SendTokenType } from "@/types/account";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
 import { formatNumber, shortAddress } from "@/utils/helpers";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
@@ -19,6 +18,8 @@ import { toast } from "react-toastify";
 import { selectStorage } from "@/redux/features/storage/reducer";
 import { CkbNetwork } from "@/types/common";
 import { AGGRON4, LINA } from "@/utils/lumos-config";
+import SwitchToken from "@/components/SwitchTokens";
+import useAssets from "@/hooks/useAssets";
 
 const CreateTx = ({
   txInfo,
@@ -33,24 +34,27 @@ const CreateTx = ({
   const { network } = useAppSelector(selectStorage);
   const { balance, address } = useMultisigBalance();
 
-  const balanceN = useMemo(() => {
-    return Number(ccc.fixedPointToString(balance));
-  }, [balance]);
+  const { assets } = useAssets();
+  const tokenBalance = useMemo(() => {
+    return txInfo.token
+      ? txInfo.token.balance
+      : Number(assets.balance.div(10 ** 8));
+  }, [assets, txInfo.token]);
 
   useEffect(() => {
-    if (txInfo.amount === 0 || balanceN === 0) return;
-    if (txInfo.amount >= balanceN) {
+    if (txInfo.amount === 0 || tokenBalance === 0) return;
+    if (txInfo.amount >= tokenBalance) {
       setTxInfo({ ...txInfo, is_include_fee: true });
     }
-  }, [balanceN, txInfo.amount]);
+  }, [tokenBalance, txInfo.amount]);
 
   const isValidBalance = useCallback(() => {
     const _amount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
-    const _balance = BI.from(ccc.fixedPointFrom(balanceN.toString()));
+    const _balance = BI.from(ccc.fixedPointFrom(tokenBalance.toString()));
     return txInfo.is_include_fee
       ? _amount.lte(_balance)
       : _amount.add(100000).lte(_balance);
-  }, [balanceN, txInfo.amount, txInfo.is_include_fee]);
+  }, [tokenBalance, txInfo.amount, txInfo.is_include_fee]);
 
   const isValidAmount = useCallback(
     (ckbMinTransfer: number) => {
@@ -69,13 +73,13 @@ const CreateTx = ({
         txInfo.is_include_fee ? 0 : 100000
       );
 
-      const _balance = BI.from(ccc.fixedPointFrom(balanceN.toString()));
+      const _balance = BI.from(ccc.fixedPointFrom(tokenBalance.toString()));
 
       const _remaining = BI.from(_balance).sub(_amount);
 
       return _remaining.lte(0) || _remaining.gte(ckbMinTransfer * 100_000_000);
     },
-    [balanceN, txInfo.amount, txInfo.is_include_fee]
+    [tokenBalance, txInfo.amount, txInfo.is_include_fee]
   );
 
   const next = useCallback(() => {
@@ -95,22 +99,27 @@ const CreateTx = ({
     const isAddressTypeJoy = ccc.bytesFrom(toScript.args).length > 20;
     const ckbMinTransfer = isAddressTypeJoy ? 63 : 61;
 
-    if (!isValidAmount(ckbMinTransfer))
-      return toast.warning(`The minimum amount is ${ckbMinTransfer} CKB.`);
+    if (!txInfo.token) {
+      if (!isValidAmount(ckbMinTransfer))
+        return toast.warning(`The minimum amount is ${ckbMinTransfer} CKB.`);
 
-    if (!isValidRemainingBalance(ckbMinTransfer))
-      return toast.warning(
-        `The remaining balance in the ${shortAddress(
-          address,
-          5
-        )} wallet must be at least ${ckbMinTransfer} CKB after sending the amount plus fee.`
-      );
+      if (!isValidRemainingBalance(ckbMinTransfer))
+        return toast.warning(
+          `The remaining balance in the ${shortAddress(
+            address,
+            5
+          )} wallet must be at least ${ckbMinTransfer} CKB after sending the amount plus fee.`
+        );
+    }
 
     if (!isValidBalance())
       return toast.warning(
         `Insufficient balance: Total amount plus fee exceeds ${formatNumber(
-          Number(ccc.fixedPointToString(balance))
-        )} CKB in the ${shortAddress(address, 5)} wallet.`
+          tokenBalance
+        )} ${txInfo.token ? txInfo.token.symbol : "CKB"} in the ${shortAddress(
+          address,
+          5
+        )} wallet.`
       );
     onNext();
   }, [
@@ -128,7 +137,7 @@ const CreateTx = ({
   return (
     <>
       <p className="text-[24px] leading-[28px] font-medium text-dark-100 px-6 border-b border-grey-300 pb-4">
-        Send CKB
+        New Transaction
       </p>
       <div className="pt-4 px-6 grid gap-4">
         <div className="grid gap-2">
@@ -183,7 +192,7 @@ const CreateTx = ({
                 onClick={() =>
                   setTxInfo({
                     ...txInfo,
-                    amount: balanceN,
+                    amount: tokenBalance,
                   })
                 }
               >
@@ -191,26 +200,30 @@ const CreateTx = ({
               </p>
             </div>
             <div className="rounded-lg border border-grey-200 py-[7px] px-4">
-              <SwitchNetwork
+              <SwitchToken
                 iconClassname="w-8 h-8"
-                customEl={
-                  <span className="text-[14px] leading-[18px]">
-                    {formatNumber(balanceN)} CKB
-                  </span>
-                }
+                selToken={txInfo.token}
+                onChange={(token) => {
+                  setTxInfo({
+                    ...txInfo,
+                    token,
+                  });
+                }}
               />
             </div>
           </div>
         </div>
-        <div className="flex gap-2 items-center">
-          <p className="text-base text-grey-400">Include Fee In The Amount</p>
-          <Switch
-            value={txInfo.is_include_fee}
-            onChange={(isChecked) => {
-              setTxInfo({ ...txInfo, is_include_fee: isChecked });
-            }}
-          />
-        </div>
+        {!txInfo.token && (
+          <div className="flex gap-2 items-center">
+            <p className="text-base text-grey-400">Include Fee In The Amount</p>
+            <Switch
+              value={txInfo.is_include_fee}
+              onChange={(isChecked) => {
+                setTxInfo({ ...txInfo, is_include_fee: isChecked });
+              }}
+            />
+          </div>
+        )}
       </div>
       <div className="px-6 mt-6">
         <Button

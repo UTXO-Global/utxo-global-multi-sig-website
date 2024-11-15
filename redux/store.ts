@@ -12,6 +12,7 @@ import storageReducer from "./features/storage/reducer";
 import accountInfoReducer from "./features/account-info/reducer";
 import addressBookReducer from "./features/address-book/reducer";
 import transactionsReducer from "./features/transactions/reducer";
+import assetReducer from "./features/assets/reducer";
 
 const persistConfig = {
   key: "utxo-global-multi-sig",
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
   accountInfo: accountInfoReducer,
   addressBook: addressBookReducer,
   transactions: transactionsReducer,
+  asset: assetReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
