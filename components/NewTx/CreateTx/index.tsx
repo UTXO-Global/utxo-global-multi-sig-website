@@ -20,6 +20,9 @@ import { CkbNetwork } from "@/types/common";
 import { AGGRON4, LINA } from "@/utils/lumos-config";
 import SwitchToken from "@/components/SwitchTokens";
 import useAssets from "@/hooks/useAssets";
+import { createInstance } from "dotbit";
+
+const dotbit = createInstance();
 
 const CreateTx = ({
   txInfo,
@@ -34,12 +37,39 @@ const CreateTx = ({
   const { network } = useAppSelector(selectStorage);
   const { balance, address } = useMultisigBalance();
 
+  const [requesting, setRequesting] = useState(false);
+  const [hasBit, setHasBit] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+
   const { assets } = useAssets();
   const tokenBalance = useMemo(() => {
     return txInfo.token
       ? txInfo.token.balance
       : Number(assets.balance.div(10 ** 8));
   }, [assets, txInfo.token]);
+
+  useEffect(() => {
+    if (inputValue.endsWith(".bit")) {
+      if (!requesting) {
+        dotbit.records(inputValue).then((records) => {
+          for (const record of records) {
+            if (record.key === "address.ckb") {
+              setTxInfo({ ...txInfo, send_to: record.value });
+              setHasBit(true);
+              break;
+            }
+          }
+          setTimeout(() => {
+            setRequesting(false);
+          }, 3000);
+        });
+      }
+      setRequesting(true);
+    } else {
+      setTxInfo({ ...txInfo, send_to: inputValue });
+      setHasBit(false);
+    }
+  }, [inputValue, requesting]);
 
   useEffect(() => {
     if (txInfo.amount === 0 || tokenBalance === 0) return;
@@ -157,13 +187,30 @@ const CreateTx = ({
             <input
               type="text"
               className="border-none outline-none flex-1 placeholder:text-grey-400 text-dark-100"
-              value={txInfo.send_to}
-              onChange={(e) =>
-                setTxInfo({ ...txInfo, send_to: e.target.value })
-              }
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
             />
           </div>
         </div>
+
+        {hasBit && (
+          <div className="grid gap-2">
+            <p className="text-[16px] leading-[20px] text-grey-400">
+              CKB Address
+            </p>
+            <div className="flex items-center gap-2">
+              <p
+                className="text-base text-dark-400"
+                style={{
+                  overflowWrap: "anywhere",
+                }}
+              >
+                {txInfo.send_to}
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="grid gap-2">
           <p className="text-[16px] leading-[20px] text-grey-400">Amount</p>
           <div className="flex items-center gap-2">

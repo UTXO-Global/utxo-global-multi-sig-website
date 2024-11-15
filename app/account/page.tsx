@@ -51,8 +51,8 @@ const Assets = () => {
             </div>
           </div>
 
-          {Object.values(assets.udtBalances).map((udtBalance) => (
-            <div className="px-6 py-3">
+          {Object.values(assets.udtBalances).map((udtBalance, index) => (
+            <div key={index} className="px-6 py-3">
               <div className="flex items-center">
                 <div className="flex items-center w-[60%] justify-start">
                   {/* <img src="/images/nervos.png" alt="ckb" className="w-8" /> */}

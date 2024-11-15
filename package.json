@@ -22,6 +22,7 @@
     "clsx": "^2.1.0",
     "date-fns": "^3.6.0",
     "decimal.js": "^10.4.3",
+    "dotbit": "^1.0.0-beta.2",
     "dotenv-cli": "^7.3.0",
     "next": "14.2.4",
     "react": "^18",
