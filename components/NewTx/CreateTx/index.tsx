@@ -39,7 +39,6 @@ const CreateTx = ({
 
   const [requesting, setRequesting] = useState(false);
   const [filtered, setFiltered] = useState<string[]>([]);
-  const [hasBit, setHasBit] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
   const { assets } = useAssets();
@@ -65,7 +64,6 @@ const CreateTx = ({
     } else {
       setFiltered([])
       setTxInfo({ ...txInfo, send_to: inputValue });
-      setHasBit(false);
     }
   }, [inputValue, requesting]);
 
@@ -208,24 +206,6 @@ const CreateTx = ({
             )}
           </div>
         </div>
-
-        {hasBit && (
-          <div className="grid gap-2">
-            <p className="text-[16px] leading-[20px] text-grey-400">
-              CKB Address
-            </p>
-            <div className="flex items-center gap-2">
-              <p
-                className="text-base text-dark-400"
-                style={{
-                  overflowWrap: "anywhere",
-                }}
-              >
-                {txInfo.send_to}
-              </p>
-            </div>
-          </div>
-        )}
 
         <div className="grid gap-2">
           <p className="text-[16px] leading-[20px] text-grey-400">Amount</p>
