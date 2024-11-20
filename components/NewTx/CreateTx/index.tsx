@@ -38,6 +38,7 @@ const CreateTx = ({
   const { balance, address } = useMultisigBalance();
 
   const [requesting, setRequesting] = useState(false);
+  const [filtered, setFiltered] = useState<string[]>([]);
   const [hasBit, setHasBit] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
@@ -52,13 +53,9 @@ const CreateTx = ({
     if (inputValue.endsWith(".bit")) {
       if (!requesting) {
         dotbit.records(inputValue).then((records) => {
-          for (const record of records) {
-            if (record.key === "address.ckb") {
-              setTxInfo({ ...txInfo, send_to: record.value });
-              setHasBit(true);
-              break;
-            }
-          }
+          setFiltered(
+            records.filter((z) => z.key === "address.ckb").map((j) => j.value)
+          );
           setTimeout(() => {
             setRequesting(false);
           }, 3000);
@@ -66,6 +63,7 @@ const CreateTx = ({
       }
       setRequesting(true);
     } else {
+      setFiltered([])
       setTxInfo({ ...txInfo, send_to: inputValue });
       setHasBit(false);
     }
@@ -172,24 +170,42 @@ const CreateTx = ({
       <div className="pt-4 px-6 grid gap-4">
         <div className="grid gap-2">
           <p className="text-[16px] leading-[20px] text-grey-400">Send To</p>
-          <div className="rounded-lg border border-grey-200 py-[11px] px-4 flex items-center gap-2">
-            <div className="flex items-center gap-2">
-              <img
-                src="/images/account.png"
-                alt="account"
-                className="w-10 aspect-square rounded-full"
-              />
+          <div className="relative">
+            <div className="rounded-lg border border-grey-200 py-[11px] px-4 flex items-center gap-2">
+              <div className="flex items-center gap-2">
+                <img
+                  src="/images/account.png"
+                  alt="account"
+                  className="w-10 aspect-square rounded-full"
+                />
 
-              <p className="text-[16px] leading-[20px] font-medium text-grey-500">
-                {SHORT_NETWORK_NAME[config.network]}:
-              </p>
+                <p className="text-[16px] leading-[20px] font-medium text-grey-500">
+                  {SHORT_NETWORK_NAME[config.network]}:
+                </p>
+              </div>
+              <input
+                type="text"
+                className="border-none outline-none flex-1 placeholder:text-grey-400 text-dark-100"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+              />
             </div>
-            <input
-              type="text"
-              className="border-none outline-none flex-1 placeholder:text-grey-400 text-dark-100"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-            />
+            {filtered.length > 0 && (
+              <div className="absolute w-full rounded-lg border border-grey-200 h-[100px] shadow-sm left-0 mt-2 bg-light-100 py-2">
+                {filtered.map((z, i) => (
+                  <div
+                    key={i}
+                    className="py-2 px-4 hover:bg-grey-200 cursor-pointer"
+                    onClick={() => {
+                      setInputValue(z);
+                      setFiltered([]);
+                    }}
+                  >
+                    {shortAddress(z, 24)}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
