@@ -18,7 +18,9 @@ export const loadCkbAddressInfo = createAsyncThunk<
     const { config: appConfig } = selectApp(getState());
 
     const res = await fetch(
-      `${appConfig.explorerAPI}/api/v1/addresses/${address}`,
+      `${appConfig.apiURL}/ckb/${
+        appConfig.network === "nervos" ? "mainnet" : "testnet"
+      }/v1/addresses/${address}`,
       {
         headers: {
           "content-type": "application/vnd.api+json",
