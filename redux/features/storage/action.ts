@@ -16,4 +16,12 @@ export const setIsDontShowAgainTestnetPopup = createAction<boolean>(
   "storage/set-is-dont-show-again-testnet-popup"
 );
 
+export const setTokens = createAction<{
+  [key: string]: {
+    name: string;
+    symbol: string;
+    decimal: number;
+  };
+}>("storage/set-tokens");
+
 export const reset = createAction("storage/reset");
