@@ -106,6 +106,8 @@ const ConfirmTx = ({
         config: lumosConfig,
       });
 
+      let fee: ccc.Num | null = null;
+
       if (txInfo.token) {
         let toAmount = txInfo.amount * 10 ** txInfo.token.decimal;
 
@@ -144,7 +146,7 @@ const ConfirmTx = ({
           throw new Error(errorMsg);
         }
 
-        const xUDTCapacity = BI.from(tokensCell[0].cellOutput.capacity);
+        const xUDTCapacity = BI.from(tokensCell[0].cellOutput.capacity); // TODO
         if (totalTokenBalance.lt(totalTokenBalanceNeeed)) {
           const errorMsg = `${txInfo.token.symbol} insufficient balance`;
           setError(errorMsg);
@@ -156,19 +158,22 @@ const ConfirmTx = ({
           .update("inputs", (inputs) => inputs.push(...tokensCell))
           .update("outputs", (outputs) => {
             // Transfer Output
+            const xUdtData = ccc.numLeToBytes(
+              totalTokenBalanceNeeed.toBigInt(),
+              16
+            );
             outputs = outputs.push({
               cellOutput: {
                 capacity: xUDTCapacity.toHexString(),
                 lock: toScript,
                 type: xUdtType,
               },
-              data: ccc.hexFrom(
-                ccc.numLeToBytes(totalTokenBalanceNeeed.toBigInt(), 16)
-              ),
+              data: ccc.hexFrom(xUdtData),
             });
 
             // Change Amount
             const diff = totalTokenBalance.sub(totalTokenBalanceNeeed);
+            const xUdtDataChange = ccc.numLeToBytes(diff.toBigInt(), 16);
             if (diff.gt(BI.from(0))) {
               outputs = outputs.push({
                 cellOutput: {
@@ -176,7 +181,7 @@ const ConfirmTx = ({
                   lock: fromScript,
                   type: xUdtType,
                 },
-                data: ccc.hexFrom(ccc.numLeToBytes(diff.toBigInt(), 16)),
+                data: ccc.hexFrom(xUdtDataChange),
               });
             }
 
@@ -214,7 +219,7 @@ const ConfirmTx = ({
           );
 
         // Calculate Fee and Add more CKB input for paying gas fee
-        let fee =
+        fee =
           ccc.Transaction.fromLumosSkeleton(txSkeleton).estimateFee(
             FIXED_FEE_RATE
           );
@@ -235,6 +240,15 @@ const ConfirmTx = ({
           );
 
           for await (const cell of emptyTypeCellCollector.collect()) {
+            if (inputCapacity.lt(outputCapacity)) {
+              txSkeleton = txSkeleton.update("inputs", (inputs) =>
+                inputs.push(cell)
+              );
+              inputCapacity = inputCapacity
+                .add(cell.cellOutput.capacity)
+                .add(BI.from(feeCapacityForeachInout));
+            }
+
             if (inputCapacity.gt(outputCapacity)) {
               const changeCapacity = inputCapacity.sub(outputCapacity);
               // Ignore if change amount is too small
@@ -252,13 +266,6 @@ const ConfirmTx = ({
                 );
               }
               break;
-            } else {
-              txSkeleton = txSkeleton.update("inputs", (inputs) =>
-                inputs.push(cell)
-              );
-              inputCapacity = inputCapacity
-                .add(cell.cellOutput.capacity)
-                .add(BI.from(feeCapacityForeachInout));
             }
           }
         }
