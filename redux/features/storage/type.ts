@@ -6,6 +6,7 @@ export type StorageReducerType = {
   tokenExpired: number;
   network: CkbNetwork;
   isDontShowAgainTestnetPopup: boolean;
+  tokens: { [key: string]: { name: string; symbol: string; decimal: number } };
 };
 
 export const defaultStorageReducer: StorageReducerType = {
@@ -14,4 +15,5 @@ export const defaultStorageReducer: StorageReducerType = {
   tokenExpired: 0,
   network: CkbNetwork.MeepoTestnet,
   isDontShowAgainTestnetPopup: false,
+  tokens: {},
 };

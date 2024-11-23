@@ -9,6 +9,7 @@ import {
   setNetwork,
   setToken,
   setTokenExpired,
+  setTokens,
 } from "./action";
 import { defaultStorageReducer } from "./type";
 
@@ -28,6 +29,9 @@ const storageReducer = createReducer(defaultStorageReducer, (builder) => {
     })
     .addCase(setIsDontShowAgainTestnetPopup, (state, action) => {
       state.isDontShowAgainTestnetPopup = action.payload;
+    })
+    .addCase(setTokens, (state, action) => {
+      state.tokens = { ...state.tokens, ...action.payload };
     })
     .addCase(reset, (state) => {
       state.token = "";
