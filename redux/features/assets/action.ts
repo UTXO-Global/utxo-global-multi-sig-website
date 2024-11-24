@@ -49,7 +49,7 @@ export const loadCkbAddressInfo = createAsyncThunk<
     });
 
     return {
-      balance: BI.from(addressInfo.attributes.balance),
+      balance: BI.from(addressInfo.attributes.balance).sub(BI.from(addressInfo.attributes.balance_occupied)),
       balanceOccupied: BI.from(addressInfo.attributes.balance_occupied),
       udtBalances,
     };

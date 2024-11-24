@@ -59,6 +59,7 @@ export type AssetSummaryType = {
 };
 
 export type AssetReducerType = {
+  isLoading: boolean;
   assets: AssetSummaryType;
 };
 
@@ -68,4 +69,5 @@ export const defaultAssetsReducer: AssetReducerType = {
     balanceOccupied: BI.from(0),
     udtBalances: {},
   },
+  isLoading: true,
 };

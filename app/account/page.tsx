@@ -14,7 +14,7 @@ import { useMemo } from "react";
 const Assets = () => {
   const { info: account } = useAppSelector(selectAccountInfo);
   const { ckbPrice } = useAppSelector(selectApp);
-  const { assets } = useAssets();
+  const { assets, isLoading } = useAssets();
   const { balance } = useMultisigBalance();
   const multisigBalance = useMemo(() => {
     return Number(ccc.fixedPointToString(balance));
@@ -51,28 +51,34 @@ const Assets = () => {
             </div>
           </div>
 
-          {Object.values(assets.udtBalances).map((udtBalance, index) => (
-            <div key={index} className="px-6 py-3">
-              <div className="flex items-center">
-                <div className="flex items-center w-[60%] justify-start">
-                  {/* <img src="/images/nervos.png" alt="ckb" className="w-8" /> */}
-                  <TextAvatar text={udtBalance.symbol} />
-
-                  <p className="text-[14px] leading-[24px] text-dark-100 font-medium ml-2">
-                    {udtBalance.symbol}
-                  </p>
-                </div>
-
-                <div className="text-base font-medium text-dark-100 w-[20%]">
-                  {account ? formatNumber(Number(udtBalance.balance)) : "--"}{" "}
-                  {udtBalance.symbol}
-                </div>
-                <div className="text-base font-medium text-dark-100 w-[20%] text-right">
-                  $--
-                </div>
-              </div>
+          {isLoading
+            ? <div className="px-6 py-5">
+              <div className="h-[16px] rounded-lg bg-grey-300 animate-pulse"></div>
             </div>
-          ))}
+            : Object.values(assets.udtBalances).map((udtBalance, index) => (
+                <div key={index} className="px-6 py-3">
+                  <div className="flex items-center">
+                    <div className="flex items-center w-[60%] justify-start">
+                      {/* <img src="/images/nervos.png" alt="ckb" className="w-8" /> */}
+                      <TextAvatar text={udtBalance.symbol} />
+
+                      <p className="text-[14px] leading-[24px] text-dark-100 font-medium ml-2">
+                        {udtBalance.symbol}
+                      </p>
+                    </div>
+
+                    <div className="text-base font-medium text-dark-100 w-[20%]">
+                      {account
+                        ? formatNumber(Number(udtBalance.balance))
+                        : "--"}{" "}
+                      {udtBalance.symbol}
+                    </div>
+                    <div className="text-base font-medium text-dark-100 w-[20%] text-right">
+                      $--
+                    </div>
+                  </div>
+                </div>
+              ))}
         </div>
       </div>
     </main>

@@ -39,7 +39,7 @@ export default function TextAvatar({
   return (
     <div
       className={cn(
-        `w-10 h-10 rounded-full flex items-center justify-center text-[19px] leading-5 ${
+        `w-8 h-8 rounded-full flex items-center justify-center text-[19px] leading-5 ${
           className ?? ""
         }`
       )}

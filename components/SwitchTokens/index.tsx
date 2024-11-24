@@ -94,7 +94,7 @@ const SwitchToken = ({
           {/* <img src={n.icon} alt="nervos" className="w-6 rounded-full" /> */}
           <TextAvatar
             text={udtBalance.symbol}
-            className="w-6 !h-6 rounded-full"
+            className="!w-6 !h-6 rounded-full"
           />
           <p>{udtBalance.symbol}</p>
         </div>

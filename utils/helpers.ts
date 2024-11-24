@@ -105,7 +105,7 @@ export const getBalance = async (address: string, config: INetworkConfig) => {
       }
     );
     const data = await res.json();
-    const balance = new Decimal(data.data[0].attributes.balance).div(10 ** 8);
+    const balance = (new Decimal(data.data[0].attributes.balance).div(10 ** 8)).sub(new Decimal(data.data[0].attributes.balance_occupied).div(10 ** 8));
 
     return balance.toNumber();
   } catch (e) {
