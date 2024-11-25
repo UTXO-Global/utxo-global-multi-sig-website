@@ -29,6 +29,8 @@ import { cccA } from "@ckb-ccc/connector-react/advanced";
 import { useRouter } from "next/navigation";
 import { AGGRON4, LINA } from "@/utils/lumos-config";
 import { selectApp } from "@/redux/features/app/reducer";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
 
 const ConfirmTx = ({
   txInfo,
@@ -82,9 +84,24 @@ const ConfirmTx = ({
         router.push(
           `/account/transactions/?address=${account?.multi_sig_address}`
         );
+      } else if (!!data.message) {
+        toast.error(data.message);
       }
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      const message: string = (
+        e.response?.data?.message || e.message
+      ).toString();
+      if (
+        message.includes(
+          `duplicate key value violates unique constraint "transactions_pkey"`
+        )
+      ) {
+        toast.error(
+          `Transaction with hash ${transaction.hash()} is still pending. Please complete it before creating a new transaction`
+        );
+      } else {
+        toast.error(message);
+      }
     }
     setLoading(false);
   };
@@ -434,6 +451,12 @@ const ConfirmTx = ({
     f();
     setLoading(false);
   }, [txInfo, account, indexer, appConfig.isTestnet]);
+
+  useEffect(() => {
+    if (!error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   return (
     <>
