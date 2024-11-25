@@ -453,7 +453,7 @@ const ConfirmTx = ({
   }, [txInfo, account, indexer, appConfig.isTestnet]);
 
   useEffect(() => {
-    if (!error) {
+    if (!!error) {
       toast.error(error);
     }
   }, [error]);
