@@ -157,7 +157,7 @@ const Transaction = ({
     try {
       if (rawTx.outputs_data[0] !== "0x") {
         const amount = ccc.numLeFromBytes(ccc.bytesFrom(rawTx.outputs_data[0]));
-        return BI.from(amount)
+        return new Decimal(Number(amount))
           .div(10 ** (tokenInfo?.decimal || 8))
           .toNumber();
       }
@@ -186,7 +186,7 @@ const Transaction = ({
           </div>
 
           <p className="text-[16px] leading-[20px] font-medium text-grey-400">
-            -{formatNumber(txAmount, 0, 8)} {tokenInfo?.symbol}
+            -{formatNumber(txAmount, 2, 8)} {tokenInfo?.symbol}
           </p>
         </div>
         <div className="w-[15%] text-[16px] leading-[20px] font-medium text-grey-400 grid gap-4 pl-2">
