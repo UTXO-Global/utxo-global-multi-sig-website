@@ -185,6 +185,7 @@ const CreateTx = ({
                 type="text"
                 className="border-none outline-none flex-1 placeholder:text-grey-400 text-dark-100"
                 value={inputValue}
+                placeholder="Address/.bit Alias"
                 onChange={(e) => setInputValue(e.target.value)}
               />
             </div>
