@@ -39,7 +39,7 @@ const ReceiveTokens = ({ account }: { account: MultiSigAccountType }) => {
       >
         <div className="bg-light-100 rounded-[16px] p-6">
           <h3 className="text-[24px] leading-[28px] font-medium text-dark-100">
-            Receive CKB
+            Multi-Sig Address
           </h3>
           <div className="mt-10 grid gap-4">
             <div className="flex justify-center">
@@ -50,7 +50,7 @@ const ReceiveTokens = ({ account }: { account: MultiSigAccountType }) => {
               />
             </div>
             <p className="text-[16px] leading-[20px] text-orange-100 text-center">
-              Only Send CKB to this Account.
+              Only Send CKB and xUDT Assets to This Account.
             </p>
             <div className="px-4 py-3 rounded-lg bg-grey-300 flex items-center gap-2">
               <img
