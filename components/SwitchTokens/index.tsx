@@ -38,7 +38,7 @@ const SwitchToken = ({
     if (selToken) {
       return selToken.balance;
     }
-    return assets.balance.div(10 ** 8);
+    return Number(assets.balance) / 10 ** 8;
   }, [selToken, assets]);
 
   const symbol = useMemo(() => {

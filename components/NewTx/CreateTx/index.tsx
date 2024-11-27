@@ -42,10 +42,13 @@ const CreateTx = ({
   const [inputValue, setInputValue] = useState("");
 
   const { assets } = useAssets();
+
   const tokenBalance = useMemo(() => {
-    return txInfo.token
-      ? txInfo.token.balance
-      : Number(assets.balance.div(10 ** 8));
+    if (txInfo.token) {
+      return txInfo.token?.balance || 0;
+    }
+
+    return Number(assets.balance) / 10 ** 8;
   }, [assets, txInfo.token]);
 
   useEffect(() => {
@@ -62,7 +65,7 @@ const CreateTx = ({
       }
       setRequesting(true);
     } else {
-      setFiltered([])
+      setFiltered([]);
       setTxInfo({ ...txInfo, send_to: inputValue });
     }
   }, [inputValue, requesting]);

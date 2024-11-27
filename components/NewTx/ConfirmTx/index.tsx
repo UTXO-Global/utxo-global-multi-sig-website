@@ -9,6 +9,7 @@ import {
   getInputsCapacity,
   getOutputsCapacity,
   INOUT_SIZE_BYTE,
+  MIN_CAPACITY,
   shortAddress,
 } from "@/utils/helpers";
 import { ccc } from "@ckb-ccc/connector-react";
@@ -43,7 +44,7 @@ const ConfirmTx = ({
     undefined
   );
 
-  const [txFee, setTxFee] = useState(BI.from(100000)); // TODO: Set dynamic fee = 0.001
+  const [txFee, setTxFee] = useState(BI.from(10000)); // TODO: Set dynamic fee = 0.001
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [error, setError] = useState("");
@@ -125,6 +126,8 @@ const ConfirmTx = ({
 
       let fee: ccc.Num | null = null;
 
+      const minCapacity = MIN_CAPACITY(toScript);
+
       if (txInfo.token) {
         let toAmount = txInfo.amount * 10 ** txInfo.token.decimal;
 
@@ -139,6 +142,12 @@ const ConfirmTx = ({
         const xudtCollector = indexer.collector({
           type: xUdtType,
           lock: fromScript,
+        });
+
+        const cellCollector = indexer.collector({
+          lock: fromScript,
+          data: "0x",
+          type: "empty",
         });
 
         const tokensCell: Cell[] = [];
@@ -163,7 +172,14 @@ const ConfirmTx = ({
           throw new Error(errorMsg);
         }
 
-        const xUDTCapacity = BI.from(tokensCell[0].cellOutput.capacity); // TODO
+        const isAddressTypeJoy = ccc.bytesFrom(toScript.args).length > 20;
+        const joyCapacityAddMore = 2_0000_0000; // 2 ckb
+
+        const collectedCells: Cell[] = [];
+        let neededCapacity = BI.from(0);
+        let totalCapacity = BI.from(0);
+        let capacityChangeOutput = BI.from(0);
+        const xUDTCapacity = BI.from(tokensCell[0].cellOutput.capacity);
         if (totalTokenBalance.lt(totalTokenBalanceNeeed)) {
           const errorMsg = `${txInfo.token.symbol} insufficient balance`;
           setError(errorMsg);
@@ -174,6 +190,11 @@ const ConfirmTx = ({
         txSkeleton = txSkeleton
           .update("inputs", (inputs) => inputs.push(...tokensCell))
           .update("outputs", (outputs) => {
+            let recap = BI.from(tokensCell[0].cellOutput.capacity);
+            if (isAddressTypeJoy) {
+              recap = recap.add(joyCapacityAddMore);
+            }
+
             // Transfer Output
             const xUdtData = ccc.numLeToBytes(
               totalTokenBalanceNeeed.toBigInt(),
@@ -181,7 +202,7 @@ const ConfirmTx = ({
             );
             outputs = outputs.push({
               cellOutput: {
-                capacity: xUDTCapacity.toHexString(),
+                capacity: recap.toHexString(),
                 lock: toScript,
                 type: xUdtType,
               },
@@ -192,6 +213,12 @@ const ConfirmTx = ({
             const diff = totalTokenBalance.sub(totalTokenBalanceNeeed);
             const xUdtDataChange = ccc.numLeToBytes(diff.toBigInt(), 16);
             if (diff.gt(BI.from(0))) {
+              neededCapacity = neededCapacity.add(
+                tokensCell[0].cellOutput.capacity
+              );
+              if (isAddressTypeJoy) {
+                neededCapacity = neededCapacity.add(joyCapacityAddMore);
+              }
               outputs = outputs.push({
                 cellOutput: {
                   capacity: xUDTCapacity.toHexString(),
@@ -240,58 +267,65 @@ const ConfirmTx = ({
           ccc.Transaction.fromLumosSkeleton(txSkeleton).estimateFee(
             FIXED_FEE_RATE
           );
-        let inputCapacity = getInputsCapacity(txSkeleton).add(fee);
-        let outputCapacity = getOutputsCapacity(txSkeleton);
 
-        if (inputCapacity.lt(outputCapacity)) {
-          const emptyTypeCellCollector = indexer.collector({
-            lock: fromScript,
-            data: "0x",
-            type: "empty",
-          });
+        neededCapacity = neededCapacity.add(BI.from(fee));
 
-          // Assume these append inputs and outputs has size = 500 bytes = INOUT_SIZE_BYTE
-          // => Fee increase = INOUT_SIZE_BYTE * FIXED_FEE_RATE / 1024
-          const feeCapacityForeachInout = Math.ceil(
-            (INOUT_SIZE_BYTE * FIXED_FEE_RATE) / 1024
-          );
-
-          for await (const cell of emptyTypeCellCollector.collect()) {
-            if (inputCapacity.lt(outputCapacity)) {
-              txSkeleton = txSkeleton.update("inputs", (inputs) =>
-                inputs.push(cell)
-              );
-              inputCapacity = inputCapacity
-                .add(cell.cellOutput.capacity)
-                .add(BI.from(feeCapacityForeachInout));
-            }
-
-            if (inputCapacity.gt(outputCapacity)) {
-              const changeCapacity = inputCapacity.sub(outputCapacity);
-              // Ignore if change amount is too small
-              if (changeCapacity.gt(feeCapacityForeachInout)) {
-                txSkeleton = txSkeleton.update("outputs", (outputs) =>
-                  outputs.push({
-                    cellOutput: {
-                      capacity: changeCapacity
-                        .sub(feeCapacityForeachInout)
-                        .toHexString(),
-                      lock: fromScript,
-                    },
-                    data: "0x",
-                  })
-                );
-              }
-              break;
-            }
+        for await (const cell of cellCollector.collect()) {
+          if (cell.data !== "0x") {
+            continue;
           }
+
+          if (
+            txSkeleton.inputs.some(
+              (input) =>
+                input.outPoint?.txHash === cell.outPoint?.txHash &&
+                input.outPoint?.index === cell.outPoint?.index
+            )
+          ) {
+            continue;
+          }
+
+          collectedCells.push(cell);
+          totalCapacity = totalCapacity.add(BI.from(cell.cellOutput.capacity));
+          if (isAddressTypeJoy) {
+            totalCapacity = totalCapacity.add(joyCapacityAddMore);
+          }
+          capacityChangeOutput = totalCapacity.sub(neededCapacity);
+          if (
+            totalCapacity.gte(neededCapacity) &&
+            (capacityChangeOutput.eq(0) || capacityChangeOutput.gt(minCapacity))
+          )
+            break;
         }
 
-        // Recalculate Fee Again
-        fee =
-          ccc.Transaction.fromLumosSkeleton(txSkeleton).estimateFee(
-            FIXED_FEE_RATE
+        if (
+          capacityChangeOutput.gt(0) &&
+          capacityChangeOutput.lt(minCapacity)
+        ) {
+          throw new Error(
+            `The remaining balance in your wallet must be greater than ${(
+              minCapacity.toNumber() /
+              10 ** 8
+            ).toString()} CKB. Please adjust your transaction amount or add more CKB to proceed`
           );
+        }
+
+        txSkeleton = txSkeleton.update("inputs", (inputs) =>
+          inputs.push(...collectedCells)
+        );
+
+        if (capacityChangeOutput.gt(0)) {
+          txSkeleton = txSkeleton.update("outputs", (outputs) =>
+            outputs.push({
+              cellOutput: {
+                capacity: capacityChangeOutput.toHexString(),
+                lock: fromScript,
+              },
+              data: "0x",
+            })
+          );
+        }
+
         setTxFee(BI.from(fee));
       } else {
         // CKB transfer
@@ -307,7 +341,9 @@ const ConfirmTx = ({
           lock: fromScript,
           type: "empty",
         });
+
         for await (const cell of collector.collect()) {
+          console.log(cell.data);
           if (
             !bytes.equal(
               blockchain.Script.pack(cell.cellOutput.lock),
@@ -444,6 +480,7 @@ const ConfirmTx = ({
       );
 
       const tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
+      console.log(Number(tx.estimateFee(3600)) * account.threshold);
       setTransaction(tx);
     };
 

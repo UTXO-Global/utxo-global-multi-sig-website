@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import Decimal from "decimal.js";
 import { AddressPrefix } from "@nervosnetwork/ckb-sdk-utils";
-import { BI, helpers } from "@ckb-lumos/lumos";
+import { BI, helpers, Script } from "@ckb-lumos/lumos";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
 
 import { InviteStatus, SignerDetailType } from "@/types/account";
@@ -105,7 +105,9 @@ export const getBalance = async (address: string, config: INetworkConfig) => {
       }
     );
     const data = await res.json();
-    const balance = (new Decimal(data.data[0].attributes.balance).div(10 ** 8)).sub(new Decimal(data.data[0].attributes.balance_occupied).div(10 ** 8));
+    const balance = new Decimal(data.data[0].attributes.balance)
+      .div(10 ** 8)
+      .sub(new Decimal(data.data[0].attributes.balance_occupied).div(10 ** 8));
 
     return balance.toNumber();
   } catch (e) {
@@ -119,7 +121,7 @@ export const camelToSnakeCase = (str: string) => {
 };
 
 // https://explorer.nervos.org/fee-rate-tracker
-export const FIXED_FEE_RATE = 1000; // shannons/kB
+export const FIXED_FEE_RATE = 3600; // shannons/kB
 export const INOUT_SIZE_BYTE = 500; // Bytes
 
 export function getOutputsCapacity(tx: LumosTransactionSkeletonType): BI {
@@ -139,3 +141,11 @@ export function getInputsCapacity(tx: LumosTransactionSkeletonType): BI {
       BI.from(0)
     );
 }
+
+export const MIN_CAPACITY = (script: Script) => {
+  if (ccc.bytesFrom(script.args).length === 22) {
+    return BI.from(63_0000_0000);
+  }
+
+  return BI.from(61_0000_0000);
+};
