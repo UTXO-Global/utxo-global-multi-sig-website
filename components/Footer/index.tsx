@@ -44,7 +44,7 @@ const Footer = () => {
             </Link>{" "}
             Team
           </div>
-          <p className="text-grey-400 pl-2 ml-2 border-l border-grey-400">
+          <p className="text-grey-400 pl-2 ml-2 border-l border-grey-400 hidden md:inline-block">
             {process.env.version}
           </p>
         </div>

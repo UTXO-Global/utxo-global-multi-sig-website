@@ -13,7 +13,7 @@ export const SUBSTACK_LINK = "https://utxoglobal.substack.com/";
 export const DOC_LINK = "https://utxo-global.gitbook.io/utxo-global";
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACIKING_ID;
 export const DEFAULT_NETWORK =
-  process.env.NEXT_PUBLIC_NETWORK_DEFAULT || "nervos_testnet";
+  process.env.NEXT_PUBLIC_NETWORK_DEFAULT || "nervos";
 export const NAVIGATIONS = [
   {
     id: "about-us",

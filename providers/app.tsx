@@ -31,7 +31,6 @@ const AppContext = createContext(defaultValue);
 const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [isShowIntro, setIsShowIntro] = useState<boolean>(true);
   const [address, setAddress] = useState<string>("");
-  const { isSupported } = useSupportedScreen();
 
   const signer = ccc.useSigner();
   const { setClient } = ccc.useCcc();
@@ -113,8 +112,6 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
         : new ccc.ClientPublicTestnet()
     );
   }, [network, setClient]);
-
-  if (!isSupported) return <NotSupportedScreen />;
 
   if (isShowIntro) return <Intro />;
 

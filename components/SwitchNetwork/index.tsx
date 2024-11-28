@@ -94,7 +94,7 @@ const SwitchNetwork = ({
       onOpenChange={handleOpenChange}
       arrow={false}
     >
-      <div className="flex gap-6 items-center cursor-pointer">
+      <div className="flex gap-4 items-center cursor-pointer">
         <div className="flex gap-2 items-center">
           <img
             src="/images/nervos.png"
