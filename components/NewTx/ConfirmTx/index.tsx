@@ -133,9 +133,11 @@ const ConfirmTx = ({
 
         // xUDT transfer
         const { args, code_hash, hash_type } = txInfo.token.typeScript;
-        const xUdtType = {
-          codeHash: code_hash,
-          hashType: hash_type,
+        const isRUSD = lumosConfig.SCRIPTS.RUSD?.CODE_HASH === code_hash;
+
+        let xUdtType = {
+          codeHash: isRUSD ? lumosConfig.SCRIPTS.RUSD?.CODE_HASH : code_hash,
+          hashType: isRUSD ? lumosConfig.SCRIPTS.RUSD?.HASH_TYPE : hash_type,
           args,
         } as Script;
 
@@ -176,15 +178,29 @@ const ConfirmTx = ({
         const joyCapacityAddMore = 2_0000_0000; // 2 ckb
 
         const collectedCells: Cell[] = [];
-        let neededCapacity = BI.from(0);
         let totalCapacity = BI.from(0);
         let capacityChangeOutput = BI.from(0);
         const xUDTCapacity = BI.from(tokensCell[0].cellOutput.capacity);
+        let neededCapacity = BI.from(0);
         if (totalTokenBalance.lt(totalTokenBalanceNeeed)) {
           const errorMsg = `${txInfo.token.symbol} insufficient balance`;
           setError(errorMsg);
           throw new Error(errorMsg);
         }
+
+        const xUDTCell = {
+          outPoint: {
+            txHash: isRUSD
+              ? lumosConfig.SCRIPTS.RUSD!.TX_HASH
+              : lumosConfig.SCRIPTS.XUDT!.TX_HASH,
+            index: isRUSD
+              ? lumosConfig.SCRIPTS.RUSD!.INDEX
+              : lumosConfig.SCRIPTS.XUDT!.INDEX,
+          },
+          depType: isRUSD
+            ? lumosConfig.SCRIPTS.RUSD!.DEP_TYPE
+            : lumosConfig.SCRIPTS.XUDT!.DEP_TYPE,
+        };
 
         // Create Tx Skeleton
         txSkeleton = txSkeleton
@@ -213,9 +229,7 @@ const ConfirmTx = ({
             const diff = totalTokenBalance.sub(totalTokenBalanceNeeed);
             const xUdtDataChange = ccc.numLeToBytes(diff.toBigInt(), 16);
             if (diff.gt(BI.from(0))) {
-              neededCapacity = neededCapacity.add(
-                tokensCell[0].cellOutput.capacity
-              );
+              neededCapacity = neededCapacity.add(xUDTCapacity);
               if (isAddressTypeJoy) {
                 neededCapacity = neededCapacity.add(joyCapacityAddMore);
               }
@@ -234,6 +248,7 @@ const ConfirmTx = ({
           .update("cellDeps", (cellDeps) =>
             cellDeps.push(
               ...[
+                xUDTCell,
                 {
                   outPoint: {
                     txHash:
@@ -243,13 +258,6 @@ const ConfirmTx = ({
                   },
                   depType:
                     lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.DEP_TYPE!,
-                },
-                {
-                  outPoint: {
-                    txHash: lumosConfig.SCRIPTS.XUDT!.TX_HASH,
-                    index: lumosConfig.SCRIPTS.XUDT!.INDEX,
-                  },
-                  depType: lumosConfig.SCRIPTS.XUDT!.DEP_TYPE,
                 },
                 {
                   outPoint: {
