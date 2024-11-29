@@ -7,13 +7,15 @@ import {
 
 export type AppReducerType = {
   ckbPrice: number;
+  tokenRates: { [key: string]: number };
   config: INetworkConfig;
 };
 
 export const defaultAppReducer: AppReducerType = {
   ckbPrice: 0,
+  tokenRates: {},
   config:
-    DEFAULT_NETWORK === "nervos_testnet"
-      ? { ...TESTNET_CONFIG }
-      : { ...MAINNET_CONFIG },
+    DEFAULT_NETWORK === "nervos"
+      ? { ...MAINNET_CONFIG }
+      : { ...TESTNET_CONFIG },
 };

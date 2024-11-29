@@ -2,7 +2,7 @@ import { createReducer } from "@reduxjs/toolkit";
 
 import { RootState } from "@/redux/store";
 
-import { loadCkbPrice, setNetworkConfig } from "./action";
+import { loadCkbPrice, loadTokenRate, setNetworkConfig } from "./action";
 import { defaultAppReducer } from "./type";
 import { MAINNET_CONFIG, TESTNET_CONFIG } from "@/configs/network";
 import { CkbNetwork } from "@/types/common";
@@ -21,6 +21,9 @@ const appReducer = createReducer(defaultAppReducer, (builder) => {
           : TESTNET_CONFIG;
       state.config = cnf;
       setBaseAPIURL(cnf.apiURL);
+    })
+    .addCase(loadTokenRate.fulfilled, (state, action) => {
+      state.tokenRates = { ...state.tokenRates, ...(action.payload as any) };
     });
 });
 
