@@ -276,7 +276,8 @@ const ConfirmTx = ({
             FIXED_FEE_RATE
           ) * BigInt(account.threshold + 1);
 
-        neededCapacity = neededCapacity.add(BI.from(fee));
+        setTxFee(BI.from(fee));
+        neededCapacity = neededCapacity.add(fee);
 
         for await (const cell of cellCollector.collect()) {
           if (cell.data !== "0x") {
@@ -333,12 +334,6 @@ const ConfirmTx = ({
             })
           );
         }
-
-        setTxFee(BI.from(fee));
-        fee =
-          ccc.Transaction.fromLumosSkeleton(txSkeleton).estimateFee(
-            FIXED_FEE_RATE
-          );
       } else {
         // CKB transfer
         let toAmount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
@@ -422,6 +417,14 @@ const ConfirmTx = ({
               ]
             )
           );
+
+        txSkeleton = await commons.common.payFee(
+          txSkeleton,
+          [txInfo.send_from],
+          txFee,
+          undefined,
+          { config: lumosConfig }
+        );
       }
 
       const firstIndex = txSkeleton
@@ -482,14 +485,6 @@ const ConfirmTx = ({
           witnesses.set(firstIndex, witness)
         );
       }
-
-      txSkeleton = await commons.common.payFee(
-        txSkeleton,
-        [txInfo.send_from],
-        txFee,
-        undefined,
-        { config: lumosConfig }
-      );
 
       const tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
       setTransaction(tx);
