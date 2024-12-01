@@ -44,7 +44,7 @@ const ConfirmTx = ({
     undefined
   );
 
-  const [txFee, setTxFee] = useState(BI.from(10000)); // TODO: Set dynamic fee = 0.001
+  const [txFee, setTxFee] = useState(BI.from(100000)); // TODO: Set dynamic fee = 0.001
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [error, setError] = useState("");
@@ -274,7 +274,7 @@ const ConfirmTx = ({
         fee =
           ccc.Transaction.fromLumosSkeleton(txSkeleton).estimateFee(
             FIXED_FEE_RATE
-          );
+          ) * BigInt(account.threshold + 1);
 
         neededCapacity = neededCapacity.add(BI.from(fee));
 
@@ -335,6 +335,10 @@ const ConfirmTx = ({
         }
 
         setTxFee(BI.from(fee));
+        fee =
+          ccc.Transaction.fromLumosSkeleton(txSkeleton).estimateFee(
+            FIXED_FEE_RATE
+          );
       } else {
         // CKB transfer
         let toAmount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
@@ -488,7 +492,6 @@ const ConfirmTx = ({
       );
 
       const tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
-      console.log(Number(tx.estimateFee(3600)) * account.threshold);
       setTransaction(tx);
     };
 
