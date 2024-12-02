@@ -119,8 +119,11 @@ const Assets = () => {
               <div key={index} className="px-6 py-3">
                 <div className="flex items-center">
                   <div className="flex items-center w-[60%] justify-start">
-                    {/* <img src="/images/nervos.png" alt="ckb" className="w-8" /> */}
-                    <TextAvatar text={udtBalance.symbol} />
+                    {!!udtBalance.icon ? (
+                      <img src={udtBalance.icon} alt="ckb" className="w-8" />
+                    ) : (
+                      <TextAvatar text={udtBalance.symbol} />
+                    )}
 
                     <p className="text-[14px] leading-[24px] text-dark-100 font-medium ml-2">
                       {udtBalance.symbol}

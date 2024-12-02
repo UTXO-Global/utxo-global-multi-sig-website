@@ -6,13 +6,10 @@ import api from "@/utils/api";
 import {
   FIXED_FEE_RATE,
   formatNumber,
-  getInputsCapacity,
-  getOutputsCapacity,
-  INOUT_SIZE_BYTE,
   MIN_CAPACITY,
   shortAddress,
 } from "@/utils/helpers";
-import { ccc } from "@ckb-ccc/connector-react";
+import { ccc, useCcc } from "@ckb-ccc/connector-react";
 import {
   BI,
   Cell,
@@ -31,7 +28,7 @@ import { useRouter } from "next/navigation";
 import { AGGRON4, LINA } from "@/utils/lumos-config";
 import { selectApp } from "@/redux/features/app/reducer";
 import { toast } from "react-toastify";
-import { AxiosError } from "axios";
+import useCells from "@/hooks/useCell";
 
 const ConfirmTx = ({
   txInfo,
@@ -45,12 +42,13 @@ const ConfirmTx = ({
   );
 
   const [txFee, setTxFee] = useState(BI.from(100000)); // TODO: Set dynamic fee = 0.001
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [error, setError] = useState("");
   const { info: account } = useAppSelector(selectAccountInfo);
   const { config: appConfig } = useAppSelector(selectApp);
   const signer = ccc.useSigner();
+  const { usableCells, loading: cellLoading } = useCells();
+  const [loading, setLoading] = useState(cellLoading);
   const indexer = useMemo(() => {
     return new Indexer(appConfig.ckbRPC);
   }, [appConfig.ckbRPC]);
@@ -92,11 +90,7 @@ const ConfirmTx = ({
       const message: string = (
         e.response?.data?.message || e.message
       ).toString();
-      if (
-        message.includes(
-          `duplicate key value violates unique constraint "transactions_pkey"`
-        )
-      ) {
+      if (message.includes(`transactions_pkey`)) {
         toast.error(
           `Transaction with hash ${transaction.hash()} is still pending. Please complete it before creating a new transaction`
         );
@@ -341,7 +335,7 @@ const ConfirmTx = ({
           toAmount = toAmount.sub(txFee);
         }
         const neededCapacity = toAmount.add(txFee);
-
+        let capacityChangeOutput = BI.from(0);
         let collectedSum = BI.from(0);
         const collected: Cell[] = [];
         const collector = indexer.collector({
@@ -349,8 +343,9 @@ const ConfirmTx = ({
           type: "empty",
         });
 
+        let hasCellPending = false;
+
         for await (const cell of collector.collect()) {
-          console.log(cell.data);
           if (
             !bytes.equal(
               blockchain.Script.pack(cell.cellOutput.lock),
@@ -360,18 +355,52 @@ const ConfirmTx = ({
             continue;
           }
 
+          if (
+            cell.outPoint &&
+            !!usableCells[cell.outPoint.txHash] &&
+            usableCells[cell.outPoint.txHash] === Number(cell.outPoint.index)
+          ) {
+            hasCellPending = true;
+            continue;
+          }
+
           collectedSum = collectedSum.add(cell.cellOutput.capacity);
           collected.push(cell);
-          if (collectedSum.gte(neededCapacity)) break;
+          capacityChangeOutput = collectedSum.sub(neededCapacity);
+          if (
+            collectedSum.gte(neededCapacity) &&
+            (capacityChangeOutput.eq(0) || capacityChangeOutput.gt(minCapacity))
+          )
+            break;
         }
 
         // Validate
         if (collectedSum.lt(neededCapacity)) {
-          setError("Not enough CKB");
-          throw new Error("Not enough CKB");
+          setError(
+            hasCellPending
+              ? "Insufficient balance: Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
+              : "Not enough CKB"
+          );
+          return;
         }
 
-        // Create Tx Skeleton
+        if (
+          capacityChangeOutput.gt(0) &&
+          capacityChangeOutput.lt(minCapacity)
+        ) {
+          setError(
+            `The remaining balance in your wallet must be greater than ${(
+              minCapacity.toNumber() /
+              10 ** 8
+            ).toString()} CKB. ${
+              hasCellPending
+                ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
+                : "Please adjust your transaction amount or add more CKB to proceed"
+            }`
+          );
+          return;
+        }
+
         txSkeleton = txSkeleton
           .update("inputs", (inputs) => inputs.push(...collected))
           .update("outputs", (outputs) =>
@@ -464,9 +493,7 @@ const ConfirmTx = ({
             !bytes.equal(lock, newWitnessArgs.lock)
           ) {
             setError("Lock field in first witness is set aside for signature!");
-            throw new Error(
-              "Lock field in first witness is set aside for signature!"
-            );
+            return;
           }
 
           const inputType = witnessArgs.inputType;
@@ -493,7 +520,7 @@ const ConfirmTx = ({
     setLoading(true);
     f();
     setLoading(false);
-  }, [txInfo, account, indexer, appConfig.isTestnet]);
+  }, [txInfo, account, indexer, appConfig.isTestnet, usableCells]);
 
   useEffect(() => {
     if (!!error) {
