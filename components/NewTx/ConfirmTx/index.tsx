@@ -416,7 +416,7 @@ const ConfirmTx = ({
               // Change Output
               {
                 cellOutput: {
-                  capacity: capacityChangeOutput.toHexString(),
+                  capacity: collectedSum.sub(toAmount).toHexString(),
                   lock: fromScript,
                 },
                 data: "0x",
