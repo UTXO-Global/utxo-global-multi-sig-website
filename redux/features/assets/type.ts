@@ -5,6 +5,7 @@ export type UdtBalanceType = {
   decimal: number;
   rawBalance: string;
   symbol: string;
+  icon: string;
   typeScript: {
     args: string;
     code_hash: string;

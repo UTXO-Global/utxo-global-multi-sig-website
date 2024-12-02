@@ -41,6 +41,7 @@ export const loadCkbAddressInfo = createAsyncThunk<
           decimal: Number(a.decimal),
           rawBalance: a.amount,
           symbol: a.symbol,
+          icon: a.udt_icon_file,
           typeScript: a.udt_type_script,
         };
       } catch (e) {
@@ -49,7 +50,9 @@ export const loadCkbAddressInfo = createAsyncThunk<
     });
 
     return {
-      balance: BI.from(addressInfo.attributes.balance).sub(BI.from(addressInfo.attributes.balance_occupied)),
+      balance: BI.from(addressInfo.attributes.balance).sub(
+        BI.from(addressInfo.attributes.balance_occupied)
+      ),
       balanceOccupied: BI.from(addressInfo.attributes.balance_occupied),
       udtBalances,
     };
