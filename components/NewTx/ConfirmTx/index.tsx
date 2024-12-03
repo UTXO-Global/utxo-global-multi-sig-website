@@ -245,6 +245,13 @@ const ConfirmTx = ({
                 xUDTCell,
                 {
                   outPoint: {
+                    txHash: lumosConfig.SCRIPTS.SECP256K1_BLAKE160?.TX_HASH!,
+                    index: lumosConfig.SCRIPTS.SECP256K1_BLAKE160?.INDEX!,
+                  },
+                  depType: lumosConfig.SCRIPTS.SECP256K1_BLAKE160?.DEP_TYPE!,
+                },
+                {
+                  outPoint: {
                     txHash:
                       lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.TX_HASH!,
                     index:
@@ -256,7 +263,7 @@ const ConfirmTx = ({
                 {
                   outPoint: {
                     txHash: lumosConfig.SCRIPTS.DAO?.TX_HASH!,
-                    index: "0x3",
+                    index: lumosConfig.SCRIPTS.DAO?.INDEX!,
                   },
                   depType: lumosConfig.SCRIPTS.DAO?.DEP_TYPE!,
                 },
@@ -439,7 +446,7 @@ const ConfirmTx = ({
                 {
                   outPoint: {
                     txHash: lumosConfig.SCRIPTS.DAO?.TX_HASH!,
-                    index: "0x3",
+                    index: lumosConfig.SCRIPTS.DAO?.INDEX!,
                   },
                   depType: lumosConfig.SCRIPTS.DAO?.DEP_TYPE!,
                 },
