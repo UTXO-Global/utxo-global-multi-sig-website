@@ -94,6 +94,7 @@ const ConfirmTx = ({
       const tx = txInfo.token
         ? await createTxSendToken(txInfo)
         : await createTxSendCKB(txInfo);
+
       if (tx.error) {
         setError(tx.error);
       }
