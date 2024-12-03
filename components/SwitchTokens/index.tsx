@@ -30,6 +30,15 @@ const SwitchToken = ({
   const [open, setOpen] = useState(false);
   const { assets } = useAssets();
 
+  const tokens = useMemo(() => {
+    if (Object.values(assets.udtBalances).length > 0) {
+      return Object.fromEntries(
+        Object.entries(assets.udtBalances).filter(([_, udt]) => udt.balance > 0)
+      );
+    }
+    return {};
+  }, [assets]);
+
   const hide = () => {
     setOpen(false);
   };
@@ -74,7 +83,7 @@ const SwitchToken = ({
         <p>CKB</p>
       </div>
 
-      {Object.entries(assets.udtBalances).map(([typeHash, udtBalance]) => (
+      {Object.entries(tokens).map(([typeHash, udtBalance]) => (
         <div
           key={`token-${typeHash}`}
           className={cn(
@@ -91,11 +100,19 @@ const SwitchToken = ({
             hide();
           }}
         >
-          {/* <img src={n.icon} alt="nervos" className="w-6 rounded-full" /> */}
-          <TextAvatar
-            text={udtBalance.symbol}
-            className="!w-6 !h-6 rounded-full"
-          />
+          {udtBalance.icon ? (
+            <img
+              src={udtBalance.icon}
+              alt="nervos"
+              className="w-6 rounded-full"
+            />
+          ) : (
+            <TextAvatar
+              text={udtBalance.symbol}
+              className="!w-6 !h-6 rounded-full"
+            />
+          )}
+
           <p>{udtBalance.symbol}</p>
         </div>
       ))}

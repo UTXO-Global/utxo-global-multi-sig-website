@@ -8,7 +8,7 @@ import Button from "@/components/Common/Button";
 import { SendTokenType } from "@/types/account";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
-import { formatNumber, shortAddress } from "@/utils/helpers";
+import { FIXED_FEE, formatNumber, shortAddress } from "@/utils/helpers";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
 import { BI, helpers } from "@ckb-lumos/lumos";
@@ -82,7 +82,7 @@ const CreateTx = ({
     const _balance = BI.from(ccc.fixedPointFrom(tokenBalance.toString()));
     return txInfo.is_include_fee
       ? _amount.lte(_balance)
-      : _amount.add(100000).lte(_balance);
+      : _amount.add(FIXED_FEE).lte(_balance);
   }, [tokenBalance, txInfo.amount, txInfo.is_include_fee]);
 
   const isValidAmount = useCallback(
@@ -99,7 +99,7 @@ const CreateTx = ({
   const isValidRemainingBalance = useCallback(
     (ckbMinTransfer: number) => {
       const _amount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString())).add(
-        txInfo.is_include_fee ? 0 : 100000
+        txInfo.is_include_fee ? 0 : FIXED_FEE
       );
 
       const _balance = BI.from(ccc.fixedPointFrom(tokenBalance.toString()));
@@ -114,6 +114,12 @@ const CreateTx = ({
   const next = useCallback(() => {
     if (!isValidSendTo())
       return toast.warning("Please enter the recipient's address.");
+
+    if (txInfo.amount <= 0) {
+      return toast.error(
+        "The transfer amount must be greater than 0. Please enter a valid amount."
+      );
+    }
 
     let toScript: any;
     try {
@@ -276,7 +282,7 @@ const CreateTx = ({
         <Button
           fullWidth
           onClick={next}
-          // disabled={!isValidTx}
+          disabled={!txInfo.send_to || txInfo.amount <= 0}
         >
           Next
         </Button>

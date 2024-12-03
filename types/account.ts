@@ -1,4 +1,6 @@
 import { UdtBalanceType } from "@/redux/features/assets/type";
+import { ccc } from "@ckb-ccc/connector-react";
+import { BI } from "@ckb-lumos/lumos";
 
 export type SignerType = {
   name: string;
@@ -49,9 +51,17 @@ export type SendTokenType = {
   network: string;
   is_include_fee: boolean;
   token?: UdtBalanceType & { typeHash: string };
+  fee?: Number;
+  feeRate: Number;
 };
 
 export type TransactionType = {
   transaction_id: string;
   payload: string;
+};
+
+export type CreateTransactionRes = {
+  transaction?: ccc.Transaction;
+  fee?: BI | undefined;
+  error?: string;
 };

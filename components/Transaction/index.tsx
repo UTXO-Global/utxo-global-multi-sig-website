@@ -115,7 +115,7 @@ const Transaction = ({
       const witnesses = signature.witnesses.toString();
       const { data } = await api.post("/multi-sig/signature", {
         txid: transaction.transaction_id,
-        signature: witnesses.slice(42),
+        signature: witnesses.slice(42, 172),
       });
 
       if (data && !!data.transaction_id) {
