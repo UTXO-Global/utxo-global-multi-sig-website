@@ -39,7 +39,7 @@ const Header = () => {
             </Link>
           </div>
           <div className="flex-1 flex justify-between items-center px-6">
-            <p className="text-[24px] leading-[28px] font-bold text-dark-100">
+            <p className="text-xl lg:text-[24px] leading-[28px] font-bold text-dark-100">
               {!!account ? pageTitle : ""}
             </p>
             <div className="flex">

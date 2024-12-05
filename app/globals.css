@@ -59,7 +59,6 @@ body {
   background-color: #ffffff;
   color: #0d0d0d;
 }
-
 /* Animate */
 .animate-shake:hover {
   animation: shake 1.2s;

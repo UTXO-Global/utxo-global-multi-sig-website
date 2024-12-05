@@ -6,6 +6,7 @@ import ConfirmTx from "./ConfirmTx";
 import { SendTokenType } from "@/types/account";
 import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
+import { FIXED_FEE, FIXED_FEE_RATE } from "@/utils/helpers";
 
 const NewTx = () => {
   const { info: account } = useAppSelector(selectAccountInfo);
@@ -16,6 +17,8 @@ const NewTx = () => {
     amount: 0,
     is_include_fee: false,
     network: "",
+    fee: FIXED_FEE,
+    feeRate: FIXED_FEE_RATE,
   });
 
   useEffect(() => {

@@ -12,8 +12,7 @@ export const EXTENTSION_GITHUB =
 export const SUBSTACK_LINK = "https://utxoglobal.substack.com/";
 export const DOC_LINK = "https://utxo-global.gitbook.io/utxo-global";
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACIKING_ID;
-export const DEFAULT_NETWORK =
-  process.env.NEXT_PUBLIC_NETWORK_DEFAULT || "nervos_testnet";
+export const DEFAULT_NETWORK = "nervos";
 export const NAVIGATIONS = [
   {
     id: "about-us",
@@ -43,3 +42,4 @@ export const NAVIGATIONS = [
 export const FEATURE_REQUEST_LINK =
   "https://docs.google.com/forms/d/e/1FAIpQLSeUC9e8ka0iSAFXR1gPjepQEcygdLgwKbtnAWfc_2IRqL1pqw/viewform";
 export const LIMIT_PER_PAGE = 10;
+export const UTXOSwapAPIKey = "scmJuHZTih2UZYkdWPhz82DKxiTgblR612MhYQZ1";

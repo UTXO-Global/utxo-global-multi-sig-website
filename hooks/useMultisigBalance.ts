@@ -9,21 +9,27 @@ const useMultisigBalance = () => {
 
   const signer = ccc.useSigner();
 
-  useEffect(() => {
-    if (!signer) {
-      setBalance(ccc.Zero);
-      return;
-    }
-
-    (async () => {
-      if (account) {
+  const fetchBalance = async () => {
+    try {
+      if (!signer || !account) {
+        setBalance(ccc.Zero);
+      } else {
         const mulAddress = await ccc.Address.fromString(
           account.multi_sig_address,
           signer.client
         );
         setBalance(await signer.client.getBalance([mulAddress.script]));
       }
-    })();
+    } catch (_e) {
+      console.log(_e);
+    }
+  };
+
+  useEffect(() => {
+    fetchBalance();
+    const t = setInterval(fetchBalance, 10000);
+
+    return () => clearInterval(t);
   }, [signer, account]);
 
   return {

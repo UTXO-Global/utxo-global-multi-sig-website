@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import Decimal from "decimal.js";
 import Link from "next/link";
 import { formatDistanceStrict, format } from "date-fns";
@@ -25,6 +25,8 @@ import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { loadInfo } from "@/redux/features/account-info/action";
 import { useSearchParams } from "next/navigation";
 import { selectApp } from "@/redux/features/app/reducer";
+import { BI } from "@ckb-lumos/lumos";
+import useTokens from "@/hooks/useToken";
 
 const STATUS_TEXT = {
   [TransactionStatus.WaitingSigned]: "Pending",
@@ -51,6 +53,10 @@ const Transaction = ({
   const searchParams = useSearchParams();
   const multisigAddress = searchParams.get("address");
   const signer = ccc.useSigner();
+  const { getToken } = useTokens();
+  const [tokenInfo, setTokenInfo] = useState<
+    { name: string; symbol: string; decimal: number } | undefined
+  >(undefined);
 
   const statusTxt = useMemo(() => {
     if (!transaction) return STATUS_TEXT[TransactionStatus.WaitingSigned];
@@ -64,6 +70,30 @@ const Transaction = ({
   const isRejected = useMemo(() => {
     return transaction?.rejected.some((z) => isAddressEqual(z, address));
   }, [address, transaction]);
+
+  const rawTx = useMemo(() => {
+    return JSON.parse(transaction.payload) as cccA.JsonRpcTransaction;
+  }, [transaction]);
+
+  const getTokenInfo = async () => {
+    const firstOutput = rawTx.outputs[0];
+    if (!!firstOutput.type) {
+      const cccScript = ccc.Script.from({
+        codeHash: firstOutput.type?.code_hash,
+        hashType: firstOutput.type?.hash_type,
+        args: firstOutput.type?.args!,
+      });
+      setTokenInfo(await getToken(cccScript.hash()));
+    }
+  };
+
+  useEffect(() => {
+    if (rawTx && rawTx.outputs[0].type) {
+      getTokenInfo();
+    } else {
+      setTokenInfo({ name: "CKB", symbol: "CKB", decimal: 8 });
+    }
+  }, [rawTx]);
 
   const confirm = async () => {
     setIsConfirmLoading(true);
@@ -85,7 +115,7 @@ const Transaction = ({
       const witnesses = signature.witnesses.toString();
       const { data } = await api.post("/multi-sig/signature", {
         txid: transaction.transaction_id,
-        signature: witnesses.slice(42),
+        signature: witnesses.slice(42, 172),
       });
 
       if (data && !!data.transaction_id) {
@@ -123,6 +153,19 @@ const Transaction = ({
     }
   };
 
+  const txAmount = useMemo(() => {
+    try {
+      if (rawTx.outputs_data[0] !== "0x") {
+        const amount = ccc.numLeFromBytes(ccc.bytesFrom(rawTx.outputs_data[0]));
+        return new Decimal(Number(amount))
+          .div(10 ** (tokenInfo?.decimal || 8))
+          .toNumber();
+      }
+    } catch (e: any) {}
+
+    return new Decimal(transaction.amount).div(10 ** 8).toNumber();
+  }, [rawTx, tokenInfo]);
+
   return (
     <div className="rounded-lg bg-light-100 overflow-hidden">
       <div
@@ -143,11 +186,7 @@ const Transaction = ({
           </div>
 
           <p className="text-[16px] leading-[20px] font-medium text-grey-400">
-            -
-            {formatNumber(
-              new Decimal(transaction.amount).div(10 ** 8).toNumber()
-            )}{" "}
-            CKB
+            -{formatNumber(txAmount, 2, 8)} {tokenInfo?.symbol}
           </p>
         </div>
         <div className="w-[15%] text-[16px] leading-[20px] font-medium text-grey-400 grid gap-4 pl-2">
@@ -508,9 +547,9 @@ const Transaction = ({
                   className="size-4"
                 >
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
-                    clip-rule="evenodd"
+                    clipRule="evenodd"
                   />
                 </svg>
 

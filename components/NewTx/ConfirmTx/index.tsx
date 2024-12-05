@@ -3,24 +3,18 @@
 import Button from "@/components/Common/Button";
 import { SendTokenType } from "@/types/account";
 import api from "@/utils/api";
-import { formatNumber, shortAddress } from "@/utils/helpers";
+import { FIXED_FEE, formatNumber, shortAddress } from "@/utils/helpers";
 import { ccc } from "@ckb-ccc/connector-react";
-import {
-  BI,
-  Cell,
-  Indexer,
-  WitnessArgs,
-  helpers,
-  commons,
-} from "@ckb-lumos/lumos";
-import { bytes, blockchain } from "@ckb-lumos/lumos/codec";
-import { useEffect, useMemo, useState } from "react";
+import { BI } from "@ckb-lumos/lumos";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { cccA } from "@ckb-ccc/connector-react/advanced";
 import { useRouter } from "next/navigation";
-import { AGGRON4, LINA } from "@/utils/lumos-config";
 import { selectApp } from "@/redux/features/app/reducer";
+import { toast } from "react-toastify";
+import useCells from "@/hooks/useCell";
+import useCreateTransaction from "@/hooks/useCreateTransaction";
 
 const ConfirmTx = ({
   txInfo,
@@ -33,16 +27,18 @@ const ConfirmTx = ({
     undefined
   );
 
-  const [txFee, setTxFee] = useState(BI.from(100000)); // Set fee = 0.001
-  const [loading, setLoading] = useState(false);
+  const [txFee, setTxFee] = useState(
+    txInfo.fee ? BI.from(txInfo.fee) : BI.from(FIXED_FEE)
+  );
   const router = useRouter();
   const [error, setError] = useState("");
   const { info: account } = useAppSelector(selectAccountInfo);
   const { config: appConfig } = useAppSelector(selectApp);
   const signer = ccc.useSigner();
-  const indexer = useMemo(() => {
-    return new Indexer(appConfig.ckbRPC);
-  }, [appConfig.ckbRPC]);
+  const { usableCells, loading: cellLoading } = useCells();
+  const [loading, setLoading] = useState(cellLoading);
+
+  const { createTxSendCKB, createTxSendToken } = useCreateTransaction();
 
   const onSign = async () => {
     if (!signer) {
@@ -66,7 +62,7 @@ const ConfirmTx = ({
           }
           return value;
         }),
-        signature: witnesses.slice(42),
+        signature: witnesses.slice(42, 172),
       });
       setLoading(false);
 
@@ -74,9 +70,20 @@ const ConfirmTx = ({
         router.push(
           `/account/transactions/?address=${account?.multi_sig_address}`
         );
+      } else if (!!data.message) {
+        toast.error(data.message);
       }
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      const message: string = (
+        e.response?.data?.message || e.message
+      ).toString();
+      if (message.includes(`transactions_pkey`)) {
+        toast.error(
+          `Transaction with hash ${transaction.hash()} is still pending. Please complete it before creating a new transaction`
+        );
+      } else {
+        toast.error(message);
+      }
     }
     setLoading(false);
   };
@@ -84,172 +91,31 @@ const ConfirmTx = ({
   useEffect(() => {
     const f = async () => {
       if (!txInfo || !account) return;
-      let txSkeleton = helpers.TransactionSkeleton({
-        cellProvider: indexer,
-      });
+      const tx = txInfo.token
+        ? await createTxSendToken(txInfo)
+        : await createTxSendCKB(txInfo);
 
-      const lumosConfig = appConfig.isTestnet ? AGGRON4 : LINA;
-
-      const fromScript = helpers.parseAddress(txInfo.send_from, {
-        config: lumosConfig,
-      });
-
-      const toScript = helpers.parseAddress(txInfo.send_to, {
-        config: lumosConfig,
-      });
-
-      let toAmount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
-      if (txInfo.is_include_fee) {
-        toAmount = toAmount.sub(txFee);
+      if (tx.error) {
+        setError(tx.error);
       }
 
-      const neededCapacity = toAmount.add(txFee);
-      let collectedSum = BI.from(0);
-      const collected: Cell[] = [];
-
-      const collector = indexer.collector({ lock: fromScript, type: "empty" });
-      for await (const cell of collector.collect()) {
-        if (
-          !bytes.equal(
-            blockchain.Script.pack(cell.cellOutput.lock),
-            blockchain.Script.pack(fromScript)
-          )
-        ) {
-          continue;
-        }
-
-        collectedSum = collectedSum.add(cell.cellOutput.capacity);
-        collected.push(cell);
-        if (collectedSum.gte(neededCapacity)) break;
+      if (tx.fee) {
+        setTxFee(tx.fee);
       }
 
-      if (collectedSum.lt(neededCapacity)) {
-        setError("Not enough CKB");
-        throw new Error("Not enough CKB");
-      }
-
-      const transferOutput: Cell = {
-        cellOutput: {
-          capacity: toAmount.toHexString(),
-          lock: toScript,
-        },
-        data: "0x",
-      };
-
-      const changeOutput: Cell = {
-        cellOutput: {
-          capacity: collectedSum.sub(toAmount).toHexString(),
-          lock: fromScript,
-        },
-        data: "0x",
-      };
-
-      txSkeleton = txSkeleton.update("inputs", (inputs) =>
-        inputs.push(...collected)
-      );
-
-      txSkeleton = txSkeleton.update("outputs", (outputs) =>
-        outputs.push(transferOutput, changeOutput)
-      );
-
-      txSkeleton = txSkeleton.update("cellDeps", (cellDeps) =>
-        cellDeps.push(
-          ...[
-            {
-              outPoint: {
-                txHash:
-                  lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.TX_HASH!,
-                index: lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.INDEX!,
-              },
-              depType:
-                lumosConfig.SCRIPTS.SECP256K1_BLAKE160_MULTISIG?.DEP_TYPE!,
-            },
-            {
-              outPoint: {
-                txHash: lumosConfig.SCRIPTS.DAO?.TX_HASH!,
-                index: "0x3",
-              },
-              depType: lumosConfig.SCRIPTS.DAO?.DEP_TYPE!,
-            },
-          ]
-        )
-      );
-
-      const firstIndex = txSkeleton
-        .get("inputs")
-        .findIndex((input) =>
-          bytes.equal(
-            blockchain.Script.pack(input.cellOutput.lock),
-            blockchain.Script.pack(fromScript)
-          )
-        );
-
-      if (firstIndex !== -1) {
-        while (firstIndex >= txSkeleton.get("witnesses").size) {
-          txSkeleton = txSkeleton.update("witnesses", (witnesses) =>
-            witnesses.push("0x")
-          );
-        }
-
-        let witness: string = txSkeleton.get("witnesses").get(firstIndex)!;
-        const SECP_SIGNATURE_PLACEHOLDER = "00".repeat(65);
-
-        let newWitnessArgs: WitnessArgs = {
-          lock:
-            "0x" +
-            account?.multi_sig_witness_data +
-            SECP_SIGNATURE_PLACEHOLDER.repeat(account?.threshold!),
-        };
-
-        if (witness !== "0x") {
-          const witnessArgs = blockchain.WitnessArgs.unpack(
-            bytes.bytify(witness)
-          );
-          const lock = witnessArgs.lock;
-          if (
-            !!lock &&
-            !!newWitnessArgs.lock &&
-            !bytes.equal(lock, newWitnessArgs.lock)
-          ) {
-            setError("Lock field in first witness is set aside for signature!");
-            throw new Error(
-              "Lock field in first witness is set aside for signature!"
-            );
-          }
-
-          const inputType = witnessArgs.inputType;
-          if (!!inputType) {
-            newWitnessArgs.inputType = inputType;
-          }
-
-          const outputType = witnessArgs.outputType;
-          if (!!outputType) {
-            newWitnessArgs.outputType = outputType;
-          }
-        }
-
-        witness = bytes.hexify(blockchain.WitnessArgs.pack(newWitnessArgs));
-        txSkeleton = txSkeleton.update("witnesses", (witnesses) =>
-          witnesses.set(firstIndex, witness)
-        );
-      }
-
-      txSkeleton = await commons.common.payFee(
-        txSkeleton,
-        [txInfo.send_from],
-        txFee,
-        undefined,
-        { config: lumosConfig }
-      );
-
-      const tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
-      setTransaction(tx);
+      setTransaction(tx.transaction);
     };
 
     setLoading(true);
     f();
     setLoading(false);
-  }, [txInfo, txFee, account, indexer, appConfig.isTestnet]);
+  }, [txInfo, account, appConfig.isTestnet, usableCells]);
+
+  useEffect(() => {
+    if (!!error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   return (
     <>
@@ -278,7 +144,7 @@ const ConfirmTx = ({
             Amount:
           </div>
           <div className="flex-1 text-[16px] leading-[20px] font-medium text-dark-100">
-            {formatNumber(txInfo.amount)} CKB
+            {formatNumber(txInfo.amount)} {txInfo.token?.symbol ?? "CKB"}
           </div>
         </div>
         <div className="pb-6 border-b border-grey-300 flex gap-4 items-center">
@@ -286,13 +152,8 @@ const ConfirmTx = ({
             Fee:
           </div>
           <div className="flex-1 text-[16px] leading-[20px] font-medium text-dark-100">
-            {formatNumber(
-              txFee.toNumber() / 10 ** 8,
-              2,
-              8
-            )}{" "}
-            CKB
-            {txInfo.is_include_fee && (
+            {formatNumber(txFee.toNumber() / 10 ** 8, 2, 8)} CKB
+            {!txInfo.token && txInfo.is_include_fee && (
               <span className="text-grey-500"> (Included Fee)</span>
             )}
           </div>

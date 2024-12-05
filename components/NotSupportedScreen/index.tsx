@@ -26,7 +26,7 @@ const NotSupportedScreen = () => {
         </h6>
         <p className="text-[16px] leading-[20px] text-grey-400 text-center max-w-[329px] mx-auto mt-4">
           We apologize for the inconvenience. For optimal viewing, please use a
-          screen with a resolution of 1024px or wider.
+          screen with a resolution of 640px or wider.
         </p>
         <div className="text-[16px] leading-[20px] text-grey-400 flex justify-center gap-2 items-center mt-10">
           <Link
