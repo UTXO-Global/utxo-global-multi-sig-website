@@ -53,6 +53,7 @@ export type SendTokenType = {
   token?: UdtBalanceType & { typeHash: string };
   fee?: Number;
   feeRate: Number;
+  isUseDID?: boolean
 };
 
 export type TransactionType = {
