@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 import Button from "../Common/Button";
@@ -21,6 +21,7 @@ import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { ccc } from "@ckb-ccc/connector-react";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
 import { selectApp } from "@/redux/features/app/reducer";
+import { event } from "@/utils/gtag";
 
 const LeftMenu = () => {
   const pathname = usePathname();
@@ -33,6 +34,19 @@ const LeftMenu = () => {
   const { info: account, isInfoLoading } = useAppSelector(selectAccountInfo);
   const { balance: multisigBalance } = useMultisigBalance();
   const { config } = useAppSelector(selectApp);
+
+  useEffect(() => {
+    try {
+      event({
+        action: "wallet_tvl",
+        address: account?.multi_sig_address,
+        network: config.network,
+        amount: Number(ccc.fixedPointToString(multisigBalance)),
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }, [account?.multi_sig_address, config.network, multisigBalance]);
 
   return (
     <div className="w-[230px] bg-light-100 border-r border-grey-200 relative">

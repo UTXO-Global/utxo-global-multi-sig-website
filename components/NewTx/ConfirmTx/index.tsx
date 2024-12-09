@@ -15,6 +15,7 @@ import { selectApp } from "@/redux/features/app/reducer";
 import { toast } from "react-toastify";
 import useCells from "@/hooks/useCell";
 import useCreateTransaction from "@/hooks/useCreateTransaction";
+import { event } from "@/utils/gtag";
 
 const ConfirmTx = ({
   txInfo,
@@ -67,6 +68,20 @@ const ConfirmTx = ({
       setLoading(false);
 
       if (data && !!data.transaction_id) {
+        try {
+          event({
+            action: "tnx_send",
+            from_address: txInfo.send_from,
+            to_address: txInfo.send_to,
+            network: appConfig.network,
+            amount: txInfo.amount,
+            coin: txInfo.token?.symbol ?? "CKB",
+            did: txInfo.isUseDID,
+          });
+        } catch (e) {
+          console.log(e);
+        }
+
         router.push(
           `/account/transactions/?address=${account?.multi_sig_address}`
         );

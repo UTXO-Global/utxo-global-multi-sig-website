@@ -19,6 +19,7 @@ const NewTx = () => {
     network: "",
     fee: FIXED_FEE,
     feeRate: FIXED_FEE_RATE,
+    isUseDID: false
   });
 
   useEffect(() => {

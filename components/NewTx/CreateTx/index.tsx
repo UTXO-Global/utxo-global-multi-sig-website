@@ -66,7 +66,7 @@ const CreateTx = ({
       setRequesting(true);
     } else {
       setFiltered([]);
-      setTxInfo({ ...txInfo, send_to: inputValue });
+      setTxInfo({ ...txInfo, send_to: inputValue, isUseDID: filtered.includes(inputValue) });
     }
   }, [inputValue, requesting]);
 
