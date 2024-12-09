@@ -36,12 +36,16 @@ const LeftMenu = () => {
   const { config } = useAppSelector(selectApp);
 
   useEffect(() => {
-    event({
-      action: "wallet_tvl",
-      address: account?.multi_sig_address,
-      network: config.network,
-      amount: Number(ccc.fixedPointToString(multisigBalance)),
-    });
+    try {
+      event({
+        action: "wallet_tvl",
+        address: account?.multi_sig_address,
+        network: config.network,
+        amount: Number(ccc.fixedPointToString(multisigBalance)),
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }, [account?.multi_sig_address, config.network, multisigBalance]);
 
   return (
