@@ -306,6 +306,10 @@ const useCreateTransaction = () => {
     let capacityChangeOutput = BI.from(0);
     const xUDTCapacity = BI.from(tokensCell[0].cellOutput.capacity);
     let neededCapacity = BI.from(0);
+    if (isAddressTypeJoy) {
+      neededCapacity = neededCapacity.add(joyCapacityAddMore);
+    }
+
     if (totalTokenBalance.lt(totalTokenBalanceNeeed)) {
       return { error: `${data.token?.symbol} insufficient balance` };
     }
