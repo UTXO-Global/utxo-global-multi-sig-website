@@ -33,8 +33,7 @@ const Skeleton = () => {
 };
 
 const _Transactions = ({ status }: { status: TransactionStatus[] }) => {
-  const { isLoading, setPage, page, transactions, totalRecords, load } =
-    useTransactions(status);
+  const { isLoading, setPage, page, transactions, totalRecords, load } = useTransactions(status);
 
   const { info: account, isInfoLoading } = useAppSelector(selectAccountInfo);
 
@@ -58,12 +57,9 @@ const _Transactions = ({ status }: { status: TransactionStatus[] }) => {
           defaultPageSize={LIMIT_PER_PAGE}
         />
         <div
-          className={cn(
-            `px-4 py-2 rounded-[6px] bg-grey-300 transition-colors hover:bg-grey-200 cursor-pointer inline-flex`,
-            {
-              "cursor-not-allowed": isLoading,
-            }
-          )}
+          className={cn(`px-4 py-2 rounded-[6px] bg-grey-300 transition-colors hover:bg-grey-200 cursor-pointer inline-flex`, {
+            "cursor-not-allowed": isLoading,
+          })}
           onClick={() => {
             if (isLoading) return;
             refresh();
@@ -134,17 +130,9 @@ const Transactions = () => {
           ))}
         </div>
       </div>
-      {tab === TransactionTab.Queue ? (
-        <_Transactions status={[TransactionStatus.WaitingSigned]} />
-      ) : null}
+      {tab === TransactionTab.Queue ? <_Transactions status={[TransactionStatus.WaitingSigned]} /> : null}
       {tab === TransactionTab.History ? (
-        <_Transactions
-          status={[
-            TransactionStatus.Sent,
-            TransactionStatus.Rejected,
-            TransactionStatus.Failed,
-          ]}
-        />
+        <_Transactions status={[TransactionStatus.Sent, TransactionStatus.Rejected, TransactionStatus.Failed]} />
       ) : null}
     </main>
   );

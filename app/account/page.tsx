@@ -10,6 +10,8 @@ import { selectApp } from "@/redux/features/app/reducer";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { formatNumber } from "@/utils/helpers";
 import { ccc } from "@ckb-ccc/connector-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
 const Assets = () => {
@@ -21,6 +23,8 @@ const Assets = () => {
   const multisigBalance = useMemo(() => {
     return Number(ccc.fixedPointToString(balance));
   }, [balance]);
+  const searchParams = useSearchParams();
+  const address = searchParams.get("address");
 
   const tokens = useMemo(() => {
     if (Object.values(assets.udtBalances).length > 0) {
@@ -40,15 +44,8 @@ const Assets = () => {
         });
 
         prices[t.typeScript.args] = 0;
-        if (
-          !!tokenRates[script.hash()] &&
-          tokenRates[script.hash()] > 0 &&
-          assets.udtBalances[script.hash()]
-        ) {
-          prices[t.typeScript.args] =
-            (assets.udtBalances[script.hash()].balance /
-              tokenRates[script.hash()]) *
-            ckbPrice;
+        if (!!tokenRates[script.hash()] && tokenRates[script.hash()] > 0 && assets.udtBalances[script.hash()]) {
+          prices[t.typeScript.args] = (assets.udtBalances[script.hash()].balance / tokenRates[script.hash()]) * ckbPrice;
         }
       });
     }
@@ -82,9 +79,7 @@ const Assets = () => {
   return (
     <main className="h-full overflow-y-auto">
       <div className="px-6 pt-4 bg-light-100 flex justify-start">
-        <div className="px-6 pt-3 pb-4 border-b-2 border-dark-100 text-[16px] leading-[20px] font-bold text-dark-100">
-          Coins
-        </div>
+        <div className="px-6 pt-3 pb-4 border-b-2 border-dark-100 text-[16px] leading-[20px] font-bold text-dark-100">Coins</div>
       </div>
       <div className="py-4 px-6">
         <div className="rounded-lg bg-light-100 overflow-hidden">
@@ -93,22 +88,22 @@ const Assets = () => {
             <div className="w-[20%]">Balance</div>
             <div className="w-[20%] text-right">Value</div>
           </div>
-          <div className="px-6 py-3">
-            <div className="flex items-center">
-              <div className="flex items-center w-[60%] justify-start">
-                <img src="/images/nervos.png" alt="ckb" className="w-8" />
-                <p className="text-[14px] leading-[24px] text-dark-100 font-medium ml-2">
-                  CKB
-                </p>
-              </div>
-              <div className="text-base font-medium text-dark-100 w-[20%]">
-                {account ? formatNumber(Number(multisigBalance)) : "--"} CKB
-              </div>
-              <div className="text-base font-medium text-dark-100 w-[20%] text-right">
-                ${account ? formatNumber(multisigBalance * ckbPrice) : 0}
+          <Link href={`/account/new-transaction/?address=${address}`}>
+            <div className="px-6 py-3">
+              <div className="flex items-center">
+                <div className="flex items-center w-[60%] justify-start">
+                  <img src="/images/nervos.png" alt="ckb" className="w-8" />
+                  <p className="text-[14px] leading-[24px] text-dark-100 font-medium ml-2">CKB</p>
+                </div>
+                <div className="text-base font-medium text-dark-100 w-[20%]">
+                  {account ? formatNumber(Number(multisigBalance)) : "--"} CKB
+                </div>
+                <div className="text-base font-medium text-dark-100 w-[20%] text-right">
+                  ${account ? formatNumber(multisigBalance * ckbPrice) : 0}
+                </div>
               </div>
             </div>
-          </div>
+          </Link>
 
           {isLoading ? (
             <div className="px-6 py-5">
@@ -116,34 +111,28 @@ const Assets = () => {
             </div>
           ) : (
             tokens.map((udtBalance, index) => (
-              <div key={index} className="px-6 py-3">
-                <div className="flex items-center">
-                  <div className="flex items-center w-[60%] justify-start">
-                    {!!udtBalance.icon ? (
-                      <img src={udtBalance.icon} alt="ckb" className="w-8" />
-                    ) : (
-                      <TextAvatar text={udtBalance.symbol} />
-                    )}
+              <Link key={index} href={`/account/new-transaction/?address=${address}&token=${udtBalance.symbol}`}>
+                <div className="px-6 py-3">
+                  <div className="flex items-center">
+                    <div className="flex items-center w-[60%] justify-start">
+                      {!!udtBalance.icon ? (
+                        <img src={udtBalance.icon} alt="ckb" className="w-8" />
+                      ) : (
+                        <TextAvatar text={udtBalance.symbol} />
+                      )}
 
-                    <p className="text-[14px] leading-[24px] text-dark-100 font-medium ml-2">
-                      {udtBalance.symbol}
-                    </p>
-                  </div>
+                      <p className="text-[14px] leading-[24px] text-dark-100 font-medium ml-2">{udtBalance.symbol}</p>
+                    </div>
 
-                  <div className="text-base font-medium text-dark-100 w-[20%]">
-                    {account ? formatNumber(Number(udtBalance.balance)) : "--"}{" "}
-                    {udtBalance.symbol}
-                  </div>
-                  <div className="text-base font-medium text-dark-100 w-[20%] text-right">
-                    $
-                    {formatNumber(
-                      tokenPrices[udtBalance.typeScript.args],
-                      2,
-                      8
-                    )}
+                    <div className="text-base font-medium text-dark-100 w-[20%]">
+                      {account ? formatNumber(Number(udtBalance.balance)) : "--"} {udtBalance.symbol}
+                    </div>
+                    <div className="text-base font-medium text-dark-100 w-[20%] text-right">
+                      ${formatNumber(tokenPrices[udtBalance.typeScript.args], 2, 8)}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))
           )}
         </div>
