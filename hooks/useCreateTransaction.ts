@@ -280,10 +280,15 @@ const useCreateTransaction = () => {
     const tokensCell: Cell[] = [];
     const totalTokenBalanceNeeed = BI.from(toAmount);
     let totalTokenBalance = BI.from(0);
+    let totalXUDTCapacity = BI.from(0);
 
     for await (const cell of xudtCollector.collect()) {
       const balNum = ccc.numFromBytes(cell.data);
       totalTokenBalance = totalTokenBalance.add(BI.from(balNum));
+      totalXUDTCapacity = totalXUDTCapacity.add(
+        BI.from(cell.cellOutput.capacity)
+      );
+
       tokensCell.push(cell);
 
       if (totalTokenBalance.gte(totalTokenBalanceNeeed)) {
@@ -302,9 +307,10 @@ const useCreateTransaction = () => {
     const joyCapacityAddMore = 2_0000_0000; // 2 ckb
 
     const collectedCells: Cell[] = [];
-    let totalCapacity = BI.from(0);
-    let capacityChangeOutput = BI.from(0);
     const xUDTCapacity = BI.from(tokensCell[0].cellOutput.capacity);
+    let totalCapacity = BI.from(0);
+    let capacityChangeOutput = totalXUDTCapacity.sub(xUDTCapacity);
+
     let neededCapacity = BI.from(0);
     if (isAddressTypeJoy) {
       neededCapacity = neededCapacity.add(joyCapacityAddMore);
@@ -417,7 +423,9 @@ const useCreateTransaction = () => {
 
       collectedCells.push(cell);
       totalCapacity = totalCapacity.add(BI.from(cell.cellOutput.capacity));
-      capacityChangeOutput = totalCapacity.sub(neededCapacity);
+      capacityChangeOutput = capacityChangeOutput.add(
+        totalCapacity.sub(neededCapacity)
+      );
       if (
         totalCapacity.gte(neededCapacity) &&
         (capacityChangeOutput.eq(0) || capacityChangeOutput.gt(minCapacity))
