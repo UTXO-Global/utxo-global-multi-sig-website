@@ -309,7 +309,8 @@ const useCreateTransaction = () => {
     const collectedCells: Cell[] = [];
     const xUDTCapacity = BI.from(tokensCell[0].cellOutput.capacity);
     let totalCapacity = BI.from(0);
-    let capacityChangeOutput = totalXUDTCapacity.sub(xUDTCapacity);
+    let capacityChangeOutput = BI.from(0);
+    const xUDTCapacityChangeOutput = totalXUDTCapacity.sub(xUDTCapacity);
 
     let neededCapacity = BI.from(0);
     if (isAddressTypeJoy) {
@@ -423,7 +424,7 @@ const useCreateTransaction = () => {
 
       collectedCells.push(cell);
       totalCapacity = totalCapacity.add(BI.from(cell.cellOutput.capacity));
-      capacityChangeOutput = capacityChangeOutput.add(
+      capacityChangeOutput = xUDTCapacityChangeOutput.add(
         totalCapacity.sub(neededCapacity)
       );
       if (
