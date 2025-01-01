@@ -363,9 +363,6 @@ const useCreateTransaction = () => {
         const xUdtDataChange = ccc.numLeToBytes(diff.toBigInt(), 16);
         if (diff.gt(BI.from(0))) {
           neededCapacity = neededCapacity.add(xUDTCapacity);
-          if (isAddressTypeJoy) {
-            neededCapacity = neededCapacity.add(joyCapacityAddMore);
-          }
           outputs = outputs.push({
             cellOutput: {
               capacity: xUDTCapacity.toHexString(),
