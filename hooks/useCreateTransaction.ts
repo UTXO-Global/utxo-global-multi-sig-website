@@ -102,6 +102,15 @@ const useCreateTransaction = () => {
       };
     }
 
+    if (toAmount.lt(minCapacity)) {
+      return {
+        error: `The minimum amount is ${(
+          minCapacity.add(data.is_include_fee ? txFee : BI.from(0)).toNumber() /
+          10 ** 8
+        ).toString()} CKB.`,
+      };
+    }
+
     if (capacityChangeOutput.gt(0) && capacityChangeOutput.lt(minCapacity)) {
       return {
         error: `The remaining balance in your wallet must be greater than ${(
@@ -254,7 +263,9 @@ const useCreateTransaction = () => {
     let fee: ccc.Num | null = null;
 
     const minCapacity = MIN_CAPACITY(toScript);
-    let toAmount = data.amount * 10 ** (data.token?.decimal || 8);
+    let toAmount = BI.from(
+      ccc.fixedPointFrom(data.amount.toString(), data.token?.decimal || 8)
+    );
 
     // xUDT transfer
     const { args, code_hash, hash_type } = data.token?.typeScript!;
@@ -278,7 +289,7 @@ const useCreateTransaction = () => {
     });
 
     const tokensCell: Cell[] = [];
-    const totalTokenBalanceNeeed = BI.from(toAmount);
+    const totalTokenBalanceNeeed = toAmount;
     let totalTokenBalance = BI.from(0);
     let totalXUDTCapacity = BI.from(0);
 

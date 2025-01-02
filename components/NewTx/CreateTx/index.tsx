@@ -48,7 +48,9 @@ const CreateTx = ({
 
   const tokens = useMemo(() => {
     if (Object.values(assets.udtBalances).length > 0) {
-      return Object.fromEntries(Object.entries(assets.udtBalances).filter(([_, udt]) => udt.balance > 0));
+      return Object.fromEntries(
+        Object.entries(assets.udtBalances).filter(([_, udt]) => udt.balance > 0)
+      );
     }
     return {};
   }, [assets]);
@@ -80,7 +82,9 @@ const CreateTx = ({
     if (inputValue.endsWith(".bit")) {
       if (!requesting) {
         dotbit.records(inputValue).then((records) => {
-          setFiltered(records.filter((z) => z.key === "address.ckb").map((j) => j.value));
+          setFiltered(
+            records.filter((z) => z.key === "address.ckb").map((j) => j.value)
+          );
           setTimeout(() => {
             setRequesting(false);
           }, 3000);
@@ -89,7 +93,11 @@ const CreateTx = ({
       setRequesting(true);
     } else {
       setFiltered([]);
-      setTxInfo({ ...txInfo, send_to: inputValue, isUseDID: filtered.includes(inputValue) });
+      setTxInfo({
+        ...txInfo,
+        send_to: inputValue,
+        isUseDID: filtered.includes(inputValue),
+      });
     }
   }, [inputValue, requesting]);
 
@@ -103,14 +111,20 @@ const CreateTx = ({
   const isValidBalance = useCallback(() => {
     const _amount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
     const _balance = BI.from(ccc.fixedPointFrom(tokenBalance.toString()));
-    return txInfo.is_include_fee ? _amount.lte(_balance) : _amount.add(FIXED_FEE).lte(_balance);
+    return txInfo.is_include_fee
+      ? _amount.lte(_balance)
+      : _amount.add(FIXED_FEE).lte(_balance);
   }, [tokenBalance, txInfo.amount, txInfo.is_include_fee]);
 
   const isValidAmount = useCallback(
     (ckbMinTransfer: number) => {
-      return txInfo.amount >= ckbMinTransfer;
+      let amount = txInfo.amount;
+      if (txInfo.is_include_fee) {
+        amount -= FIXED_FEE / 10 ** 8;
+      }
+      return amount >= ckbMinTransfer;
     },
-    [txInfo.amount]
+    [txInfo.amount, txInfo.is_include_fee]
   );
 
   const isValidSendTo = useCallback(() => {
@@ -119,7 +133,9 @@ const CreateTx = ({
 
   const isValidRemainingBalance = useCallback(
     (ckbMinTransfer: number) => {
-      const _amount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString())).add(txInfo.is_include_fee ? 0 : FIXED_FEE);
+      const _amount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString())).add(
+        txInfo.is_include_fee ? 0 : FIXED_FEE
+      );
 
       const _balance = BI.from(ccc.fixedPointFrom(tokenBalance.toString()));
 
@@ -131,10 +147,13 @@ const CreateTx = ({
   );
 
   const next = useCallback(() => {
-    if (!isValidSendTo()) return toast.warning("Please enter the recipient's address.");
+    if (!isValidSendTo())
+      return toast.warning("Please enter the recipient's address.");
 
     if (txInfo.amount <= 0) {
-      return toast.error("The transfer amount must be greater than 0. Please enter a valid amount.");
+      return toast.error(
+        "The transfer amount must be greater than 0. Please enter a valid amount."
+      );
     }
 
     let toScript: any;
@@ -151,7 +170,12 @@ const CreateTx = ({
     const ckbMinTransfer = isAddressTypeJoy ? 63 : 61;
 
     if (!txInfo.token) {
-      if (!isValidAmount(ckbMinTransfer)) return toast.warning(`The minimum amount is ${ckbMinTransfer} CKB.`);
+      if (!isValidAmount(ckbMinTransfer))
+        return toast.warning(
+          `The minimum amount is ${
+            ckbMinTransfer + (txInfo.is_include_fee ? FIXED_FEE / 10 ** 8 : 0)
+          } CKB.`
+        );
 
       if (!isValidRemainingBalance(ckbMinTransfer))
         return toast.warning(
@@ -164,25 +188,46 @@ const CreateTx = ({
 
     if (!isValidBalance())
       return toast.warning(
-        `Insufficient balance: Total amount plus fee exceeds ${formatNumber(tokenBalance)} ${
-          txInfo.token ? txInfo.token.symbol : "CKB"
-        } in the ${shortAddress(address, 5)} wallet.`
+        `Insufficient balance: Total amount plus fee exceeds ${formatNumber(
+          tokenBalance
+        )} ${txInfo.token ? txInfo.token.symbol : "CKB"} in the ${shortAddress(
+          address,
+          5
+        )} wallet.`
       );
     onNext();
-  }, [address, balance, isValidAmount, isValidBalance, isValidRemainingBalance, isValidSendTo, network, onNext, txInfo.send_to]);
+  }, [
+    address,
+    balance,
+    isValidAmount,
+    isValidBalance,
+    isValidRemainingBalance,
+    isValidSendTo,
+    network,
+    onNext,
+    txInfo.send_to,
+  ]);
 
   return (
     <>
-      <p className="text-[24px] leading-[28px] font-medium text-dark-100 px-6 border-b border-grey-300 pb-4">New Transaction</p>
+      <p className="text-[24px] leading-[28px] font-medium text-dark-100 px-6 border-b border-grey-300 pb-4">
+        New Transaction
+      </p>
       <div className="pt-4 px-6 grid gap-4">
         <div className="grid gap-2">
           <p className="text-[16px] leading-[20px] text-grey-400">Send To</p>
           <div className="relative">
             <div className="rounded-lg border border-grey-200 py-[11px] px-4 flex items-center gap-2">
               <div className="flex items-center gap-2">
-                <img src="/images/account.png" alt="account" className="w-10 aspect-square rounded-full" />
+                <img
+                  src="/images/account.png"
+                  alt="account"
+                  className="w-10 aspect-square rounded-full"
+                />
 
-                <p className="text-[16px] leading-[20px] font-medium text-grey-500">{SHORT_NETWORK_NAME[config.network]}:</p>
+                <p className="text-[16px] leading-[20px] font-medium text-grey-500">
+                  {SHORT_NETWORK_NAME[config.network]}:
+                </p>
               </div>
               <input
                 type="text"
@@ -273,7 +318,11 @@ const CreateTx = ({
         )}
       </div>
       <div className="px-6 mt-6">
-        <Button fullWidth onClick={next} disabled={!txInfo.send_to || txInfo.amount <= 0}>
+        <Button
+          fullWidth
+          onClick={next}
+          disabled={!txInfo.send_to || txInfo.amount <= 0}
+        >
           Next
         </Button>
       </div>
