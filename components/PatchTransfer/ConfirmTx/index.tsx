@@ -152,8 +152,11 @@ const ConfirmPatchTransferTx = ({
             Recipients: ${txInfo.tos.length} address
           </div>
           <div className="flex flex-col text-[16px] leading-[20px] text-dark-100 mt-4 max-h-[300px] overflow-y-auto">
-            {txInfo.tos.map((to) => (
-              <div className="w-full flex justify-between items-center gap-4 p-2">
+            {txInfo.tos.map((to, idx) => (
+              <div
+                className="w-full flex justify-between items-center gap-4 p-2"
+                key={`to-address-${idx}`}
+              >
                 <p className="w-[70%]">{shortAddress(to.address, 20)}</p>
                 <p>
                   {formatNumber(to.amount)}{" "}
