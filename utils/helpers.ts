@@ -2,9 +2,8 @@ import { toast } from "react-toastify";
 import Decimal from "decimal.js";
 import { AddressPrefix } from "@nervosnetwork/ckb-sdk-utils";
 import { BI, helpers, Script } from "@ckb-lumos/lumos";
-import { TransactionSkeleton } from "@ckb-lumos/helpers";
 
-import { InviteStatus, SignerDetailType } from "@/types/account";
+import { InviteStatus } from "@/types/account";
 import { AddressBookType } from "@/types/address-book";
 
 import { ccc, LumosTransactionSkeletonType } from "@ckb-ccc/connector-react";

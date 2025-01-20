@@ -9,13 +9,13 @@ import { useAppSelector } from "@/redux/hook";
 import { PatchTransferType } from "@/types/account";
 import api from "@/utils/api";
 import { FIXED_FEE, formatNumber, shortAddress } from "@/utils/helpers";
-import { ccc } from "@ckb-ccc/connector-react";
-import { cccA } from "@ckb-ccc/connector-react/advanced";
 import { BI } from "@ckb-lumos/lumos";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { event } from "@/utils/gtag";
 import { toast } from "react-toastify";
+import { ccc } from "@ckb-ccc/connector-react";
+import { cccA } from "@ckb-ccc/connector-react/advanced";
 
 const ConfirmPatchTransferTx = ({
   txInfo,
@@ -38,7 +38,8 @@ const ConfirmPatchTransferTx = ({
   const { usableCells, loading: cellLoading } = useCells();
   const [loading, setLoading] = useState(cellLoading);
 
-  const { createTxPatchTransferCKB } = useCreateTransaction();
+  const { createTxPatchTransferCKB, createTxPatchTransferToken } =
+    useCreateTransaction();
 
   const totalAmount = useMemo(() => {
     return txInfo.tos.reduce((total, to) => total + to.amount, 0);
@@ -109,7 +110,7 @@ const ConfirmPatchTransferTx = ({
     const f = async () => {
       if (!txInfo || !account) return;
       const tx = txInfo.token
-        ? await createTxPatchTransferCKB(txInfo)
+        ? await createTxPatchTransferToken(txInfo)
         : await createTxPatchTransferCKB(txInfo);
 
       if (tx.error) {

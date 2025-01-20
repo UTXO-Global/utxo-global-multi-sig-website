@@ -2,7 +2,6 @@
 
 import Button from "@/components/Common/Button";
 import SwitchToken from "@/components/SwitchTokens";
-import { SHORT_NETWORK_NAME } from "@/configs/network";
 import useAssets from "@/hooks/useAssets";
 import { selectApp } from "@/redux/features/app/reducer";
 import { useAppSelector } from "@/redux/hook";
@@ -18,6 +17,12 @@ import { toast } from "react-toastify";
 import { selectStorage } from "@/redux/features/storage/reducer";
 import { CkbNetwork } from "@/types/common";
 import { AGGRON4, LINA } from "@/utils/lumos-config";
+
+import { InboxOutlined } from "@ant-design/icons";
+import type { UploadProps } from "antd";
+import Dragger from "antd/es/upload/Dragger";
+import { RcFile } from "antd/es/upload";
+
 const exampleSamePrice =
   "Example\nckb1qzda0cr08m...rdsr9lalq\nckb1qzda0cr08m...jq2rdms8";
 const exampleCustomPrice =
@@ -34,9 +39,25 @@ const CreatePatchTransferTx = ({
   const [inputValue, setInputValue] = useState("");
   const [placeholder, setPlaceholder] = useState(exampleSamePrice);
   const [isTransferCustomAmount, setIsTransferCustomAmount] = useState(false);
+  const [isUploadFile, setIsUploadFile] = useState(false);
+  const [file, setFile] = useState<RcFile | File | undefined>();
   const { config } = useAppSelector(selectApp);
   const { network } = useAppSelector(selectStorage);
   const { assets } = useAssets();
+
+  const props: UploadProps = {
+    name: "file",
+    multiple: false,
+    accept: ".csv",
+    maxCount: 1,
+    showUploadList: false,
+    beforeUpload: (file) => {
+      if (file) {
+        setFile(file);
+      }
+      return false;
+    },
+  };
 
   const assetBalance = useMemo(() => {
     if (txInfo.token) {
@@ -48,9 +69,9 @@ const CreatePatchTransferTx = ({
 
   useEffect(() => {
     const recipients: { address: string; amount: number }[] = [];
-    const addresses = inputValue.split("\n");
+    const addresses = inputValue.trim().split("\n");
     addresses.forEach((address) => {
-      const info = address.split(",");
+      const info = address.trim().split(",");
       let amount = txInfo.amount || 0;
       if (isTransferCustomAmount) {
         amount = info.length > 1 ? Number(info[1].trim()) : 0;
@@ -65,7 +86,7 @@ const CreatePatchTransferTx = ({
       ...txInfo,
       tos: recipients,
     });
-  }, [inputValue, isTransferCustomAmount]);
+  }, [inputValue, isTransferCustomAmount, txInfo.amount]);
 
   const totalAmount = useMemo(() => {
     return txInfo.tos.reduce((total, to) => total + to.amount, 0);
@@ -86,9 +107,9 @@ const CreatePatchTransferTx = ({
         amount -= FIXED_FEE / 10 ** 8;
       }
 
-      return totalAmount >= ckbMinTransfer;
+      return !!txInfo.token ? totalAmount > 0 : totalAmount >= ckbMinTransfer;
     },
-    [totalAmount, txInfo.is_include_fee]
+    [totalAmount, txInfo.is_include_fee, txInfo.token]
   );
 
   const isValidRemainingBalance = useCallback(
@@ -199,6 +220,51 @@ const CreatePatchTransferTx = ({
     );
   };
 
+  useEffect(() => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e?.target?.result as string;
+        const rows = text.trim().split("\n");
+        let input = "";
+        for (const row of rows.slice(1)) {
+          try {
+            const cols = row.trim().split(",");
+            const address = cols[0].trim();
+            const amount = cols.length > 1 ? cols[1].trim() : null;
+            if (isTransferCustomAmount && !Number(amount)) {
+              return toast.error("Invalid amount");
+            }
+            input += `${address}`;
+            if (isTransferCustomAmount) {
+              input += `,${amount}`;
+            }
+            input += "\n";
+          } catch (e: any) {
+            return toast.error(e.message);
+          }
+        }
+        setIsUploadFile(false);
+        setInputValue(input);
+      };
+      reader.readAsText(file);
+    }
+  }, [file, isTransferCustomAmount]);
+
+  const UploadFile = () => {
+    return (
+      <Dragger {...props} className="w-full">
+        <p className="ant-upload-drag-icon">
+          <InboxOutlined />
+        </p>
+        <p className="ant-upload-text">
+          Click or drag file to this area to upload
+        </p>
+        <p className="ant-upload-hint">Supported file types: CSV</p>
+      </Dragger>
+    );
+  };
+
   return (
     <>
       <p className="text-[24px] leading-[28px] font-medium text-dark-100 px-6 border-b border-grey-300 pb-4">
@@ -223,16 +289,44 @@ const CreatePatchTransferTx = ({
         <AmountType />
         <div className="grid gap-2">
           <div className="flex justify-between items-center">
-            <p className="text-[16px] leading-[20px] text-grey-400">
+            <div className="text-[16px] leading-[20px] text-grey-400">
               Recipient Address List
-            </p>
+            </div>
+            <div className="border border-grey-200 rounded-2xl">
+              <button
+                className={cn(
+                  " px-2 py-1 text-sm rounded-2xl transition-all text-grey-400",
+                  {
+                    "!bg-dark-300 !text-grey-300": !isUploadFile,
+                  }
+                )}
+                onClick={() => setIsUploadFile(false)}
+              >
+                Manual Input
+              </button>
+              <button
+                className={cn(
+                  "px-2 py-1 text-sm rounded-2xl transition-all text-grey-400",
+                  {
+                    "!bg-dark-300 !text-grey-300": isUploadFile,
+                  }
+                )}
+                onClick={() => setIsUploadFile(true)}
+              >
+                Upload File
+              </button>
+            </div>
           </div>
-          <textarea
-            className="rounded-lg border border-grey-200 py-[11px] outline-none flex-1 placeholder:text-grey-400 text-dark-100 resize-none px-4 w-full h-28"
-            onChange={(e) => setInputValue(e.target.value)}
-            value={inputValue}
-            placeholder={placeholder}
-          />
+          {isUploadFile ? (
+            <UploadFile />
+          ) : (
+            <textarea
+              className="rounded-lg border border-grey-200 py-[11px] outline-none flex-1 placeholder:text-grey-400 text-dark-100 resize-none px-4 w-full h-40"
+              onChange={(e) => setInputValue(e.target.value)}
+              value={inputValue}
+              placeholder={placeholder}
+            />
+          )}
         </div>
 
         {!isTransferCustomAmount && (

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Popover } from "antd";
 import { ccc } from "@ckb-ccc/connector-react";
 import { useRouter } from "next/navigation";

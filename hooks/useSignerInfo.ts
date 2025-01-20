@@ -1,4 +1,3 @@
-import { ccc } from "@ckb-ccc/connector-react";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "@/providers/app";
 import { getBalance } from "@/utils/helpers";
