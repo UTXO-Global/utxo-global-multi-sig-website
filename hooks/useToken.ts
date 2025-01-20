@@ -1,9 +1,4 @@
-import { useEffect } from "react";
-
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-
-import { loadCkbAddressInfo } from "@/redux/features/assets/action";
-import { selectAssets } from "@/redux/features/assets/reducer";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { selectStorage } from "@/redux/features/storage/reducer";
 import { selectApp } from "@/redux/features/app/reducer";

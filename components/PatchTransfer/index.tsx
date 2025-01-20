@@ -23,7 +23,7 @@ const PatchTransfer = () => {
 
   useEffect(() => {
     if (account) {
-      setTxInfo((prev) => ({ ...prev, send_from: account.multi_sig_address }));
+      setTxInfo((prev) => ({ ...prev, from: account.multi_sig_address }));
     }
   }, [account, setTxInfo]);
   return (
