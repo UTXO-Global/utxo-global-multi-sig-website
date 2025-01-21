@@ -2,17 +2,17 @@
 
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { useAppSelector } from "@/redux/hook";
-import { PatchTransferType } from "@/types/account";
+import { BatchTransferType } from "@/types/account";
 import { FIXED_FEE, FIXED_FEE_RATE } from "@/utils/helpers";
 import { useEffect, useState } from "react";
 import cn from "@/utils/cn";
-import ConfirmPatchTransferTx from "./ConfirmTx";
-import CreatePatchTransferTx from "./CreateManualTx";
+import ConfirmBatchTransferTx from "./ConfirmTx";
+import CreateBatchTransferTx from "./CreateManualTx";
 
-const PatchTransfer = () => {
+const BatchTransfer = () => {
   const { info: account } = useAppSelector(selectAccountInfo);
   const [step, setStep] = useState<number>(1);
-  const [txInfo, setTxInfo] = useState<PatchTransferType>({
+  const [txInfo, setTxInfo] = useState<BatchTransferType>({
     from: account?.multi_sig_address!,
     tos: [],
     is_include_fee: false,
@@ -35,17 +35,17 @@ const PatchTransfer = () => {
         })}
       ></div>
       {step === 1 ? (
-        <CreatePatchTransferTx
+        <CreateBatchTransferTx
           txInfo={txInfo}
           setTxInfo={setTxInfo}
           onNext={() => setStep(2)}
         />
       ) : null}
       {step === 2 ? (
-        <ConfirmPatchTransferTx txInfo={txInfo} onBack={() => setStep(1)} />
+        <ConfirmBatchTransferTx txInfo={txInfo} onBack={() => setStep(1)} />
       ) : null}
     </>
   );
 };
 
-export default PatchTransfer;
+export default BatchTransfer;

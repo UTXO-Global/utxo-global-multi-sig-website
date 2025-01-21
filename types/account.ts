@@ -56,7 +56,7 @@ export type SendTokenType = {
   isUseDID?: boolean;
 };
 
-export type PatchTransferType = {
+export type BatchTransferType = {
   from: string;
   tos: { address: string; amount: number }[];
   network: string;

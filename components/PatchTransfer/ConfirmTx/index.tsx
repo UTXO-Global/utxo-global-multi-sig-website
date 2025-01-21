@@ -6,7 +6,7 @@ import useCreateTransaction from "@/hooks/useCreateTransaction";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { selectApp } from "@/redux/features/app/reducer";
 import { useAppSelector } from "@/redux/hook";
-import { PatchTransferType } from "@/types/account";
+import { BatchTransferType } from "@/types/account";
 import api from "@/utils/api";
 import { FIXED_FEE, formatNumber, shortAddress } from "@/utils/helpers";
 import { BI } from "@ckb-lumos/lumos";
@@ -17,11 +17,11 @@ import { toast } from "react-toastify";
 import { ccc } from "@ckb-ccc/connector-react";
 import { cccA } from "@ckb-ccc/connector-react/advanced";
 
-const ConfirmPatchTransferTx = ({
+const ConfirmBatchTransferTx = ({
   txInfo,
   onBack,
 }: {
-  txInfo: PatchTransferType;
+  txInfo: BatchTransferType;
   onBack: () => void;
 }) => {
   const [transaction, setTransaction] = useState<ccc.Transaction | undefined>(
@@ -38,7 +38,7 @@ const ConfirmPatchTransferTx = ({
   const { usableCells, loading: cellLoading } = useCells();
   const [loading, setLoading] = useState(cellLoading);
 
-  const { createTxPatchTransferCKB, createTxPatchTransferToken } =
+  const { createTxBatchTransferCKB, createTxBatchTransferToken } =
     useCreateTransaction();
 
   const totalAmount = useMemo(() => {
@@ -110,8 +110,8 @@ const ConfirmPatchTransferTx = ({
     const f = async () => {
       if (!txInfo || !account) return;
       const tx = txInfo.token
-        ? await createTxPatchTransferToken(txInfo)
-        : await createTxPatchTransferCKB(txInfo);
+        ? await createTxBatchTransferToken(txInfo)
+        : await createTxBatchTransferCKB(txInfo);
 
       if (tx.error) {
         setError(tx.error);
@@ -204,4 +204,4 @@ const ConfirmPatchTransferTx = ({
   );
 };
 
-export default ConfirmPatchTransferTx;
+export default ConfirmBatchTransferTx;

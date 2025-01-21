@@ -5,7 +5,7 @@ import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { useAppSelector } from "@/redux/hook";
 import {
   CreateTransactionRes,
-  PatchTransferType,
+  BatchTransferType,
   SendTokenType,
 } from "@/types/account";
 import { BI, Cell, Indexer, commons, helpers } from "@ckb-lumos/lumos";
@@ -119,11 +119,10 @@ const useCreateTransaction = () => {
         error: `The remaining balance in your wallet must be greater than ${(
           minCapacity.toNumber() /
           10 ** 8
-        ).toString()} CKB. ${
-          hasCellPending
-            ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
-            : "Please adjust your transaction amount or add more CKB to proceed"
-        }`,
+        ).toString()} CKB. ${hasCellPending
+          ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
+          : "Please adjust your transaction amount or add more CKB to proceed"
+          }`,
       };
     }
 
@@ -374,8 +373,8 @@ const useCreateTransaction = () => {
     };
   };
 
-  const createTxPatchTransferCKB = async (
-    data: PatchTransferType
+  const createTxBatchTransferCKB = async (
+    data: BatchTransferType
   ): Promise<CreateTransactionRes> => {
     let txSkeleton = helpers.TransactionSkeleton({
       cellProvider: indexer,
@@ -456,11 +455,10 @@ const useCreateTransaction = () => {
         error: `The remaining balance in your wallet must be greater than ${(
           minCapacity.toNumber() /
           10 ** 8
-        ).toString()} CKB. ${
-          hasCellPending
-            ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
-            : "Please adjust your transaction amount or add more CKB to proceed"
-        }`,
+        ).toString()} CKB. ${hasCellPending
+          ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
+          : "Please adjust your transaction amount or add more CKB to proceed"
+          }`,
       };
     }
 
@@ -520,8 +518,8 @@ const useCreateTransaction = () => {
     };
   };
 
-  const createTxPatchTransferToken = async (
-    data: PatchTransferType
+  const createTxBatchTransferToken = async (
+    data: BatchTransferType
   ): Promise<CreateTransactionRes> => {
     let txSkeleton = helpers.TransactionSkeleton({
       cellProvider: indexer,
@@ -734,8 +732,8 @@ const useCreateTransaction = () => {
   return {
     createTxSendCKB,
     createTxSendToken,
-    createTxPatchTransferCKB,
-    createTxPatchTransferToken,
+    createTxBatchTransferCKB,
+    createTxBatchTransferToken,
   };
 };
 

@@ -249,7 +249,7 @@ const LeftMenu = () => {
                 </clipPath>
               </defs>
             </svg>
-            <span>Patch Transfer</span>
+            <span>Batch Transfer</span>
           </div>
         </Link>
         <Link
