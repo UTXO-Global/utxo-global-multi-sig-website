@@ -119,11 +119,10 @@ const useCreateTransaction = () => {
         error: `The remaining balance in your wallet must be greater than ${(
           minCapacity.toNumber() /
           10 ** 8
-        ).toString()} CKB. ${
-          hasCellPending
-            ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
-            : "Please adjust your transaction amount or add more CKB to proceed"
-        }`,
+        ).toString()} CKB. ${hasCellPending
+          ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
+          : "Please adjust your transaction amount or add more CKB to proceed"
+          }`,
       };
     }
 
@@ -456,11 +455,10 @@ const useCreateTransaction = () => {
         error: `The remaining balance in your wallet must be greater than ${(
           minCapacity.toNumber() /
           10 ** 8
-        ).toString()} CKB. ${
-          hasCellPending
-            ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
-            : "Please adjust your transaction amount or add more CKB to proceed"
-        }`,
+        ).toString()} CKB. ${hasCellPending
+          ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
+          : "Please adjust your transaction amount or add more CKB to proceed"
+          }`,
       };
     }
 
