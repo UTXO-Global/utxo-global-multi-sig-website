@@ -44,8 +44,15 @@ const Assets = () => {
         });
 
         prices[t.typeScript.args] = 0;
-        if (!!tokenRates[script.hash()] && tokenRates[script.hash()] > 0 && assets.udtBalances[script.hash()]) {
-          prices[t.typeScript.args] = (assets.udtBalances[script.hash()].balance / tokenRates[script.hash()]) * ckbPrice;
+        if (
+          !!tokenRates[script.hash()] &&
+          tokenRates[script.hash()] > 0 &&
+          assets.udtBalances[script.hash()]
+        ) {
+          prices[t.typeScript.args] =
+            (assets.udtBalances[script.hash()].balance /
+              tokenRates[script.hash()]) *
+            ckbPrice;
         }
       });
     }
@@ -79,7 +86,9 @@ const Assets = () => {
   return (
     <main className="h-full overflow-y-auto">
       <div className="px-6 pt-4 bg-light-100 flex justify-start">
-        <div className="px-6 pt-3 pb-4 border-b-2 border-dark-100 text-[16px] leading-[20px] font-bold text-dark-100">Coins</div>
+        <div className="px-6 pt-3 pb-4 border-b-2 border-dark-100 text-[16px] leading-[20px] font-bold text-dark-100">
+          Coins
+        </div>
       </div>
       <div className="py-4 px-6">
         <div className="rounded-lg bg-light-100 overflow-hidden">
@@ -93,7 +102,9 @@ const Assets = () => {
               <div className="flex items-center">
                 <div className="flex items-center w-[60%] justify-start">
                   <img src="/images/nervos.png" alt="ckb" className="w-8" />
-                  <p className="text-[14px] leading-[24px] text-dark-100 font-medium ml-2">CKB</p>
+                  <p className="text-[14px] leading-[24px] text-dark-100 font-medium ml-2">
+                    CKB
+                  </p>
                 </div>
                 <div className="text-base font-medium text-dark-100 w-[20%]">
                   {account ? formatNumber(Number(multisigBalance)) : "--"} CKB
@@ -111,7 +122,10 @@ const Assets = () => {
             </div>
           ) : (
             tokens.map((udtBalance, index) => (
-              <Link key={index} href={`/account/new-transaction/?address=${address}&token=${udtBalance.symbol}`}>
+              <Link
+                key={index}
+                href={`/account/new-transaction/?address=${address}&token=${udtBalance.symbol}`}
+              >
                 <div className="px-6 py-3">
                   <div className="flex items-center">
                     <div className="flex items-center w-[60%] justify-start">
@@ -121,14 +135,24 @@ const Assets = () => {
                         <TextAvatar text={udtBalance.symbol} />
                       )}
 
-                      <p className="text-[14px] leading-[24px] text-dark-100 font-medium ml-2">{udtBalance.symbol}</p>
+                      <p className="text-[14px] leading-[24px] text-dark-100 font-medium ml-2">
+                        {udtBalance.symbol}
+                      </p>
                     </div>
 
                     <div className="text-base font-medium text-dark-100 w-[20%]">
-                      {account ? formatNumber(Number(udtBalance.balance)) : "--"} {udtBalance.symbol}
+                      {account
+                        ? formatNumber(Number(udtBalance.balance))
+                        : "--"}{" "}
+                      {udtBalance.symbol}
                     </div>
                     <div className="text-base font-medium text-dark-100 w-[20%] text-right">
-                      ${formatNumber(tokenPrices[udtBalance.typeScript.args], 2, 8)}
+                      $
+                      {formatNumber(
+                        tokenPrices[udtBalance.typeScript.args],
+                        2,
+                        8
+                      )}
                     </div>
                   </div>
                 </div>

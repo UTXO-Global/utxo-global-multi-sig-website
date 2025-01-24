@@ -206,6 +206,53 @@ const LeftMenu = () => {
           ) : null}
         </Link>
         <Link
+          href={`/account/batch-transfer/?address=${address}`}
+          className={cn(
+            `rounded-lg px-4 py-[10px] flex items-center justify-between cursor-pointer transition-all hover:pl-8`,
+            {
+              "bg-grey-300 hover:pl-4": pathname === "/account/batch-transfer/",
+            }
+          )}
+        >
+          <div className="flex gap-4 items-center">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g clipPath="url(#clip0_1038_77358)">
+                <path
+                  d="M7.4308 2.85742L10.8594 6.28599L7.4308 9.71457"
+                  stroke="black"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M0.572546 13.1431V10.8574C0.572546 9.645 1.05418 8.48224 1.91149 7.62493C2.76879 6.76762 3.93156 6.28599 5.14397 6.28599H10.8583M12.0011 2.85742L15.4297 6.28599L12.0011 9.71456"
+                  stroke="black"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0_1038_77358">
+                  <rect
+                    width="16"
+                    height="16"
+                    fill="white"
+                    transform="matrix(-1 0 0 1 16 0)"
+                  />
+                </clipPath>
+              </defs>
+            </svg>
+            <span>Batch Transfer</span>
+          </div>
+        </Link>
+        <Link
           href={`/account/info/?address=${address}`}
           className={cn(
             `rounded-lg px-4 py-[10px] flex items-center gap-4 cursor-pointer transition-all hover:pl-8`,

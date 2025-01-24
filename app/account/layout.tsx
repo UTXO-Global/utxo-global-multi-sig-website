@@ -10,7 +10,7 @@ import useAccountInfo from "@/hooks/useAccountInfo";
 import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 
-const _AccountLayout = ({ children }: { children: React.ReactNode }) => {
+const Layout = ({ children }: { children: React.ReactNode }) => {
   useAccountInfo();
   const { info: account, isInfoLoading } = useAppSelector(selectAccountInfo);
 
@@ -49,7 +49,7 @@ export default function AccountLayout({
 }) {
   return (
     <Suspense>
-      <_AccountLayout>{children}</_AccountLayout>
+      <Layout>{children}</Layout>
     </Suspense>
   );
 }

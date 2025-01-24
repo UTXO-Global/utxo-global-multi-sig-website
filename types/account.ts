@@ -53,7 +53,18 @@ export type SendTokenType = {
   token?: UdtBalanceType & { typeHash: string };
   fee?: Number;
   feeRate: Number;
-  isUseDID?: boolean
+  isUseDID?: boolean;
+};
+
+export type BatchTransferType = {
+  from: string;
+  tos: { address: string; amount: number }[];
+  network: string;
+  is_include_fee: boolean;
+  amount?: number;
+  fee?: number;
+  feeRate: number;
+  token?: UdtBalanceType & { typeHash: string };
 };
 
 export type TransactionType = {

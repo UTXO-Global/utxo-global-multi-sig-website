@@ -248,3 +248,20 @@ body {
 .ant-pagination-item-active {
   border-color: transparent !important;
 }
+
+*::-webkit-scrollbar {
+  background: transparent;
+  width: 4px;
+  height: 4px;
+  border-radius: 100px;
+}
+
+*::-webkit-scrollbar-button {
+  display: none;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+  width: 4px !important;
+  border-radius: 100px;
+}
