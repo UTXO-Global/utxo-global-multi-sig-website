@@ -5,7 +5,7 @@ import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { useAppSelector } from "@/redux/hook";
 import {
   CreateTransactionRes,
-  PatchTransferType,
+  BatchTransferType,
   SendTokenType,
 } from "@/types/account";
 import { BI, Cell, Indexer, commons, helpers } from "@ckb-lumos/lumos";
@@ -374,8 +374,8 @@ const useCreateTransaction = () => {
     };
   };
 
-  const createTxPatchTransferCKB = async (
-    data: PatchTransferType
+  const createTxBatchTransferCKB = async (
+    data: BatchTransferType
   ): Promise<CreateTransactionRes> => {
     let txSkeleton = helpers.TransactionSkeleton({
       cellProvider: indexer,
@@ -520,8 +520,8 @@ const useCreateTransaction = () => {
     };
   };
 
-  const createTxPatchTransferToken = async (
-    data: PatchTransferType
+  const createTxBatchTransferToken = async (
+    data: BatchTransferType
   ): Promise<CreateTransactionRes> => {
     let txSkeleton = helpers.TransactionSkeleton({
       cellProvider: indexer,
@@ -734,8 +734,8 @@ const useCreateTransaction = () => {
   return {
     createTxSendCKB,
     createTxSendToken,
-    createTxPatchTransferCKB,
-    createTxPatchTransferToken,
+    createTxBatchTransferCKB,
+    createTxBatchTransferToken,
   };
 };
 

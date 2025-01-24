@@ -5,7 +5,7 @@ import SwitchToken from "@/components/SwitchTokens";
 import useAssets from "@/hooks/useAssets";
 import { selectApp } from "@/redux/features/app/reducer";
 import { useAppSelector } from "@/redux/hook";
-import { PatchTransferType } from "@/types/account";
+import { BatchTransferType } from "@/types/account";
 import { Switch } from "antd";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { NumericFormat } from "react-number-format";
@@ -27,13 +27,13 @@ const exampleSamePrice =
   "Example\nckb1qzda0cr08m...rdsr9lalq\nckb1qzda0cr08m...jq2rdms8";
 const exampleCustomPrice =
   "Example\nckb1qzda0cr08m...rdsr9lalq,100\nckb1qzda0cr08m...jq2rdms8,200";
-const CreatePatchTransferTx = ({
+const CreateBatchTransferTx = ({
   txInfo,
   setTxInfo,
   onNext,
 }: {
-  txInfo: PatchTransferType;
-  setTxInfo: (info: PatchTransferType) => void;
+  txInfo: BatchTransferType;
+  setTxInfo: (info: BatchTransferType) => void;
   onNext: () => void;
 }) => {
   const [inputValue, setInputValue] = useState("");
@@ -268,7 +268,7 @@ const CreatePatchTransferTx = ({
   return (
     <>
       <p className="text-[24px] leading-[28px] font-medium text-dark-100 px-6 border-b border-grey-300 pb-4">
-        UTXO Patch Transfer
+        UTXO Batch Transfer
       </p>
       <div className="pt-4 px-6 grid gap-4">
         <div className="grid gap-2">
@@ -385,4 +385,4 @@ const CreatePatchTransferTx = ({
   );
 };
 
-export default CreatePatchTransferTx;
+export default CreateBatchTransferTx;

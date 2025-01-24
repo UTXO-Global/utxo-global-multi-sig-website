@@ -6,7 +6,7 @@ import useCreateTransaction from "@/hooks/useCreateTransaction";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { selectApp } from "@/redux/features/app/reducer";
 import { useAppSelector } from "@/redux/hook";
-import { PatchTransferType } from "@/types/account";
+import { BatchTransferType } from "@/types/account";
 import api from "@/utils/api";
 import { FIXED_FEE, formatNumber, shortAddress } from "@/utils/helpers";
 import { BI } from "@ckb-lumos/lumos";
@@ -17,11 +17,11 @@ import { toast } from "react-toastify";
 import { ccc } from "@ckb-ccc/connector-react";
 import { cccA } from "@ckb-ccc/connector-react/advanced";
 
-const ConfirmPatchTransferTx = ({
+const ConfirmBatchTransferTx = ({
   txInfo,
   onBack,
 }: {
-  txInfo: PatchTransferType;
+  txInfo: BatchTransferType;
   onBack: () => void;
 }) => {
   const [transaction, setTransaction] = useState<ccc.Transaction | undefined>(
@@ -38,7 +38,7 @@ const ConfirmPatchTransferTx = ({
   const { usableCells, loading: cellLoading } = useCells();
   const [loading, setLoading] = useState(cellLoading);
 
-  const { createTxPatchTransferCKB, createTxPatchTransferToken } =
+  const { createTxBatchTransferCKB, createTxBatchTransferToken } =
     useCreateTransaction();
 
   const totalAmount = useMemo(() => {
@@ -74,7 +74,7 @@ const ConfirmPatchTransferTx = ({
       if (data && !!data.transaction_id) {
         try {
           event({
-            action: "tnx_patch_send",
+            action: "tnx_batch_send",
             from_address: txInfo.from,
             to_address: txInfo.tos,
             network: appConfig.network,
@@ -89,9 +89,11 @@ const ConfirmPatchTransferTx = ({
           `/account/transactions/?address=${account?.multi_sig_address}`
         );
       } else if (!!data.message) {
+        console.log("data =>>>", data);
         toast.error(data.message);
       }
     } catch (e: any) {
+      console.log("eeee", e);
       const message: string = (
         e.response?.data?.message || e.message
       ).toString();
@@ -110,8 +112,8 @@ const ConfirmPatchTransferTx = ({
     const f = async () => {
       if (!txInfo || !account) return;
       const tx = txInfo.token
-        ? await createTxPatchTransferToken(txInfo)
-        : await createTxPatchTransferCKB(txInfo);
+        ? await createTxBatchTransferToken(txInfo)
+        : await createTxBatchTransferCKB(txInfo);
 
       if (tx.error) {
         setError(tx.error);
@@ -149,8 +151,8 @@ const ConfirmPatchTransferTx = ({
           </div>
         </div>
         <div className="pb-6 border-b border-grey-300 items-center">
-          <div className="w-[30%] text-[18px] leading-[24px] font-medium text-grey-400">
-            Recipients: ${txInfo.tos.length} address
+          <div className="text-[18px] leading-[24px] font-medium text-grey-400">
+            Recipients: {txInfo.tos.length} addresses
           </div>
           <div className="flex flex-col text-[16px] leading-[20px] text-dark-100 mt-4 max-h-[300px] overflow-y-auto">
             {txInfo.tos.map((to, idx) => (
@@ -204,4 +206,4 @@ const ConfirmPatchTransferTx = ({
   );
 };
 
-export default ConfirmPatchTransferTx;
+export default ConfirmBatchTransferTx;
