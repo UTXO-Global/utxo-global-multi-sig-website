@@ -89,7 +89,6 @@ const ConfirmBatchTransferTx = ({
           `/account/transactions/?address=${account?.multi_sig_address}`
         );
       } else if (!!data.message) {
-        console.log("data =>>>", data);
         toast.error(data.message);
       }
     } catch (e: any) {
