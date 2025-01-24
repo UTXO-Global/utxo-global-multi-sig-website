@@ -206,11 +206,11 @@ const LeftMenu = () => {
           ) : null}
         </Link>
         <Link
-          href={`/account/patch-transfer/?address=${address}`}
+          href={`/account/batch-transfer/?address=${address}`}
           className={cn(
             `rounded-lg px-4 py-[10px] flex items-center justify-between cursor-pointer transition-all hover:pl-8`,
             {
-              "bg-grey-300 hover:pl-4": pathname === "/account/patch-transfer/",
+              "bg-grey-300 hover:pl-4": pathname === "/account/batch-transfer/",
             }
           )}
         >

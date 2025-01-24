@@ -74,7 +74,7 @@ const ConfirmBatchTransferTx = ({
       if (data && !!data.transaction_id) {
         try {
           event({
-            action: "tnx_patch_send",
+            action: "tnx_batch_send",
             from_address: txInfo.from,
             to_address: txInfo.tos,
             network: appConfig.network,
@@ -92,6 +92,7 @@ const ConfirmBatchTransferTx = ({
         toast.error(data.message);
       }
     } catch (e: any) {
+      console.log("eeee", e);
       const message: string = (
         e.response?.data?.message || e.message
       ).toString();
@@ -149,8 +150,8 @@ const ConfirmBatchTransferTx = ({
           </div>
         </div>
         <div className="pb-6 border-b border-grey-300 items-center">
-          <div className="w-[30%] text-[18px] leading-[24px] font-medium text-grey-400">
-            Recipients: ${txInfo.tos.length} address
+          <div className="text-[18px] leading-[24px] font-medium text-grey-400">
+            Recipients: {txInfo.tos.length} addresses
           </div>
           <div className="flex flex-col text-[16px] leading-[20px] text-dark-100 mt-4 max-h-[300px] overflow-y-auto">
             {txInfo.tos.map((to, idx) => (
