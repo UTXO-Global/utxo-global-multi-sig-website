@@ -92,7 +92,6 @@ const ConfirmBatchTransferTx = ({
         toast.error(data.message);
       }
     } catch (e: any) {
-      console.log("eeee", e);
       const message: string = (
         e.response?.data?.message || e.message
       ).toString();
