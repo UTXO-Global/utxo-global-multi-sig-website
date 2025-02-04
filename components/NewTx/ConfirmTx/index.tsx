@@ -94,7 +94,7 @@ const ConfirmTx = ({
       ).toString();
       if (message.includes(`transactions_pkey`)) {
         toast.error(
-          `Transaction with hash ${transaction.hash()} is still pending. Please complete it before creating a new transaction`
+          `Duplicate transaction detected with hash ${transaction.hash()}. Please contact support at https://t.me/utxoglobal/12 for help`
         );
       } else {
         toast.error(message);
