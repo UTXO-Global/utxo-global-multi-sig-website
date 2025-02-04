@@ -11,6 +11,7 @@ import IcnChevron from "@/public/icons/icn-chevron.svg";
 import IcnChecked from "@/public/icons/icn-checked.svg";
 import IcnUserGroup from "@/public/icons/icn-user-group.svg";
 import IcnExternalLink from "@/public/icons/icn-external-link.svg";
+import IcnInProgress from "@/public/icons/icn-in-progress.svg";
 
 import cn from "@/utils/cn";
 import { TransactionStatus, TransactionType } from "@/types/transaction";
@@ -30,7 +31,8 @@ import useTokens from "@/hooks/useToken";
 
 const STATUS_TEXT = {
   [TransactionStatus.WaitingSigned]: "Pending",
-  [TransactionStatus.Sent]: "Success",
+  [TransactionStatus.InProgressing]: "In-Progress",
+  [TransactionStatus.Commited]: "Commited",
   [TransactionStatus.Rejected]: "Rejected",
   [TransactionStatus.Failed]: "Unsuccess",
 };
@@ -200,26 +202,31 @@ const Transaction = ({
         <div className="w-[40%] flex items-center gap-3 pl-4">
           <div className="flex justify-between flex-1">
             <div className="flex gap-1 items-center">
-              {transaction.status === TransactionStatus.Sent ? (
+              {transaction.status === TransactionStatus.InProgressing && (
+                <div className="w-6 aspect-square p-[2px]">
+                  <IcnInProgress className="fill-[#00b0ff] w-full" />
+                </div>
+              )}
+
+              {transaction.status === TransactionStatus.Commited && (
                 <div className="w-6 aspect-square p-[2px]">
                   <IcnChecked className="fill-success-100 w-full" />
                 </div>
-              ) : (
-                <IcnUserGroup
-                  className={cn("w-6", {
-                    "stroke-error-100":
-                      transaction.status === TransactionStatus.Failed ||
-                      transaction.status === TransactionStatus.Rejected,
-                  })}
-                />
+              )}
+
+              {(transaction.status === TransactionStatus.Failed ||
+                transaction.status === TransactionStatus.Rejected) && (
+                <IcnUserGroup className={cn("w-6 stroke-error-100")} />
               )}
 
               <p
                 className={cn(
                   `text-[16px] leading-[20px] font-medium text-orange-100`,
                   {
+                    "text-[#00b0ff]":
+                      transaction.status === TransactionStatus.InProgressing,
                     "text-success-200":
-                      transaction.status === TransactionStatus.Sent,
+                      transaction.status === TransactionStatus.Commited,
                     "text-error-100":
                       transaction.status === TransactionStatus.Failed ||
                       transaction.status === TransactionStatus.Rejected,
@@ -257,8 +264,10 @@ const Transaction = ({
                 className={cn(
                   `text-[16px] leading-[20px] font-medium text-orange-100 capitalize`,
                   {
+                    "text-[#00b0ff]":
+                      transaction.status === TransactionStatus.InProgressing,
                     "text-success-200":
-                      transaction.status === TransactionStatus.Sent,
+                      transaction.status === TransactionStatus.Commited,
                     "text-error-100":
                       transaction.status === TransactionStatus.Failed ||
                       transaction.status === TransactionStatus.Rejected,
@@ -306,7 +315,10 @@ const Transaction = ({
               Number of confirmations required: {accountInfo.threshold}
             </p>
           ) : null}
-          {transaction.status === TransactionStatus.Sent ? (
+          {[
+            TransactionStatus.InProgressing,
+            TransactionStatus.Commited,
+          ].includes(transaction.status) ? (
             <div className="flex gap-8 text-[16px] leading-[20px] text-grey-400">
               <p className="w-[90px] font-medium">Explorer:</p>
               <Link
@@ -352,7 +364,10 @@ const Transaction = ({
             </div>
             <div className="relative">
               <div className="flex gap-2 items-center bg-light-100">
-                {transaction.status === TransactionStatus.Sent ? (
+                {[
+                  TransactionStatus.InProgressing,
+                  TransactionStatus.Commited,
+                ].includes(transaction.status) ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -509,7 +524,13 @@ const Transaction = ({
                 </div>
               </div>
             )}
-            {transaction.status === TransactionStatus.Sent && (
+            {transaction.status === TransactionStatus.InProgressing && (
+              <div className="flex gap-2 items-center bg-light-100 relative">
+                <IcnInProgress className="fill-[#0D0D0D] w-4 h-4" />
+                <p className="font-medium text-dark-100">In-Progress</p>
+              </div>
+            )}
+            {transaction.status === TransactionStatus.Commited && (
               <div className="flex gap-2 items-center bg-light-100 relative">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
