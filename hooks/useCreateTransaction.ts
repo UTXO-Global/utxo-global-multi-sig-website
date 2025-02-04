@@ -96,7 +96,6 @@ const useCreateTransaction = () => {
         break;
     }
 
-    // Validate
     if (collectedSum.lt(neededCapacity)) {
       return {
         error: hasCellPending
@@ -119,10 +118,11 @@ const useCreateTransaction = () => {
         error: `The remaining balance in your wallet must be greater than ${(
           minCapacity.toNumber() /
           10 ** 8
-        ).toString()} CKB. ${hasCellPending
-          ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
-          : "Please adjust your transaction amount or add more CKB to proceed"
-          }`,
+        ).toString()} CKB. ${
+          hasCellPending
+            ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
+            : "Please adjust your transaction amount or add more CKB to proceed"
+        }`,
       };
     }
 
@@ -335,6 +335,15 @@ const useCreateTransaction = () => {
         break;
     }
 
+    if (totalCapacity.lt(neededCapacity)) {
+      return {
+        error: `Insufficient balance. The required amount is ${(
+          neededCapacity.toNumber() /
+          10 ** 8
+        ).toString()} CKB. Please add more CKB to proceed`,
+      };
+    }
+
     if (capacityChangeOutput.gt(0) && capacityChangeOutput.lt(minCapacity)) {
       return {
         error: `The remaining balance in your wallet must be greater than ${(
@@ -455,10 +464,11 @@ const useCreateTransaction = () => {
         error: `The remaining balance in your wallet must be greater than ${(
           minCapacity.toNumber() /
           10 ** 8
-        ).toString()} CKB. ${hasCellPending
-          ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
-          : "Please adjust your transaction amount or add more CKB to proceed"
-          }`,
+        ).toString()} CKB. ${
+          hasCellPending
+            ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
+            : "Please adjust your transaction amount or add more CKB to proceed"
+        }`,
       };
     }
 
