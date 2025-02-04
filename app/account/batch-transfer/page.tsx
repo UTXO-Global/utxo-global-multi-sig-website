@@ -1,3 +1,5 @@
+"use client";
+
 import BatchTransfer from "@/components/BatchTransfer";
 
 const BatchTransferPage = () => {

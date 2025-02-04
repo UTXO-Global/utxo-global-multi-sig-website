@@ -43,6 +43,7 @@ export const copy = (value: string) => {
 };
 
 export const isValidCKBAddress = (address: string, network: string) => {
+  if (!address) return false;
   if (address.length < 97) return true;
   const lumosConfig = network === "nervos" ? LINA : AGGRON4;
 

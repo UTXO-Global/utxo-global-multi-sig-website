@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pagination } from "antd";
 
 import cn from "@/utils/cn";
 
 import Transaction from "@/components/Transaction";
-import IcnSpinner from "@/public/icons/icn-spinner.svg";
 import IcnReload from "@/public/icons/icn-reload.svg";
 import useTransactions from "@/hooks/useTransactions";
 import { TransactionStatus, TransactionTab } from "@/types/transaction";
@@ -118,7 +117,11 @@ const Transactions = () => {
     <main className="h-full overflow-y-auto">
       <div className="px-6 pt-4 bg-light-100 flex justify-between items-center">
         <div className="flex justify-start">
-          {[TransactionTab.Queue, TransactionTab.History].map((z, i) => (
+          {[
+            TransactionTab.Queue,
+            TransactionTab.InProgressing,
+            TransactionTab.History,
+          ].map((z, i) => (
             <div
               key={i}
               className={cn(
@@ -134,18 +137,23 @@ const Transactions = () => {
           ))}
         </div>
       </div>
-      {tab === TransactionTab.Queue ? (
+      {tab === TransactionTab.Queue && (
         <TransactionHistory status={[TransactionStatus.WaitingSigned]} />
-      ) : null}
-      {tab === TransactionTab.History ? (
+      )}
+
+      {tab === TransactionTab.InProgressing && (
+        <TransactionHistory status={[TransactionStatus.InProgressing]} />
+      )}
+
+      {tab === TransactionTab.History && (
         <TransactionHistory
           status={[
-            TransactionStatus.Sent,
+            TransactionStatus.Commited,
             TransactionStatus.Rejected,
             TransactionStatus.Failed,
           ]}
         />
-      ) : null}
+      )}
     </main>
   );
 };

@@ -36,8 +36,12 @@ const Step02 = ({
   const { config } = useAppSelector(selectApp);
 
   const isValidSigners = useMemo(() => {
-    return errors.every((z) => z.name && z.address);
-  }, [errors]);
+    return (
+      errors.every((z) => z.name && z.address) &&
+      threshold > 1 &&
+      signers.length > 1
+    );
+  }, [errors, threshold, signers]);
 
   const onChangeSignerName = (e: any, index: number) => {
     setSigners(
@@ -58,7 +62,7 @@ const Step02 = ({
   };
 
   const addSigner = () => {
-    setErrors([...errors, { name: true, address: true }]);
+    setErrors([...errors, { name: false, address: false }]);
     setSigners([
       ...signers,
       {
@@ -69,16 +73,18 @@ const Step02 = ({
   };
 
   const deleteSigner = (index: number) => {
-    setSigners(signers.filter((z, i) => i !== index));
+    if (signers.length > 2) {
+      setSigners(signers.filter((z, i) => i !== index));
+    }
   };
 
   const validate = useCallback(() => {
-    setErrors(
-      signers.map((z, i) => ({
-        name: isValidName(z.name),
-        address: isValidCKBAddress(z.address, config.network),
-      }))
-    );
+    const errs = signers.map((z, i) => ({
+      name: isValidName(z.name),
+      address: isValidCKBAddress(z.address, config.network),
+    }));
+
+    setErrors(() => [...errs]);
   }, [signers, config.network]);
 
   const _isDuplicateSigner = () => {
@@ -97,11 +103,18 @@ const Step02 = ({
 
   useEffect(() => {
     validate();
-  }, [validate]);
+  }, [signers]);
 
   useEffect(() => {
     if (signers.length === 0) {
-      setSigners([{ name: "Owner", address }]);
+      setSigners([
+        { name: "Owner", address },
+        { name: "", address: "" },
+      ]);
+      setErrors([
+        { name: true, address: true },
+        { name: false, address: false },
+      ]);
     } else {
       setSigners(signers.map((z, i) => (i === 0 ? { ...z, address } : z)));
     }
@@ -174,10 +187,14 @@ const Step02 = ({
                         </div>
                       )}
                     </div>
-                    {i === 0 ? null : (
+                    {i === 0 || signers.length <= 2 ? null : (
                       <div
                         className="p-2 hover:bg-grey-200 rounded-full cursor-pointer"
-                        onClick={() => deleteSigner(i)}
+                        onClick={() => {
+                          if (signers.length > 2) {
+                            deleteSigner(i);
+                          }
+                        }}
                       >
                         <IcnTrash className="w-6" />
                       </div>
@@ -199,6 +216,11 @@ const Step02 = ({
           >
             + Add New Signer
           </button>
+          {signers.length < 2 && (
+            <div className="text-error-100 text-sm mt-4">
+              *There must be more than one signer
+            </div>
+          )}
           {isSubmit && !isValidSigners ? (
             <div className="text-error-100 text-sm mt-4">
               <p>
@@ -221,6 +243,11 @@ const Step02 = ({
           <p className="mt-1 text-[16px] leading-[20px] text-dark-100">
             Any transaction requires the confirmation of:
           </p>
+          {threshold < 2 && (
+            <div className="text-error-100 text-sm mt-4">
+              *Threshold must be greater than one
+            </div>
+          )}
           <div className="flex gap-4 items-center mt-6">
             <Select
               defaultValue={threshold}
@@ -242,9 +269,9 @@ const Step02 = ({
                   />
                 </svg>
               }
-              options={Array(signers.length)
+              options={Array(signers.length > 0 ? signers.length - 1 : 0)
                 .fill(0)
-                .map((z, i) => ({ value: i + 1, label: i + 1 }))}
+                .map((z, i) => ({ value: i + 2, label: i + 2 }))}
             />
             <p className="text-[18px] leading-[24px] font-medium text-dark-100">
               out of {signers.length}{" "}
@@ -259,7 +286,7 @@ const Step02 = ({
         </Button>
         <Button
           onClick={() => createSigners()}
-          disabled={isSubmit && !isValidSigners}
+          disabled={isSubmit || !isValidSigners}
         >
           Next
         </Button>
