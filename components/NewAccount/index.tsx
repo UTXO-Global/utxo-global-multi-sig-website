@@ -15,7 +15,7 @@ import api from "@/utils/api";
 const NewAccount = () => {
   const [step, setStep] = useState<number>(1);
   const [accountName, setAccountName] = useState<string>("");
-  const [threshold, setThreshold] = useState<number>(1);
+  const [threshold, setThreshold] = useState<number>(2);
   const [signers, setSigners] = useState<SignerType[]>([]);
   const [accountCreated, setAccountCreated] =
     useState<MultiSigAccountType | null>(null);
