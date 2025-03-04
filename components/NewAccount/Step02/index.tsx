@@ -99,17 +99,21 @@ const Step02 = ({
 
       if (idx > 0) {
         if (!_isValidName) {
-          error.name = "Invalid name.";
+          error.name =
+            "Signer name must be be between 4 and 16 character and contain only letters, numbers, and underscores";
         } else if (
           signers.some(
-            (u, i) => u.name.toLowerCase() === z.name.toLowerCase() && i !== idx
+            (u, i) => u.name.toLowerCase() === z.name.toLowerCase() && i < idx
           )
         ) {
-          error.name = "This name is already in use.";
+          error.name =
+            "This name is already in use. Please choose a different name.";
         }
 
         if (!_isValidAddress) {
-          error.address = "Invalid CKB address.";
+          error.address = `Invalid CKB address. Example: ${
+            config.network === "nervos" ? "ckb1qzda0cr08" : "ckt1qzda0cr08"
+          }... Please check again.`;
         } else if (
           signers[0].address.toLowerCase() === z.address.toLowerCase()
         ) {
@@ -117,10 +121,11 @@ const Step02 = ({
         } else if (
           signers.some(
             (u, i) =>
-              u.address.toLowerCase() === z.address.toLowerCase() && i !== idx
+              u.address.toLowerCase() === z.address.toLowerCase() && i < idx
           )
         ) {
-          error.address = "This address is already in use.";
+          error.address =
+            "This address is already in use. Please enter a different address.";
         }
 
         error.isValid = !error.address && !error.name;
@@ -195,11 +200,6 @@ const Step02 = ({
                       value={z.name}
                       onChange={(e) => onChangeSignerName(e, i)}
                     />
-                    {!!error?.name && (
-                      <small className="text-error-100 text-xs">
-                        * {error?.name}
-                      </small>
-                    )}
                   </div>
                   <div className="flex-1">
                     <p className="text-base text-grey-500 mb-2">Signer</p>
@@ -251,12 +251,19 @@ const Step02 = ({
                         </div>
                       )}
                     </div>
-                    {!!error?.address && (
-                      <small className="text-error-100 text-xs">
-                        * {error?.address}
-                      </small>
-                    )}
                   </div>
+                </div>
+                <div className="mt-2">
+                  {!!error?.name && (
+                    <div className="text-error-100 text-xs">
+                      * {error?.name}
+                    </div>
+                  )}
+                  {!!error?.address && (
+                    <div className="text-error-100 text-xs">
+                      * {error?.address}
+                    </div>
+                  )}
                 </div>
                 {i === 0 ? (
                   <p className="text-[14px] leading-[18px] text-grey-500 mt-1">
@@ -278,15 +285,6 @@ const Step02 = ({
               *There must be more than one signer
             </div>
           )}
-          {isSubmit && !isValidSigners ? (
-            <div className="text-error-100 text-sm mt-4">
-              <p>
-                *Signer name must be be between 4 and 16 character and contain
-                only letters, numbers, and underscores.
-              </p>
-              <p>*Address must be valid.</p>
-            </div>
-          ) : null}
         </div>
         <div className="pt-6 pb-8 border-b border-grey-200">
           <div className="flex items-center gap-2">
