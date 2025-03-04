@@ -1,6 +1,6 @@
 {
   "name": "utxo-global-multi-sig",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -17,7 +17,7 @@
     "@reduxjs/toolkit": "^2.1.0",
     "@svgr/webpack": "^8.1.0",
     "@utxoswap/swap-sdk-js": "^0.1.14",
-    "antd": "^5.19.3",
+    "antd": "^5.24.2",
     "aos": "^2.3.4",
     "axios": "^1.7.2",
     "clsx": "^2.1.0",
@@ -38,8 +38,8 @@
   "devDependencies": {
     "@types/aos": "^3.0.7",
     "@types/node": "^22.10.7",
-    "@types/react": "^19.0.7",
-    "@types/react-dom": "^19.0.3",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
     "postcss": "^8",
