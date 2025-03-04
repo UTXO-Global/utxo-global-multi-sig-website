@@ -237,7 +237,9 @@ const Step02 = ({
               Threshold
             </p>
             <Tooltip title="The threshold of a Multi-Sig Account specifies how many signers need to confirm a Account Transaction before it can be executed.">
-              <IcnInfoOutline className="w-5 stroke-grey-400 cursor-pointer" />
+              <div>
+                <IcnInfoOutline className="w-5 stroke-grey-400 cursor-pointer" />
+              </div>
             </Tooltip>
           </div>
           <p className="mt-1 text-[16px] leading-[20px] text-dark-100">
