@@ -43,20 +43,14 @@ export const copy = (value: string) => {
 };
 
 export const isValidCKBAddress = (address: string, network: string) => {
-  if (!address) return false;
-  if (address.length < 97) return true;
-  const lumosConfig = network === "nervos" ? LINA : AGGRON4;
-
-  const toScript = helpers.parseAddress(address, {
-    config: lumosConfig,
-  });
-
-  if (ccc.bytesFrom(toScript.args).length > 20) return false;
-
   try {
-    // const script = addressToScript(address);
-    // const reconstructedAddress = scriptToAddress(script);
-    // const isAddressValid = address === reconstructedAddress;
+    if (!address) return false;
+    const lumosConfig = network === "nervos" ? LINA : AGGRON4;
+    const toScript = helpers.parseAddress(address, {
+      config: lumosConfig,
+    });
+
+    if (ccc.bytesFrom(toScript.args).length > 20) return false;
     const isCorrectPrefix = address.startsWith(
       network === "nervos" ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     );

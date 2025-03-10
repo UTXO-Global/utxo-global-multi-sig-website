@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Select, Tooltip } from "antd";
+import { message, Select, Tooltip } from "antd";
 import { ccc } from "@ckb-ccc/connector-react";
 import { toast } from "react-toastify";
 
@@ -14,6 +14,13 @@ import cn from "@/utils/cn";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
 import { useAppSelector } from "@/redux/hook";
 import { selectApp } from "@/redux/features/app/reducer";
+
+type SignerError = {
+  idx: number;
+  name: string;
+  address: string;
+  isValid: boolean;
+};
 
 const Step02 = ({
   onNext,
@@ -31,15 +38,13 @@ const Step02 = ({
   setThreshold: (val: number) => void;
 }) => {
   const { address, balance } = useSignerInfo();
-  const [errors, setErrors] = useState<any[]>([]);
+  const [errors, setErrors] = useState<SignerError[]>([]);
   const [isSubmit, setIsSubmit] = useState<boolean>(false);
   const { config } = useAppSelector(selectApp);
 
   const isValidSigners = useMemo(() => {
     return (
-      errors.every((z) => z.name && z.address) &&
-      threshold > 1 &&
-      signers.length > 1
+      errors.every((z) => z.isValid) && threshold > 1 && signers.length > 1
     );
   }, [errors, threshold, signers]);
 
@@ -62,7 +67,10 @@ const Step02 = ({
   };
 
   const addSigner = () => {
-    setErrors([...errors, { name: false, address: false }]);
+    setErrors([
+      ...errors,
+      { idx: signers.length, name: "", address: "", isValid: false },
+    ]);
     setSigners([
       ...signers,
       {
@@ -79,10 +87,51 @@ const Step02 = ({
   };
 
   const validate = useCallback(() => {
-    const errs = signers.map((z, i) => ({
-      name: isValidName(z.name),
-      address: isValidCKBAddress(z.address, config.network),
-    }));
+    const errs = signers.map((z, idx) => {
+      const _isValidName = isValidName(z.name);
+      const _isValidAddress = isValidCKBAddress(z.address, config.network);
+      const error = {
+        idx,
+        name: "",
+        address: "",
+        isValid: true,
+      };
+
+      if (idx > 0) {
+        if (!_isValidName) {
+          error.name =
+            "Signer name must be be between 4 and 16 character and contain only letters, numbers, and underscores";
+        } else if (
+          signers.some(
+            (u, i) => u.name.toLowerCase() === z.name.toLowerCase() && i < idx
+          )
+        ) {
+          error.name =
+            "This name is already in use. Please choose a different name.";
+        }
+
+        if (!_isValidAddress) {
+          error.address = `Invalid CKB address. Example: ${
+            config.network === "nervos" ? "ckb1qzda0cr08" : "ckt1qzda0cr08"
+          }... Please check again.`;
+        } else if (
+          signers[0].address.toLowerCase() === z.address.toLowerCase()
+        ) {
+          error.address = "This address must belong to the primary owner.";
+        } else if (
+          signers.some(
+            (u, i) =>
+              u.address.toLowerCase() === z.address.toLowerCase() && i < idx
+          )
+        ) {
+          error.address =
+            "This address is already in use. Please enter a different address.";
+        }
+
+        error.isValid = !error.address && !error.name;
+      }
+      return { ...error };
+    });
 
     setErrors(() => [...errs]);
   }, [signers, config.network]);
@@ -112,8 +161,8 @@ const Step02 = ({
         { name: "", address: "" },
       ]);
       setErrors([
-        { name: true, address: true },
-        { name: false, address: false },
+        { idx: 0, name: "", address: "", isValid: true },
+        { idx: 1, name: "", address: "", isValid: false },
       ]);
     } else {
       setSigners(signers.map((z, i) => (i === 0 ? { ...z, address } : z)));
@@ -131,84 +180,99 @@ const Step02 = ({
       </p>
       <div className="mt-6 pt-5 border-t border-grey-200 px-16">
         <div className="pb-8 border-b border-grey-200">
-          {signers.map((z, i) => (
-            <div key={i}>
-              <div className="flex gap-6 mt-2">
-                <div className="w-[244px]">
-                  <p className="text-base text-grey-500">Signer Name</p>
-                  <input
-                    type="text"
-                    className={cn(
-                      `outline-none border border-grey-200 placeholder:text-grey-400 rounded-lg px-4 py-[19px] mt-2 w-full`,
-                      {
-                        "border-error-100": isSubmit && !errors[i].name,
-                      }
-                    )}
-                    placeholder="Enter the name"
-                    readOnly={i === 0}
-                    value={z.name}
-                    onChange={(e) => onChangeSignerName(e, i)}
-                  />
-                </div>
-                <div className="flex-1">
-                  <p className="text-base text-grey-500 mb-2">Signer</p>
-                  <div className="flex gap-4 items-center">
-                    <div
+          {signers.map((z, i) => {
+            const error = errors.find((err) => err.idx === i);
+            return (
+              <div key={i}>
+                <div className="flex gap-6 mt-2">
+                  <div className="w-[244px]">
+                    <p className="text-base text-grey-500">Signer Name</p>
+                    <input
+                      type="text"
                       className={cn(
-                        `flex-1 rounded-lg border border-grey-200 px-4 py-[11px] flex items-center gap-2 relative`,
+                        `outline-none border border-grey-200 placeholder:text-grey-400 rounded-lg px-4 py-[19px] mt-2 w-full`,
                         {
-                          "border-error-100": isSubmit && !errors[i].address,
+                          "border-error-100": !!error?.name,
                         }
                       )}
-                    >
-                      <img
-                        src="/images/account.png"
-                        alt="account"
-                        className="w-10"
-                      />
-                      {i === 0 ? (
-                        <p className="text-[18px] leading-[24px] text-dark-100 truncate flex gap-2 items-center">
-                          <span className="text-grey-500">
-                            {SHORT_NETWORK_NAME[config.network]}:
-                          </span>{" "}
-                          <span>{shortAddress(address, 14)}</span>
-                        </p>
-                      ) : (
-                        <div className="text-[18px] leading-[24px] text-dark-100 flex items-center gap-2 flex-1">
-                          <span className="text-grey-500">
-                            {SHORT_NETWORK_NAME[config.network]}:
-                          </span>{" "}
-                          <input
-                            type="text"
-                            className="outline-none border-none w-full flex-1"
-                            value={z.address}
-                            onChange={(e) => onChangeSignerAddress(e, i)}
-                          />
+                      placeholder="Enter the name"
+                      readOnly={i === 0}
+                      value={z.name}
+                      onChange={(e) => onChangeSignerName(e, i)}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-base text-grey-500 mb-2">Signer</p>
+                    <div className="flex gap-4 items-center">
+                      <div
+                        className={cn(
+                          `flex-1 rounded-lg border border-grey-200 px-4 py-[11px] flex items-center gap-2 relative`,
+                          {
+                            "border-error-100": !!error?.address,
+                          }
+                        )}
+                      >
+                        <img
+                          src="/images/account.png"
+                          alt="account"
+                          className="w-10"
+                        />
+                        {i === 0 ? (
+                          <p className="text-[18px] leading-[24px] text-dark-100 truncate flex gap-2 items-center">
+                            <span className="text-grey-500">
+                              {SHORT_NETWORK_NAME[config.network]}:
+                            </span>{" "}
+                            <span>{shortAddress(address, 14)}</span>
+                          </p>
+                        ) : (
+                          <div className="text-[18px] leading-[24px] text-dark-100 flex items-center gap-2 flex-1">
+                            <span className="text-grey-500">
+                              {SHORT_NETWORK_NAME[config.network]}:
+                            </span>{" "}
+                            <input
+                              type="text"
+                              className="outline-none border-none w-full flex-1"
+                              value={z.address}
+                              onChange={(e) => onChangeSignerAddress(e, i)}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      {i === 0 || signers.length <= 2 ? null : (
+                        <div
+                          className="p-2 hover:bg-grey-200 rounded-full cursor-pointer"
+                          onClick={() => {
+                            if (signers.length > 2) {
+                              deleteSigner(i);
+                            }
+                          }}
+                        >
+                          <IcnTrash className="w-6" />
                         </div>
                       )}
                     </div>
-                    {i === 0 || signers.length <= 2 ? null : (
-                      <div
-                        className="p-2 hover:bg-grey-200 rounded-full cursor-pointer"
-                        onClick={() => {
-                          if (signers.length > 2) {
-                            deleteSigner(i);
-                          }
-                        }}
-                      >
-                        <IcnTrash className="w-6" />
-                      </div>
-                    )}
                   </div>
                 </div>
+                <div className="mt-2">
+                  {!!error?.name && (
+                    <div className="text-error-100 text-xs">
+                      * {error?.name}
+                    </div>
+                  )}
+                  {!!error?.address && (
+                    <div className="text-error-100 text-xs">
+                      * {error?.address}
+                    </div>
+                  )}
+                </div>
+                {i === 0 ? (
+                  <p className="text-[14px] leading-[18px] text-grey-500 mt-1">
+                    Your connected wallet
+                  </p>
+                ) : null}
               </div>
-              {i === 0 ? (
-                <p className="text-[14px] leading-[18px] text-grey-500 mt-1">
-                  Your connected wallet
-                </p>
-              ) : null}
-            </div>
-          ))}
+            );
+          })}
 
           <button
             className="rounded-lg mt-6 border-none outline-none bg-grey-300 hover:bg-grey-200 transition-colors text-orange-100 text-[16px] leading-[20px] font-medium px-4 py-3"
@@ -221,15 +285,6 @@ const Step02 = ({
               *There must be more than one signer
             </div>
           )}
-          {isSubmit && !isValidSigners ? (
-            <div className="text-error-100 text-sm mt-4">
-              <p>
-                *Signer name must be be between 4 and 16 character and contain
-                only letters, numbers, and underscores.
-              </p>
-              <p>*Address must be valid.</p>
-            </div>
-          ) : null}
         </div>
         <div className="pt-6 pb-8 border-b border-grey-200">
           <div className="flex items-center gap-2">
@@ -237,7 +292,9 @@ const Step02 = ({
               Threshold
             </p>
             <Tooltip title="The threshold of a Multi-Sig Account specifies how many signers need to confirm a Account Transaction before it can be executed.">
-              <IcnInfoOutline className="w-5 stroke-grey-400 cursor-pointer" />
+              <div>
+                <IcnInfoOutline className="w-5 stroke-grey-400 cursor-pointer" />
+              </div>
             </Tooltip>
           </div>
           <p className="mt-1 text-[16px] leading-[20px] text-dark-100">
