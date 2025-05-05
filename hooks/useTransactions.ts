@@ -51,7 +51,7 @@ const useTransactions = (status: TransactionStatus[]) => {
 
     try {
       const { data } = await api.put(
-        `/multi-sig/transactions/${address}/commited`,
+        `/multi-sig/transactions/${address}/committed`,
         {
           tx_hashes: txHashes,
         }
@@ -75,8 +75,7 @@ const useTransactions = (status: TransactionStatus[]) => {
   const isCommited = async (txHash: string) => {
     try {
       const res = await fetch(
-        `${appConfig.apiURL}/ckb/${
-          appConfig.network === "nervos" ? "mainnet" : "testnet"
+        `${appConfig.apiURL}/ckb/${appConfig.network === "nervos" ? "mainnet" : "testnet"
         }/v1/transactions/0x${txHash}`
       );
 
