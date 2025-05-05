@@ -35,6 +35,7 @@ const STATUS_TEXT = {
   [TransactionStatus.Commited]: "Commited",
   [TransactionStatus.Rejected]: "Rejected",
   [TransactionStatus.Failed]: "Unsuccess",
+  [TransactionStatus.Cancelled]: "Cancelled",
 };
 
 const Transaction = ({
@@ -49,6 +50,7 @@ const Transaction = ({
   const [isShow, setIsShow] = useState<boolean>(false);
   const [isConfirmLoading, setIsConfirmLoading] = useState<boolean>(false);
   const [isRejectLoading, setIsRejectLoading] = useState<boolean>(false);
+  const [isCancelLoading, setIsCancelLoading] = useState<boolean>(false);
   const { config } = useAppSelector(selectApp);
   const { address } = useContext(AppContext);
   const dispatch = useAppDispatch();
@@ -71,6 +73,10 @@ const Transaction = ({
 
   const isRejected = useMemo(() => {
     return transaction?.rejected.some((z) => isAddressEqual(z, address));
+  }, [address, transaction]);
+
+  const isCancelled = useMemo(() => {
+    return transaction?.status === TransactionStatus.Cancelled;
   }, [address, transaction]);
 
   const rawTx = useMemo(() => {
@@ -155,6 +161,25 @@ const Transaction = ({
     }
   };
 
+  const onCancel = async () => {
+    setIsCancelLoading(true);
+    try {
+      const transactionId = transaction.transaction_id;
+      const { data } = await api.put(
+        `/multi-sig/transactions/${transactionId}/cancel`
+      );
+
+      if (data && !!data.result) {
+        toast.success("Transaction cancelled");
+      }
+      refresh?.();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsCancelLoading(false);
+    }
+  };
+
   const txAmount = useMemo(() => {
     try {
       if (rawTx.outputs_data[0] !== "0x") {
@@ -236,49 +261,68 @@ const Transaction = ({
                 {`${transaction.confirmed.length} out of ${accountInfo.threshold}`}
               </p>
             </div>
-            {!isConfirmed &&
-            transaction.status === TransactionStatus.WaitingSigned ? (
-              !isRejected ? (
+            <div className="flex gap-1 items-center">
+              {!isConfirmed &&
+              transaction.status === TransactionStatus.WaitingSigned ? (
+                !isRejected ? (
+                  <Button
+                    size="small"
+                    kind="secondary"
+                    className="!py-[5px]"
+                    disabled={isConfirmLoading}
+                    loading={isConfirmLoading}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      confirm();
+                    }}
+                  >
+                    Confirm
+                  </Button>
+                ) : (
+                  <p
+                    className={`text-[16px] leading-[20px] font-medium text-error-100 capitalize`}
+                  >
+                    Rejected
+                  </p>
+                )
+              ) : (
+                <p
+                  className={cn(
+                    `text-[16px] leading-[20px] font-medium text-orange-100 capitalize`,
+                    {
+                      "text-[#00b0ff]":
+                        transaction.status === TransactionStatus.InProgressing,
+                      "text-success-200":
+                        transaction.status === TransactionStatus.Commited,
+                      "text-error-100":
+                        transaction.status === TransactionStatus.Failed ||
+                        transaction.status === TransactionStatus.Rejected,
+                      "text-[#6c757d]":
+                        transaction.status === TransactionStatus.Cancelled,
+                      "mr-[9px]":
+                        transaction.status === TransactionStatus.WaitingSigned,
+                    }
+                  )}
+                >
+                  {statusTxt}
+                </p>
+              )}
+
+              {transaction.status === TransactionStatus.WaitingSigned && (
                 <Button
                   size="small"
                   kind="secondary"
-                  className="!py-[5px]"
-                  disabled={isConfirmLoading}
-                  loading={isConfirmLoading}
+                  loading={isCancelLoading}
+                  disabled={isCancelLoading || isCancelled}
                   onClick={(e) => {
                     e.stopPropagation();
-                    confirm();
+                    onCancel();
                   }}
                 >
-                  Confirm
+                  Cancel
                 </Button>
-              ) : (
-                <p
-                  className={`text-[16px] leading-[20px] font-medium text-error-100 capitalize`}
-                >
-                  Rejected
-                </p>
-              )
-            ) : (
-              <p
-                className={cn(
-                  `text-[16px] leading-[20px] font-medium text-orange-100 capitalize`,
-                  {
-                    "text-[#00b0ff]":
-                      transaction.status === TransactionStatus.InProgressing,
-                    "text-success-200":
-                      transaction.status === TransactionStatus.Commited,
-                    "text-error-100":
-                      transaction.status === TransactionStatus.Failed ||
-                      transaction.status === TransactionStatus.Rejected,
-                    "mr-[9px]":
-                      transaction.status === TransactionStatus.WaitingSigned,
-                  }
-                )}
-              >
-                {statusTxt}
-              </p>
-            )}
+              )}
+            </div>
           </div>
 
           <IcnChevron
@@ -577,6 +621,34 @@ const Transaction = ({
                 <p className="font-medium text-error-100">Not completed</p>
               </div>
             )}
+
+            {transaction.status === TransactionStatus.Cancelled && (
+              <div className="relative">
+                <div className="flex gap-2 items-center bg-light-100">
+                  <svg
+                    width="15"
+                    height="14"
+                    viewBox="0 0 15 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      opacity="0.3"
+                      d="M8 14C11.866 14 15 10.866 15 7C15 3.13401 11.866 0 8 0C4.13401 0 1 3.13401 1 7C1 10.866 4.13401 14 8 14Z"
+                      fill="#6c757d"
+                    />
+                    <path
+                      d="M8 12C10.7614 12 13 9.76143 13 7C13 4.23858 10.7614 2 8 2C5.23858 2 3 4.23858 3 7C3 9.76143 5.23858 12 8 12Z"
+                      fill="#6c757d"
+                    />
+                  </svg>
+                  <p className="font-medium text-[#6c757d]">{`Cancelled ${
+                    transaction.updated_by &&
+                    `by ${shortAddress(transaction.updated_by, 5)}`
+                  }`}</p>
+                </div>
+              </div>
+            )}
           </div>
           {transaction.status === TransactionStatus.WaitingSigned ? (
             <div className="grid grid-cols-2 gap-2 mt-6">
@@ -600,6 +672,18 @@ const Transaction = ({
                   Reject
                 </Button>
               )} */}
+              <Button
+                size="small"
+                kind="secondary"
+                loading={isCancelLoading}
+                disabled={isCancelLoading || isCancelled}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCancel();
+                }}
+              >
+                Cancel
+              </Button>
             </div>
           ) : null}
         </div>

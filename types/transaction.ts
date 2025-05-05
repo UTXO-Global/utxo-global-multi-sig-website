@@ -1,6 +1,7 @@
 export enum TransactionTab {
   Queue = "queue",
   InProgressing = "in-progressing",
+  Cancelled = "cancelled",
   History = "history",
 }
 
@@ -10,6 +11,7 @@ export enum TransactionStatus {
   Commited = 2,
   Rejected = 3,
   Failed = 4,
+  Cancelled = 5,
 }
 
 export type TransactionType = {
@@ -20,6 +22,7 @@ export type TransactionType = {
   rejected: string[];
   status: TransactionStatus;
   payload: string;
+  updated_by: string;
   created_at: number;
   amount: number;
   errors?: { signer_address: string; error_msg: string }[];
