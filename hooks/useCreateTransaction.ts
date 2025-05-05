@@ -12,7 +12,7 @@ import { BI, Cell, Indexer, commons, helpers } from "@ckb-lumos/lumos";
 import { selectApp } from "@/redux/features/app/reducer";
 import { AGGRON4, LINA } from "@/utils/lumos-config";
 import { ccc } from "@ckb-ccc/connector-react";
-import { FIXED_FEE, FIXED_FEE_RATE, MIN_CAPACITY } from "@/utils/helpers";
+import { FIXED_FEE, FIXED_FEE_RATE, calcMinCapacity } from "@/utils/helpers";
 import { blockchain, bytes } from "@ckb-lumos/lumos/codec";
 import useCells from "./useCell";
 import {
@@ -49,7 +49,7 @@ const useCreateTransaction = () => {
     });
 
     let txFee = BI.from(data.fee || FIXED_FEE);
-    const minCapacity = MIN_CAPACITY(toScript);
+    const minCapacity = calcMinCapacity(toScript);
     let toAmount = BI.from(ccc.fixedPointFrom(data.amount.toString()));
     if (data.is_include_fee) {
       toAmount = toAmount.sub(txFee);
@@ -191,9 +191,6 @@ const useCreateTransaction = () => {
       config: lumosConfig,
     });
 
-    let fee: ccc.Num | null = null;
-
-    const minCapacity = MIN_CAPACITY(toScript);
     let toAmount = BI.from(
       ccc.fixedPointFrom(data.amount.toString(), data.token?.decimal || 8)
     );
@@ -213,7 +210,6 @@ const useCreateTransaction = () => {
     });
 
     const tokensCell: Cell[] = [];
-    const totalTokenBalanceNeeed = toAmount;
     let totalTokenBalance = BI.from(0);
     let totalXUDTCapacity = BI.from(0);
 
@@ -226,7 +222,7 @@ const useCreateTransaction = () => {
 
       tokensCell.push(cell);
 
-      if (totalTokenBalance.gte(totalTokenBalanceNeeed)) {
+      if (totalTokenBalance.gte(toAmount)) {
         break;
       }
     }
@@ -238,57 +234,47 @@ const useCreateTransaction = () => {
       };
     }
 
-    const isAddressTypeJoy = ccc.bytesFrom(toScript.args).length > 20;
-    const joyCapacityAddMore = 2_0000_0000; // 2 ckb
-
-    const collectedCells: Cell[] = [];
-    const xUDTCapacity = BI.from(tokensCell[0].cellOutput.capacity);
-    let totalCapacity = BI.from(0);
-    let capacityChangeOutput = BI.from(0);
-    const xUDTCapacityChangeOutput = totalXUDTCapacity.sub(xUDTCapacity);
-
-    let neededCapacity = BI.from(0);
-    if (isAddressTypeJoy) {
-      neededCapacity = neededCapacity.add(joyCapacityAddMore);
-    }
-
-    if (totalTokenBalance.lt(totalTokenBalanceNeeed)) {
+    if (totalTokenBalance.lt(toAmount)) {
       return { error: `${data.token?.symbol} insufficient balance` };
     }
 
+    const xUDTCapacity = BI.from(tokensCell[0].cellOutput.capacity);
+    const xUDTData = ccc.hexFrom(ccc.numLeToBytes(toAmount.toBigInt(), 16));
+    const minRecipientCapacity = BI.from(
+      helpers.minimalCellCapacity({
+        cellOutput: {
+          lock: toScript,
+          type: xUdtType,
+          capacity: "0x0",
+        },
+        data: xUDTData,
+      })
+    );
+
+    let neededCapacity = minRecipientCapacity;
     const xUDTCell = getxudtCellDeps(
       data.token?.typeScript?.code_hash!,
       lumosConfig
     );
 
-    // Create Tx Skeleton
+    // add input, output
     txSkeleton = txSkeleton
       .update("inputs", (inputs: List<Cell>) => inputs.push(...tokensCell))
       .update("outputs", (outputs: List<Cell>) => {
-        let recap = BI.from(tokensCell[0].cellOutput.capacity);
-        if (isAddressTypeJoy) {
-          recap = recap.add(joyCapacityAddMore);
-        }
-
         // Transfer Output
-        const xUdtData = ccc.numLeToBytes(
-          totalTokenBalanceNeeed.toBigInt(),
-          16
-        );
         outputs = outputs.push({
           cellOutput: {
-            capacity: recap.toHexString(),
+            capacity: minRecipientCapacity.toHexString(),
             lock: toScript,
             type: xUdtType,
           },
-          data: ccc.hexFrom(xUdtData),
+          data: xUDTData,
         });
 
         // Change Amount
-        const diff = totalTokenBalance.sub(totalTokenBalanceNeeed);
-        const xUdtDataChange = ccc.numLeToBytes(diff.toBigInt(), 16);
+        const diff = totalTokenBalance.sub(toAmount);
         if (diff.gt(BI.from(0))) {
-          neededCapacity = neededCapacity.add(xUDTCapacity);
+          const xUdtDataChange = ccc.numLeToBytes(diff.toBigInt(), 16);
           outputs = outputs.push({
             cellOutput: {
               capacity: xUDTCapacity.toHexString(),
@@ -297,27 +283,29 @@ const useCreateTransaction = () => {
             },
             data: ccc.hexFrom(xUdtDataChange),
           });
+          neededCapacity = neededCapacity.add(xUDTCapacity);
         }
 
         return outputs;
       });
 
     txSkeleton = addMultisigCellDeps(txSkeleton, lumosConfig, [xUDTCell]);
-    // Calculate Fee and Add more CKB input for paying gas fee
-    fee =
+    const fee =
       ccc.Transaction.fromLumosSkeleton(txSkeleton).estimateFee(FIXED_FEE_RATE);
     neededCapacity = neededCapacity.add(fee);
+    const collectedCells: Cell[] = [];
+    let totalCapacity = BI.from(0);
+    let capacityChangeOutput = BI.from(0);
+    const minCapacity = calcMinCapacity(toScript);
 
     for await (const cell of cellCollector.collect()) {
-      if (cell.data !== "0x") {
-        continue;
-      }
+      if (cell.data !== "0x") continue;
 
       if (
         txSkeleton.inputs.some(
-          (input: Cell) =>
-            input.outPoint?.txHash === cell.outPoint?.txHash &&
-            input.outPoint?.index === cell.outPoint?.index
+          (i: Cell) =>
+            i.outPoint?.txHash === cell.outPoint?.txHash &&
+            i.outPoint?.index === cell.outPoint?.index
         )
       ) {
         continue;
@@ -325,9 +313,7 @@ const useCreateTransaction = () => {
 
       collectedCells.push(cell);
       totalCapacity = totalCapacity.add(BI.from(cell.cellOutput.capacity));
-      capacityChangeOutput = xUDTCapacityChangeOutput.add(
-        totalCapacity.sub(neededCapacity)
-      );
+      capacityChangeOutput = totalCapacity.sub(neededCapacity);
       if (
         totalCapacity.gte(neededCapacity) &&
         (capacityChangeOutput.eq(0) || capacityChangeOutput.gt(minCapacity))

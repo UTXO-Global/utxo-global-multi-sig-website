@@ -166,8 +166,17 @@ const CreateTx = ({
       return toast.warning("Recipient's address is invalid.");
     }
 
-    const isAddressTypeJoy = ccc.bytesFrom(toScript.args).length > 20;
-    const ckbMinTransfer = isAddressTypeJoy ? 63 : 61;
+    const ckbMinTransfer = BI.from(
+      helpers.minimalCellCapacity({
+        cellOutput: {
+          capacity: "0x0",
+          lock: toScript,
+        },
+        data: "0x",
+      })
+    )
+      .div(10 ** 8)
+      .toNumber();
 
     if (!txInfo.token) {
       if (!isValidAmount(ckbMinTransfer))
