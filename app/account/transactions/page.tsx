@@ -120,6 +120,7 @@ const Transactions = () => {
           {[
             TransactionTab.Queue,
             TransactionTab.InProgressing,
+            TransactionTab.Cancelled,
             TransactionTab.History,
           ].map((z, i) => (
             <div
@@ -145,12 +146,17 @@ const Transactions = () => {
         <TransactionHistory status={[TransactionStatus.InProgressing]} />
       )}
 
+      {tab === TransactionTab.Cancelled && (
+        <TransactionHistory status={[TransactionStatus.Cancelled]} />
+      )}
+
       {tab === TransactionTab.History && (
         <TransactionHistory
           status={[
             TransactionStatus.Commited,
             TransactionStatus.Rejected,
             TransactionStatus.Failed,
+            TransactionStatus.Cancelled,
           ]}
         />
       )}
