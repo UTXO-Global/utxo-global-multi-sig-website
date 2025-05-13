@@ -26,8 +26,9 @@ import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { loadInfo } from "@/redux/features/account-info/action";
 import { useSearchParams } from "next/navigation";
 import { selectApp } from "@/redux/features/app/reducer";
-import { BI } from "@ckb-lumos/lumos";
+import { BI, helpers } from "@ckb-lumos/lumos";
 import useTokens from "@/hooks/useToken";
+import { AGGRON4, LINA } from "@/utils/lumos-config";
 
 const STATUS_TEXT = {
   [TransactionStatus.WaitingSigned]: "Pending",
@@ -180,18 +181,44 @@ const Transaction = ({
     }
   };
 
-  const txAmount = useMemo(() => {
-    try {
-      if (rawTx.outputs_data[0] !== "0x") {
-        const amount = ccc.numLeFromBytes(ccc.bytesFrom(rawTx.outputs_data[0]));
-        return new Decimal(Number(amount))
-          .div(10 ** (tokenInfo?.decimal || 8))
-          .toNumber();
-      }
-    } catch (e: any) {}
+  const toAddresses = useMemo(() => {
+    const lumosConfig = config.isTestnet ? AGGRON4 : LINA;
+    const results: { address: string; amount: number }[] = [];
+    for (let i = 0; i < rawTx.outputs.length; i++) {
+      const o = rawTx.outputs[i];
+      const address = helpers.encodeToAddress(
+        {
+          codeHash: o.lock.code_hash,
+          hashType: o.lock.hash_type,
+          args: o.lock.args,
+        },
+        { config: lumosConfig }
+      );
 
-    return new Decimal(transaction.amount).div(10 ** 8).toNumber();
+      if (accountInfo.multi_sig_address === address) continue;
+
+      const isToken = rawTx.outputs_data[i] !== "0x";
+      const amount = isToken
+        ? ccc.numLeFromBytes(ccc.bytesFrom(rawTx.outputs_data[i]))
+        : BI.from(o.capacity).toBigInt();
+
+      console.log(o, o.capacity, isToken, amount, rawTx.outputs_data[i]);
+
+      results.push({
+        address,
+        amount: Number(
+          ccc.fixedPointToString(amount, isToken ? tokenInfo?.decimal || 8 : 8)
+        ),
+      });
+    }
+
+    console.log(results);
+    return results;
   }, [rawTx, tokenInfo]);
+
+  const txAmount = useMemo(() => {
+    return toAddresses.reduce((value, item) => (value += item.amount), 0);
+  }, [toAddresses]);
 
   return (
     <div className="rounded-lg bg-light-100 overflow-hidden">
@@ -342,8 +369,18 @@ const Transaction = ({
       >
         <div className="w-[60%] px-4 py-6 grid gap-3 border-r border-grey-300 content-start sticky top-0">
           <div className="flex gap-8 text-[16px] leading-[20px] text-grey-400">
-            <p className="w-[90px] font-medium">To Address:</p>
-            <p>{shortAddress(transaction.to_address, 14)}</p>
+            <p className="w-[90px] font-medium">To:</p>
+            {toAddresses.length === 1 ? (
+              <p>{shortAddress(transaction.to_address, 14)}</p>
+            ) : (
+              <Link
+                className="text-success-200 underline cursor-pointer"
+                href={`${config.explorer}/transaction/0x${transaction.transaction_id}`}
+                target="_blank"
+              >
+                {toAddresses.length} Addresses
+              </Link>
+            )}
           </div>
           <div className="flex gap-8 text-[16px] leading-[20px] text-grey-400">
             <p className="w-[90px] font-medium">Created:</p>
