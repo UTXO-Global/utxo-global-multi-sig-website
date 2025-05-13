@@ -26,6 +26,7 @@ import { RcFile } from "antd/es/upload";
 import { validateBatchInputs } from "./validate";
 import AmountType from "./AmountType";
 import UploadFile from "./UploadFile";
+import useCreateTransaction from "@/hooks/useCreateTransaction";
 
 const CreateBatchTransferTx = ({
   txInfo,
@@ -47,6 +48,8 @@ const CreateBatchTransferTx = ({
     address: [],
     amount: "",
   });
+
+  const { isTxLoading, isTxPending } = useCreateTransaction();
 
   const assetBalance = useMemo(() => {
     if (txInfo.token) {
@@ -342,6 +345,12 @@ const CreateBatchTransferTx = ({
       </div>
 
       <div className="px-6 mt-6">
+        {isTxPending && (
+          <div className="text-sm text-[#FF3333] mb-1">
+            * You have a pending transaction. Please complete or cancel it
+            before creating a new one.
+          </div>
+        )}
         <Button
           fullWidth
           onClick={next}

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { List } from "immutable";
 
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
@@ -21,19 +21,41 @@ import {
   getxudtType,
   prepareMultisigWitness,
 } from "@/utils/ckb";
+import useTransactions from "./useTransactions";
+import { TransactionStatus } from "@/types/transaction";
+import { toast } from "react-toastify";
 
 const useCreateTransaction = () => {
   const { info: account } = useAppSelector(selectAccountInfo);
   const { config: appConfig } = useAppSelector(selectApp);
-  const { usableCells, loading: cellLoading } = useCells();
+
+  const {
+    isLoading: transactionLoading,
+    transactions,
+    load: LoadPendingTransaction,
+  } = useTransactions(
+    [TransactionStatus.WaitingSigned, TransactionStatus.InProgressing],
+    false
+  );
 
   const indexer = useMemo(() => {
     return new Indexer(appConfig.ckbRPC);
   }, [appConfig.ckbRPC]);
 
+  const isTxPending = useMemo(() => {
+    return transactions?.length > 0;
+  }, [transactions]);
+
   const createTxSendCKB = async (
     data: SendTokenType
   ): Promise<CreateTransactionRes> => {
+    if (isTxPending) {
+      return {
+        error:
+          "You have a pending transaction. Please complete or cancel it before creating a new one.",
+      };
+    }
+
     let txSkeleton = helpers.TransactionSkeleton({
       cellProvider: indexer,
     });
@@ -74,15 +96,6 @@ const useCreateTransaction = () => {
           blockchain.Script.pack(fromScript)
         )
       ) {
-        continue;
-      }
-
-      if (
-        cell.outPoint &&
-        !!usableCells[cell.outPoint.txHash] &&
-        usableCells[cell.outPoint.txHash] === Number(cell.outPoint.index)
-      ) {
-        hasCellPending = true;
         continue;
       }
 
@@ -177,6 +190,12 @@ const useCreateTransaction = () => {
   const createTxSendToken = async (
     data: SendTokenType
   ): Promise<CreateTransactionRes> => {
+    if (isTxPending) {
+      return {
+        error:
+          "You have a pending transaction. Please complete or cancel it before creating a new one.",
+      };
+    }
     let txSkeleton = helpers.TransactionSkeleton({
       cellProvider: indexer,
     });
@@ -371,6 +390,12 @@ const useCreateTransaction = () => {
   const createTxBatchTransferCKB = async (
     data: BatchTransferType
   ): Promise<CreateTransactionRes> => {
+    if (isTxPending) {
+      return {
+        error:
+          "You have a pending transaction. Please complete or cancel it before creating a new one.",
+      };
+    }
     let txSkeleton = helpers.TransactionSkeleton({
       cellProvider: indexer,
     });
@@ -429,15 +454,6 @@ const useCreateTransaction = () => {
           blockchain.Script.pack(fromScript)
         )
       ) {
-        continue;
-      }
-
-      if (
-        cell.outPoint &&
-        !!usableCells[cell.outPoint.txHash] &&
-        usableCells[cell.outPoint.txHash] === Number(cell.outPoint.index)
-      ) {
-        hasCellPending = true;
         continue;
       }
 
@@ -542,6 +558,12 @@ const useCreateTransaction = () => {
   const createTxBatchTransferToken = async (
     data: BatchTransferType
   ): Promise<CreateTransactionRes> => {
+    if (isTxPending) {
+      return {
+        error:
+          "You have a pending transaction. Please complete or cancel it before creating a new one.",
+      };
+    }
     let txSkeleton = helpers.TransactionSkeleton({
       cellProvider: indexer,
     });
@@ -751,11 +773,17 @@ const useCreateTransaction = () => {
     };
   };
 
+  useEffect(() => {
+    LoadPendingTransaction(true);
+  }, [account]);
+
   return {
     createTxSendCKB,
     createTxSendToken,
     createTxBatchTransferCKB,
     createTxBatchTransferToken,
+    isTxPending: isTxPending,
+    isTxLoading: transactionLoading,
   };
 };
 

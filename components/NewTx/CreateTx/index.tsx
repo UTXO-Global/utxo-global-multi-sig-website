@@ -22,6 +22,7 @@ import SwitchToken from "@/components/SwitchTokens";
 import useAssets from "@/hooks/useAssets";
 import { createInstance } from "dotbit";
 import { useSearchParams } from "next/navigation";
+import useCreateTransaction from "@/hooks/useCreateTransaction";
 
 const dotbit = createInstance();
 
@@ -45,6 +46,7 @@ const CreateTx = ({
   const tokenParam = searchParams.get("token");
 
   const { assets } = useAssets();
+  const { isTxLoading, isTxPending } = useCreateTransaction();
 
   const tokens = useMemo(() => {
     if (Object.values(assets.udtBalances).length > 0) {
@@ -327,10 +329,17 @@ const CreateTx = ({
         )}
       </div>
       <div className="px-6 mt-6">
+        {isTxPending && (
+          <div className="text-sm text-[#FF3333] mb-1">
+            * You have a pending transaction. Please complete or cancel it
+            before creating a new one.
+          </div>
+        )}
         <Button
           fullWidth
           onClick={next}
-          disabled={!txInfo.send_to || txInfo.amount <= 0}
+          disabled={!txInfo.send_to || txInfo.amount <= 0 || isTxLoading}
+          loading={isTxLoading}
         >
           Next
         </Button>
