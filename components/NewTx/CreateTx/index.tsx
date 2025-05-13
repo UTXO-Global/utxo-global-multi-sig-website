@@ -81,25 +81,29 @@ const CreateTx = ({
   }, [tokenParam, tokens]);
 
   useEffect(() => {
-    if (inputValue.endsWith(".bit")) {
-      if (!requesting) {
-        dotbit.records(inputValue).then((records) => {
-          setFiltered(
-            records.filter((z) => z.key === "address.ckb").map((j) => j.value)
-          );
-          setTimeout(() => {
-            setRequesting(false);
-          }, 3000);
+    try {
+      if (inputValue.endsWith(".bit")) {
+        if (!requesting) {
+          dotbit.records(inputValue).then((records) => {
+            setFiltered(
+              records.filter((z) => z.key === "address.ckb").map((j) => j.value)
+            );
+            setTimeout(() => {
+              setRequesting(false);
+            }, 3000);
+          });
+        }
+        setRequesting(true);
+      } else {
+        setFiltered([]);
+        setTxInfo({
+          ...txInfo,
+          send_to: inputValue,
+          isUseDID: filtered.includes(inputValue),
         });
       }
-      setRequesting(true);
-    } else {
-      setFiltered([]);
-      setTxInfo({
-        ...txInfo,
-        send_to: inputValue,
-        isUseDID: filtered.includes(inputValue),
-      });
+    } catch (e) {
+      console.log(e);
     }
   }, [inputValue, requesting]);
 
@@ -249,7 +253,7 @@ const CreateTx = ({
               />
             </div>
             {filtered.length > 0 && (
-              <div className="absolute w-full rounded-lg border border-grey-200 h-[100px] shadow-sm left-0 mt-2 bg-light-100 py-2">
+              <div className="absolute w-full rounded-lg border border-grey-200 min-h-[100px] max-h-[200px] overflow-auto shadow-sm left-0 mt-2 bg-light-100 py-2 z-10">
                 {filtered.map((z, i) => (
                   <div
                     key={i}
