@@ -148,3 +148,19 @@ export const calcMinCapacity = (script: Script, data: string = "0x"): BI => {
 
   return BI.from(minCap);
 };
+
+export function parseRecipientInput(
+  input: string,
+  isCustom: boolean,
+  defaultAmount: number
+) {
+  return input
+    .trim()
+    .split("\n")
+    .filter((line) => !!line.trim())
+    .map((line) => {
+      const [addr, amtStr] = line.trim().split(",");
+      const amount = isCustom ? Number(amtStr?.trim()) || 0 : defaultAmount;
+      return { address: addr.trim(), amount };
+    });
+}

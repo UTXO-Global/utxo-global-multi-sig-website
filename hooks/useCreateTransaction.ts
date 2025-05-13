@@ -384,7 +384,31 @@ const useCreateTransaction = () => {
     let txFee = BI.from(data.fee || FIXED_FEE);
     let totalAmount = data.tos.reduce((total, to) => total + to.amount, 0);
     let toAmount = BI.from(ccc.fixedPointFrom(totalAmount.toString()));
-    const minCapacity = BI.from(63_0000_0000);
+    const minCapForSender = helpers.minimalCellCapacity({
+      cellOutput: { capacity: "0x0", lock: fromScript },
+      data: "0x",
+    });
+
+    let minCapacity = BI.from(0);
+    data.tos.forEach((to, idx) => {
+      try {
+        const toScript = helpers.parseAddress(to.address, {
+          config: lumosConfig,
+        });
+        const minCKBbyAddr = BI.from(
+          ccc.fixedPointFrom(
+            helpers.minimalCellCapacity({
+              cellOutput: { capacity: "0x0", lock: toScript },
+              data: "0x",
+            })
+          )
+        );
+
+        if (minCKBbyAddr > minCapacity) {
+          minCapacity = minCapacity.add(minCKBbyAddr);
+        }
+      } catch (_) {}
+    });
 
     let neededCapacity = toAmount.add(txFee);
     let capacityChangeOutput = BI.from(0);
@@ -438,19 +462,20 @@ const useCreateTransaction = () => {
 
     if (toAmount.lt(minCapacity)) {
       return {
-        error: `The minimum amount is ${(
-          minCapacity.add(data.is_include_fee ? txFee : BI.from(0)).toNumber() /
-          10 ** 8
-        ).toString()} CKB.`,
+        error: `The minimum amount is ${ccc.fixedPointToString(
+          minCapacity.add(data.is_include_fee ? txFee : BI.from(0)).toNumber()
+        )} CKB.`,
       };
     }
 
-    if (capacityChangeOutput.gt(0) && capacityChangeOutput.lt(minCapacity)) {
+    if (
+      capacityChangeOutput.gt(0) &&
+      capacityChangeOutput.lt(minCapForSender)
+    ) {
       return {
-        error: `The remaining balance in your wallet must be greater than ${(
-          minCapacity.toNumber() /
-          10 ** 8
-        ).toString()} CKB. ${
+        error: `The remaining balance in your wallet must be greater than ${ccc.fixedPointToString(
+          minCapForSender
+        )} CKB. ${
           hasCellPending
             ? "Some funds are locked in pending transactions. Please wait for confirmation or add more CKB."
             : "Please adjust your transaction amount or add more CKB to proceed"
@@ -529,7 +554,10 @@ const useCreateTransaction = () => {
 
     let fee: ccc.Num | null = null;
 
-    const minCapacity = BI.from(63_0000_0000);
+    const minCapForSender = helpers.minimalCellCapacity({
+      cellOutput: { capacity: "0x0", lock: fromScript },
+      data: "0x",
+    });
     let totalAmount = data.tos.reduce((total, to) => total + to.amount, 0);
     let toAmount = BI.from(
       ccc.fixedPointFrom(totalAmount.toString(), data.token?.decimal || 8)
@@ -601,41 +629,37 @@ const useCreateTransaction = () => {
       const toScript = helpers.parseAddress(info.address, {
         config: lumosConfig,
       });
-      const isAddressTypeJoy = ccc.bytesFrom(toScript.args).length > 20;
-      const joyCapacityAddMore = 2_0000_0000; // 2 ckb
-      if (isAddressTypeJoy) {
-        neededCapacity = neededCapacity.add(joyCapacityAddMore);
-      }
+      let amount = BI.from(
+        ccc.fixedPointFrom(info.amount.toString(), data.token?.decimal || 8)
+      );
+
+      const xUDTData = ccc.hexFrom(ccc.numLeToBytes(amount.toBigInt(), 16));
+      const minRecipientCapacity = BI.from(
+        helpers.minimalCellCapacity({
+          cellOutput: {
+            lock: toScript,
+            type: xUdtType,
+            capacity: "0x0",
+          },
+          data: xUDTData,
+        })
+      );
+
+      neededCapacity = neededCapacity.add(minRecipientCapacity);
 
       txSkeleton = txSkeleton.update("outputs", (outputs) => {
-        let recap = BI.from(xUDTCapacity);
-        if (isAddressTypeJoy) {
-          recap = recap.add(joyCapacityAddMore);
-        }
-
-        let amount = BI.from(
-          ccc.fixedPointFrom(info.amount.toString(), data.token?.decimal || 8)
-        );
-
-        const xUdtData = ccc.numLeToBytes(amount.toBigInt(), 16);
-
         return outputs.push({
           cellOutput: {
-            capacity: recap.toHexString(),
+            capacity: minRecipientCapacity.toHexString(),
             lock: toScript,
             type: xUdtType,
           },
-          data: ccc.hexFrom(xUdtData),
+          data: xUDTData,
         });
       });
     }
 
-    if (data.tos.length && data.tos.length > 1) {
-      neededCapacity = neededCapacity.add(
-        xUDTCapacity.mul(BI.from(data.tos.length - 1))
-      );
-    }
-
+    neededCapacity = neededCapacity.sub(xUDTCapacity);
     txSkeleton = addMultisigCellDeps(txSkeleton, lumosConfig, [xUDTCell]);
 
     // Change Amount
@@ -682,17 +706,19 @@ const useCreateTransaction = () => {
       );
       if (
         totalCapacity.gte(neededCapacity) &&
-        (capacityChangeOutput.eq(0) || capacityChangeOutput.gt(minCapacity))
+        (capacityChangeOutput.eq(0) || capacityChangeOutput.gt(minCapForSender))
       )
         break;
     }
 
-    if (capacityChangeOutput.gt(0) && capacityChangeOutput.lt(minCapacity)) {
+    if (
+      capacityChangeOutput.gt(0) &&
+      capacityChangeOutput.lt(minCapForSender)
+    ) {
       return {
-        error: `The remaining balance in your wallet must be greater than ${(
-          minCapacity.toNumber() /
-          10 ** 8
-        ).toString()} CKB. Please adjust your transaction amount or add more CKB to proceed`,
+        error: `The remaining balance in your wallet must be greater than ${ccc.fixedPointToString(
+          minCapForSender
+        )} CKB. Please adjust your transaction amount or add more CKB to proceed`,
       };
     }
 
