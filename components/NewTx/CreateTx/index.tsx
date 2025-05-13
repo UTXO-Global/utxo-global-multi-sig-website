@@ -22,6 +22,7 @@ import SwitchToken from "@/components/SwitchTokens";
 import useAssets from "@/hooks/useAssets";
 import { createInstance } from "dotbit";
 import { useSearchParams } from "next/navigation";
+import useCreateTransaction from "@/hooks/useCreateTransaction";
 
 const dotbit = createInstance();
 
@@ -45,6 +46,7 @@ const CreateTx = ({
   const tokenParam = searchParams.get("token");
 
   const { assets } = useAssets();
+  const { isTxLoading, isTxPending } = useCreateTransaction();
 
   const tokens = useMemo(() => {
     if (Object.values(assets.udtBalances).length > 0) {
@@ -79,25 +81,29 @@ const CreateTx = ({
   }, [tokenParam, tokens]);
 
   useEffect(() => {
-    if (inputValue.endsWith(".bit")) {
-      if (!requesting) {
-        dotbit.records(inputValue).then((records) => {
-          setFiltered(
-            records.filter((z) => z.key === "address.ckb").map((j) => j.value)
-          );
-          setTimeout(() => {
-            setRequesting(false);
-          }, 3000);
+    try {
+      if (inputValue.endsWith(".bit")) {
+        if (!requesting) {
+          dotbit.records(inputValue).then((records) => {
+            setFiltered(
+              records.filter((z) => z.key === "address.ckb").map((j) => j.value)
+            );
+            setTimeout(() => {
+              setRequesting(false);
+            }, 3000);
+          });
+        }
+        setRequesting(true);
+      } else {
+        setFiltered([]);
+        setTxInfo({
+          ...txInfo,
+          send_to: inputValue,
+          isUseDID: filtered.includes(inputValue),
         });
       }
-      setRequesting(true);
-    } else {
-      setFiltered([]);
-      setTxInfo({
-        ...txInfo,
-        send_to: inputValue,
-        isUseDID: filtered.includes(inputValue),
-      });
+    } catch (e) {
+      console.log(e);
     }
   }, [inputValue, requesting]);
 
@@ -247,7 +253,7 @@ const CreateTx = ({
               />
             </div>
             {filtered.length > 0 && (
-              <div className="absolute w-full rounded-lg border border-grey-200 h-[100px] shadow-sm left-0 mt-2 bg-light-100 py-2">
+              <div className="absolute w-full rounded-lg border border-grey-200 min-h-[100px] max-h-[200px] overflow-auto shadow-sm left-0 mt-2 bg-light-100 py-2 z-10">
                 {filtered.map((z, i) => (
                   <div
                     key={i}
@@ -327,10 +333,17 @@ const CreateTx = ({
         )}
       </div>
       <div className="px-6 mt-6">
+        {isTxPending && (
+          <div className="text-sm text-[#FF3333] mb-1">
+            * You have a pending transaction. Please complete or cancel it
+            before creating a new one.
+          </div>
+        )}
         <Button
           fullWidth
           onClick={next}
-          disabled={!txInfo.send_to || txInfo.amount <= 0}
+          disabled={!txInfo.send_to || txInfo.amount <= 0 || isTxLoading}
+          loading={isTxLoading}
         >
           Next
         </Button>

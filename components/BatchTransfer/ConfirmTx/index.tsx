@@ -181,7 +181,12 @@ const ConfirmBatchTransferTx = ({
             Fee:
           </div>
           <div className="flex-1 text-[16px] leading-[20px] font-medium text-dark-100 text-right">
-            {formatNumber(txFee.toNumber() / 10 ** 8, 2, 8)} CKB
+            {formatNumber(
+              Number(ccc.fixedPointToString(txFee.toNumber())),
+              2,
+              8
+            )}{" "}
+            CKB
             {!txInfo.token && txInfo.is_include_fee && (
               <span className="text-grey-500"> (Included Fee)</span>
             )}
