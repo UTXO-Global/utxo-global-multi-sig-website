@@ -9,7 +9,6 @@ import { ccc } from "@ckb-ccc/connector-react";
 export const validateBatchInputs = (
   txInfo: BatchTransferType,
   network: CkbNetwork,
-  isCustom: boolean,
   setErrors: (errors: { address: string[]; amount: string }) => void
 ) => {
   const lumosConfig = network === CkbNetwork.MeepoTestnet ? AGGRON4 : LINA;
@@ -31,7 +30,7 @@ export const validateBatchInputs = (
       );
       if (minCKBbyAddr > minTransferCkb) minTransferCkb = minCKBbyAddr;
 
-      if (isCustom) {
+      if (txInfo.isCustomAmount) {
         if (!!txInfo.token && to.amount <= 0) {
           addressErrors.push(`Line ${idx + 1}: Amount must be greater than 0`);
         } else if (!txInfo.token && to.amount < minCKBbyAddr) {
@@ -46,7 +45,7 @@ export const validateBatchInputs = (
   });
 
   let amountError = "";
-  if (!isCustom) {
+  if (!txInfo.isCustomAmount) {
     if (!txInfo.token && (txInfo.amount || 0) < minTransferCkb) {
       amountError = `Minimum amount is ${minTransferCkb}`;
     }

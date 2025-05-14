@@ -7,6 +7,7 @@ import { SendTokenType } from "@/types/account";
 import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { FIXED_FEE, FIXED_FEE_RATE } from "@/utils/helpers";
+import useCreateTransaction from "@/hooks/useCreateTransaction";
 
 const NewTx = () => {
   const { info: account } = useAppSelector(selectAccountInfo);
@@ -19,7 +20,7 @@ const NewTx = () => {
     network: "",
     fee: FIXED_FEE,
     feeRate: FIXED_FEE_RATE,
-    isUseDID: false
+    isUseDID: false,
   });
 
   useEffect(() => {
@@ -27,6 +28,24 @@ const NewTx = () => {
       setTxInfo((prev) => ({ ...prev, send_from: account.multi_sig_address }));
     }
   }, [account, setTxInfo]);
+
+  const { createTxSendCKB, createTxSendToken } = useCreateTransaction();
+
+  useEffect(() => {
+    (async () => {
+      if (txInfo.amount && txInfo.send_from && txInfo.send_to) {
+        const tx = txInfo.token
+          ? await createTxSendToken(txInfo)
+          : await createTxSendCKB(txInfo);
+
+        setTxInfo((prev) => ({
+          ...prev,
+          fee: Number(tx.transaction?.estimateFee(FIXED_FEE_RATE)),
+        }));
+      }
+    })();
+  }, [txInfo.amount, txInfo.send_from, txInfo.send_to]);
+
   return (
     <>
       <div className="w-full h-1 bg-[#D9D9D9] absolute top-0 left-0"></div>

@@ -39,7 +39,6 @@ const CreateBatchTransferTx = ({
 }) => {
   const [inputValue, setInputValue] = useState("");
   const [placeholder, setPlaceholder] = useState("");
-  const [isTransferCustomAmount, setIsTransferCustomAmount] = useState(false);
   const [isUploadFile, setIsUploadFile] = useState(false);
   const [file, setFile] = useState<RcFile | File | undefined>();
   const { network } = useAppSelector(selectStorage);
@@ -64,18 +63,21 @@ const CreateBatchTransferTx = ({
   }, [txInfo.tos]);
 
   useEffect(() => {
-    if (!inputValue) return;
+    if (!inputValue) {
+      setTxInfo({ ...txInfo, tos: [] });
+      return;
+    }
     const recipients = parseRecipientInput(
       inputValue,
-      isTransferCustomAmount,
+      txInfo.isCustomAmount,
       txInfo.amount || 0
     );
     setTxInfo({ ...txInfo, tos: recipients });
-  }, [inputValue, isTransferCustomAmount, txInfo.amount]);
+  }, [inputValue, txInfo.isCustomAmount, txInfo.amount]);
 
   useEffect(() => {
-    validateBatchInputs(txInfo, network, isTransferCustomAmount, setErrors);
-  }, [txInfo, isTransferCustomAmount]);
+    validateBatchInputs(txInfo, network, setErrors);
+  }, [txInfo]);
 
   const isValidBalance = useCallback(() => {
     const amountBI = BI.from(ccc.fixedPointFrom(totalAmount.toString()));
@@ -200,11 +202,11 @@ const CreateBatchTransferTx = ({
             const cols = row.trim().split(",");
             const address = cols[0].trim();
             const amount = cols.length > 1 ? cols[1].trim() : null;
-            if (isTransferCustomAmount && !Number(amount)) {
+            if (txInfo.isCustomAmount && !Number(amount)) {
               return toast.error("Invalid amount");
             }
             input += `${address}`;
-            if (isTransferCustomAmount) {
+            if (txInfo.isCustomAmount) {
               input += `,${amount}`;
             }
             input += "\n";
@@ -217,7 +219,17 @@ const CreateBatchTransferTx = ({
       };
       reader.readAsText(file);
     }
-  }, [file, isTransferCustomAmount]);
+  }, [file, txInfo.isCustomAmount]);
+
+  useEffect(() => {
+    if (txInfo.tos?.length > 0) {
+      const inputDefault = txInfo.isCustomAmount
+        ? txInfo.tos.map((to) => `${to.address},${to.amount}`).join("\n")
+        : txInfo.tos.map((to) => `${to.address}`).join("\n");
+
+      setInputValue(inputDefault);
+    }
+  }, [txInfo.isCustomAmount]);
 
   return (
     <>
@@ -241,8 +253,10 @@ const CreateBatchTransferTx = ({
           </div>
         </div>
         <AmountType
-          isCustom={isTransferCustomAmount}
-          setIsCustom={setIsTransferCustomAmount}
+          isCustom={txInfo.isCustomAmount}
+          setIsCustom={(value: boolean) =>
+            setTxInfo({ ...txInfo, isCustomAmount: value })
+          }
           setPlaceholder={setPlaceholder}
         />
         <div className="grid gap-2">
@@ -297,7 +311,7 @@ const CreateBatchTransferTx = ({
           )}
         </div>
 
-        {!isTransferCustomAmount && (
+        {!txInfo.isCustomAmount && (
           <div className="grid gap-2">
             <p className="text-[16px] leading-[20px] text-grey-400">
               Amount per Address Transfer

@@ -432,7 +432,9 @@ const useCreateTransaction = () => {
         if (minCKBbyAddr > minCapacity) {
           minCapacity = minCapacity.add(minCKBbyAddr);
         }
-      } catch (_) {}
+      } catch (error) {
+        console.log(error);
+      }
     });
 
     let neededCapacity = toAmount.add(txFee);

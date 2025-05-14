@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import cn from "@/utils/cn";
 import ConfirmBatchTransferTx from "./ConfirmTx";
 import CreateBatchTransferTx from "./CreateManualTx";
+import useCreateTransaction from "@/hooks/useCreateTransaction";
 
 const BatchTransfer = () => {
   const { info: account } = useAppSelector(selectAccountInfo);
@@ -19,13 +20,32 @@ const BatchTransfer = () => {
     network: "",
     fee: FIXED_FEE,
     feeRate: FIXED_FEE_RATE,
+    isCustomAmount: false,
   });
+
+  const { createTxBatchTransferCKB, createTxBatchTransferToken } =
+    useCreateTransaction();
 
   useEffect(() => {
     if (account) {
       setTxInfo((prev) => ({ ...prev, from: account.multi_sig_address }));
     }
   }, [account, setTxInfo]);
+
+  useEffect(() => {
+    (async () => {
+      if (!!txInfo.amount && txInfo.tos.length > 0 && !!txInfo.from) {
+        const tx = txInfo.token
+          ? await createTxBatchTransferToken(txInfo)
+          : await createTxBatchTransferCKB(txInfo);
+
+        setTxInfo((prev) => ({
+          ...prev,
+          fee: Number(tx.transaction?.estimateFee(FIXED_FEE_RATE)),
+        }));
+      }
+    })();
+  }, [txInfo.amount, txInfo.tos, txInfo.from, txInfo.token]);
   return (
     <>
       <div className="w-full h-1 bg-[#D9D9D9] absolute top-0 left-0"></div>

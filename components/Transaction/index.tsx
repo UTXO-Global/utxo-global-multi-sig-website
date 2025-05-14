@@ -294,7 +294,6 @@ const Transaction = ({
                 !isRejected ? (
                   <Button
                     size="small"
-                    kind="secondary"
                     className="!py-[5px]"
                     disabled={isConfirmLoading}
                     loading={isConfirmLoading}
@@ -339,6 +338,7 @@ const Transaction = ({
                 <Button
                   size="small"
                   kind="secondary"
+                  className="!py-[5px]"
                   loading={isCancelLoading}
                   disabled={isCancelLoading || isCancelled}
                   onClick={(e) => {
@@ -423,24 +423,7 @@ const Transaction = ({
           >
             <div className="w-[2px] h-full bg-grey-300 absolute top-0 left-[7px]"></div>
             <div className="flex gap-2 items-center bg-light-100 relative">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-              >
-                <path
-                  d="M8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15Z"
-                  fill="#0D0D0D"
-                />
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M9 7H11C11.5523 7 12 7.44772 12 8C12 8.55228 11.5523 9 11 9H9V11C9 11.5523 8.55228 12 8 12C7.44772 12 7 11.5523 7 11V9H5C4.44772 9 4 8.55228 4 8C4 7.44772 4.44772 7 5 7H7V5C7 4.44772 7.44772 4 8 4C8.55228 4 9 4.44772 9 5V7Z"
-                  fill="white"
-                />
-              </svg>
+              <IcnCreated />
               <p className="font-medium text-dark-100">Created</p>
             </div>
             <div className="relative">
@@ -449,42 +432,11 @@ const Transaction = ({
                   TransactionStatus.InProgressing,
                   TransactionStatus.Commited,
                 ].includes(transaction.status) ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                  >
-                    <path
-                      d="M8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15Z"
-                      fill="#0D0D0D"
-                    />
-                    <path
-                      d="M7.68894 8.54156L6.18321 7.13278C5.77992 6.75545 5.14711 6.7765 4.76978 7.17979C4.39245 7.58308 4.4135 8.2159 4.8168 8.59322L7.0378 10.6712C7.4352 11.043 8.05698 11.0288 8.43694 10.6392L11.3049 7.69817C11.6905 7.30277 11.6826 6.66965 11.2872 6.28406C10.8918 5.89848 10.2587 5.90643 9.87307 6.30183L7.68894 8.54156Z"
-                      fill="white"
-                    />
-                  </svg>
+                  <IcnConfirmed />
                 ) : transaction.status === TransactionStatus.WaitingSigned ? (
                   <div className="border border-grey-500 rounded-full w-4 aspect-square"></div>
                 ) : transaction.rejected.length > 0 ? (
-                  <svg
-                    width="15"
-                    height="14"
-                    viewBox="0 0 15 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      opacity="0.3"
-                      d="M8 14C11.866 14 15 10.866 15 7C15 3.13401 11.866 0 8 0C4.13401 0 1 3.13401 1 7C1 10.866 4.13401 14 8 14Z"
-                      fill="#FF3333"
-                    />
-                    <path
-                      d="M8 12C10.7614 12 13 9.76143 13 7C13 4.23858 10.7614 2 8 2C5.23858 2 3 4.23858 3 7C3 9.76143 5.23858 12 8 12Z"
-                      fill="#FF3333"
-                    />
-                  </svg>
+                  <IcnRejected />
                 ) : null}
 
                 <p className="font-medium text-dark-100">
@@ -500,18 +452,7 @@ const Transaction = ({
                     key={`confirmed-${i}`}
                     className="flex gap-2 items-center"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                    >
-                      <path
-                        d="M8 11C9.65686 11 11 9.65686 11 8C11 6.34315 9.65686 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65686 6.34315 11 8 11Z"
-                        fill="#0D0D0D"
-                      />
-                    </svg>
+                    <IcnDot />
                     <div className="flex gap-2">
                       <p className="text-success-200 font-normal text-[14px]">
                         {shortAddress(z, 14)}
@@ -527,20 +468,9 @@ const Transaction = ({
                     key={`rejected-${i}`}
                     className="flex gap-2 items-center"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                    >
-                      <path
-                        d="M8 11C9.65686 11 11 9.65686 11 8C11 6.34315 9.65686 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65686 6.34315 11 8 11Z"
-                        fill="#0D0D0D"
-                      />
-                    </svg>
+                    <IcnDot />
                     <div className="flex gap-2">
-                      <p className="text-rejected-100 font-normal text-[14px]">
+                      <p className="text-error-100 font-normal text-[14px]">
                         {shortAddress(z, 14)}
                       </p>
                       <div className="px-1 py-[2px] bg-[#FEE7E7] rounded-[4px] text-[10px] leading-[16px] text-error-100">
@@ -554,24 +484,7 @@ const Transaction = ({
             {transaction.status === TransactionStatus.Failed && (
               <div className="relative">
                 <div className="flex gap-2 items-center bg-light-100">
-                  <svg
-                    width="15"
-                    height="14"
-                    viewBox="0 0 15 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      opacity="0.3"
-                      d="M8 14C11.866 14 15 10.866 15 7C15 3.13401 11.866 0 8 0C4.13401 0 1 3.13401 1 7C1 10.866 4.13401 14 8 14Z"
-                      fill="#FF3333"
-                    />
-                    <path
-                      d="M8 12C10.7614 12 13 9.76143 13 7C13 4.23858 10.7614 2 8 2C5.23858 2 3 4.23858 3 7C3 9.76143 5.23858 12 8 12Z"
-                      fill="#FF3333"
-                    />
-                  </svg>
-
+                  <IcnError />
                   <p className="font-medium text-error-100">Errors </p>
                 </div>
                 <div className="grid gap-4 mt-5">
@@ -580,18 +493,7 @@ const Transaction = ({
                       key={`confirmed-${i}`}
                       className="flex gap-2 items-center"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                      >
-                        <path
-                          d="M8 11C9.65686 11 11 9.65686 11 8C11 6.34315 9.65686 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65686 6.34315 11 8 11Z"
-                          fill="#0D0D0D"
-                        />
-                      </svg>
+                      <IcnDot />
                       <div className="flex gap-2">
                         <p className="text-error-100 font-normal text-[14px]">
                           {z.signer_address.length > 20
@@ -613,22 +515,7 @@ const Transaction = ({
             )}
             {transaction.status === TransactionStatus.Commited && (
               <div className="flex gap-2 items-center bg-light-100 relative">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                >
-                  <path
-                    d="M8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15Z"
-                    fill="#0D0D0D"
-                  />
-                  <path
-                    d="M7.68894 8.54156L6.18321 7.13278C5.77992 6.75545 5.14711 6.7765 4.76978 7.17979C4.39245 7.58308 4.4135 8.2159 4.8168 8.59322L7.0378 10.6712C7.4352 11.043 8.05698 11.0288 8.43694 10.6392L11.3049 7.69817C11.6905 7.30277 11.6826 6.66965 11.2872 6.28406C10.8918 5.89848 10.2587 5.90643 9.87307 6.30183L7.68894 8.54156Z"
-                    fill="white"
-                  />
-                </svg>
+                <IcnConfirmed />
                 <p className="font-medium text-dark-100">Completed</p>
               </div>
             )}
@@ -642,19 +529,7 @@ const Transaction = ({
             {(transaction.status === TransactionStatus.Rejected ||
               transaction.status === TransactionStatus.Failed) && (
               <div className="flex gap-2 items-center bg-light-100 relative">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="#ff3333"
-                  className="size-4"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-
+                <IcnDeny />
                 <p className="font-medium text-error-100">Not completed</p>
               </div>
             )}
@@ -662,27 +537,21 @@ const Transaction = ({
             {transaction.status === TransactionStatus.Cancelled && (
               <div className="relative">
                 <div className="flex gap-2 items-center bg-light-100">
-                  <svg
-                    width="15"
-                    height="14"
-                    viewBox="0 0 15 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      opacity="0.3"
-                      d="M8 14C11.866 14 15 10.866 15 7C15 3.13401 11.866 0 8 0C4.13401 0 1 3.13401 1 7C1 10.866 4.13401 14 8 14Z"
-                      fill="#6c757d"
-                    />
-                    <path
-                      d="M8 12C10.7614 12 13 9.76143 13 7C13 4.23858 10.7614 2 8 2C5.23858 2 3 4.23858 3 7C3 9.76143 5.23858 12 8 12Z"
-                      fill="#6c757d"
-                    />
-                  </svg>
-                  <p className="font-medium text-[#6c757d]">{`Cancelled ${
-                    transaction.updated_by &&
-                    `by ${shortAddress(transaction.updated_by, 5)}`
-                  }`}</p>
+                  <IcnDeny />
+                  <p className="font-medium text-error-100">Cancelled</p>
+                </div>
+                <div className="grid gap-4 mt-5">
+                  <div className="flex gap-2 items-center">
+                    <IcnDot />
+                    <div className="flex gap-2">
+                      <p className="text-error-100 font-normal text-[14px]">
+                        {shortAddress(transaction.updated_by, 14)}
+                      </p>
+                      <div className="px-1 py-[2px] bg-[#FEE7E7] rounded-[4px] text-[10px] leading-[16px] text-error-100">
+                        Cancelled
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -730,3 +599,125 @@ const Transaction = ({
 };
 
 export default Transaction;
+
+const IcnCreated = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <path
+        d="M8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15Z"
+        fill="#0D0D0D"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M9 7H11C11.5523 7 12 7.44772 12 8C12 8.55228 11.5523 9 11 9H9V11C9 11.5523 8.55228 12 8 12C7.44772 12 7 11.5523 7 11V9H5C4.44772 9 4 8.55228 4 8C4 7.44772 4.44772 7 5 7H7V5C7 4.44772 7.44772 4 8 4C8.55228 4 9 4.44772 9 5V7Z"
+        fill="white"
+      />
+    </svg>
+  );
+};
+
+const IcnConfirmed = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <path
+        d="M8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15Z"
+        fill="#0D0D0D"
+      />
+      <path
+        d="M7.68894 8.54156L6.18321 7.13278C5.77992 6.75545 5.14711 6.7765 4.76978 7.17979C4.39245 7.58308 4.4135 8.2159 4.8168 8.59322L7.0378 10.6712C7.4352 11.043 8.05698 11.0288 8.43694 10.6392L11.3049 7.69817C11.6905 7.30277 11.6826 6.66965 11.2872 6.28406C10.8918 5.89848 10.2587 5.90643 9.87307 6.30183L7.68894 8.54156Z"
+        fill="white"
+      />
+    </svg>
+  );
+};
+
+const IcnDeny = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="#ff3333"
+      className="size-4"
+    >
+      <path
+        fillRule="evenodd"
+        d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+};
+
+const IcnRejected = () => {
+  return (
+    <svg
+      width="15"
+      height="14"
+      viewBox="0 0 15 14"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        opacity="0.3"
+        d="M8 14C11.866 14 15 10.866 15 7C15 3.13401 11.866 0 8 0C4.13401 0 1 3.13401 1 7C1 10.866 4.13401 14 8 14Z"
+        fill="#FF3333"
+      />
+      <path
+        d="M8 12C10.7614 12 13 9.76143 13 7C13 4.23858 10.7614 2 8 2C5.23858 2 3 4.23858 3 7C3 9.76143 5.23858 12 8 12Z"
+        fill="#FF3333"
+      />
+    </svg>
+  );
+};
+
+const IcnDot = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <path
+        d="M8 11C9.65686 11 11 9.65686 11 8C11 6.34315 9.65686 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65686 6.34315 11 8 11Z"
+        fill="#0D0D0D"
+      />
+    </svg>
+  );
+};
+
+const IcnError = () => {
+  return (
+    <svg
+      width="15"
+      height="14"
+      viewBox="0 0 15 14"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        opacity="0.3"
+        d="M8 14C11.866 14 15 10.866 15 7C15 3.13401 11.866 0 8 0C4.13401 0 1 3.13401 1 7C1 10.866 4.13401 14 8 14Z"
+        fill="#FF3333"
+      />
+      <path
+        d="M8 12C10.7614 12 13 9.76143 13 7C13 4.23858 10.7614 2 8 2C5.23858 2 3 4.23858 3 7C3 9.76143 5.23858 12 8 12Z"
+        fill="#FF3333"
+      />
+    </svg>
+  );
+};
