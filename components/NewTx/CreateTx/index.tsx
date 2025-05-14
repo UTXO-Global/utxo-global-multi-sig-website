@@ -8,7 +8,12 @@ import Button from "@/components/Common/Button";
 import { SendTokenType } from "@/types/account";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
-import { FIXED_FEE, formatNumber, shortAddress } from "@/utils/helpers";
+import {
+  FIXED_FEE,
+  FIXED_FEE_RATE,
+  formatNumber,
+  shortAddress,
+} from "@/utils/helpers";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
 import { BI, helpers } from "@ckb-lumos/lumos";
@@ -41,7 +46,7 @@ const CreateTx = ({
 
   const [requesting, setRequesting] = useState(false);
   const [filtered, setFiltered] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(txInfo.send_to || "");
   const searchParams = useSearchParams();
   const tokenParam = searchParams.get("token");
 
@@ -62,7 +67,7 @@ const CreateTx = ({
       return txInfo.token?.balance || 0;
     }
 
-    return Number(assets.balance) / 10 ** 8;
+    return Number(ccc.fixedPointToString(assets.balance.toString()));
   }, [assets, txInfo.token]);
 
   useEffect(() => {
@@ -117,20 +122,22 @@ const CreateTx = ({
   const isValidBalance = useCallback(() => {
     const _amount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
     const _balance = BI.from(ccc.fixedPointFrom(tokenBalance.toString()));
+    const fee = BI.from(txInfo.fee || FIXED_FEE);
     return txInfo.is_include_fee
       ? _amount.lte(_balance)
-      : _amount.add(FIXED_FEE).lte(_balance);
-  }, [tokenBalance, txInfo.amount, txInfo.is_include_fee]);
+      : _amount.add(fee).lte(_balance);
+  }, [tokenBalance, txInfo.amount, txInfo.is_include_fee, txInfo.fee]);
 
   const isValidAmount = useCallback(
     (ckbMinTransfer: number) => {
       let amount = txInfo.amount;
+      const fee = BI.from(txInfo.fee || FIXED_FEE);
       if (txInfo.is_include_fee) {
-        amount -= FIXED_FEE / 10 ** 8;
+        amount -= Number(ccc.fixedPointToString(fee.toNumber()));
       }
       return amount >= ckbMinTransfer;
     },
-    [txInfo.amount, txInfo.is_include_fee]
+    [txInfo.amount, txInfo.is_include_fee, txInfo.fee]
   );
 
   const isValidSendTo = useCallback(() => {

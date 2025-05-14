@@ -116,7 +116,7 @@ export const camelToSnakeCase = (str: string) => {
 
 // https://explorer.nervos.org/fee-rate-tracker
 export const FIXED_FEE_RATE = 3600; // shannons/kB
-export const FIXED_FEE = 100000; // 0.001 CKB
+export const FIXED_FEE = 10000; // 0.0001 CKB
 export const INOUT_SIZE_BYTE = 500; // Bytes
 
 export function getOutputsCapacity(tx: LumosTransactionSkeletonType): BI {
