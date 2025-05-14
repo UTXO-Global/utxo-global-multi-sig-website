@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect, useMemo, useState } from "react";
+import { Fragment, useContext, useEffect, useMemo, useState } from "react";
 import Decimal from "decimal.js";
 import Link from "next/link";
 import { formatDistanceStrict, format } from "date-fns";
@@ -29,6 +29,7 @@ import { selectApp } from "@/redux/features/app/reducer";
 import { BI, helpers } from "@ckb-lumos/lumos";
 import useTokens from "@/hooks/useToken";
 import { AGGRON4, LINA } from "@/utils/lumos-config";
+import { Modal } from "antd";
 
 const STATUS_TEXT = {
   [TransactionStatus.WaitingSigned]: "Pending",
@@ -48,6 +49,10 @@ const Transaction = ({
   accountInfo: MultiSigAccountType;
   refresh?: () => void;
 }) => {
+  const [openModal, setOpenModal] = useState(false);
+  const [modalContext, setModalContext] = useState<
+    { address: string; amount: number; symbol: string }[]
+  >([]);
   const [isShow, setIsShow] = useState<boolean>(false);
   const [isConfirmLoading, setIsConfirmLoading] = useState<boolean>(false);
   const [isRejectLoading, setIsRejectLoading] = useState<boolean>(false);
@@ -183,7 +188,7 @@ const Transaction = ({
 
   const toAddresses = useMemo(() => {
     const lumosConfig = config.isTestnet ? AGGRON4 : LINA;
-    const results: { address: string; amount: number }[] = [];
+    const results: { address: string; amount: number; symbol: string }[] = [];
     for (let i = 0; i < rawTx.outputs.length; i++) {
       const o = rawTx.outputs[i];
       const address = helpers.encodeToAddress(
@@ -202,17 +207,15 @@ const Transaction = ({
         ? ccc.numLeFromBytes(ccc.bytesFrom(rawTx.outputs_data[i]))
         : BI.from(o.capacity).toBigInt();
 
-      console.log(o, o.capacity, isToken, amount, rawTx.outputs_data[i]);
-
       results.push({
         address,
         amount: Number(
           ccc.fixedPointToString(amount, isToken ? tokenInfo?.decimal || 8 : 8)
         ),
+        symbol: tokenInfo?.symbol!,
       });
     }
 
-    console.log(results);
     return results;
   }, [rawTx, tokenInfo]);
 
@@ -369,17 +372,21 @@ const Transaction = ({
       >
         <div className="w-[60%] px-4 py-6 grid gap-3 border-r border-grey-300 content-start sticky top-0">
           <div className="flex gap-8 text-[16px] leading-[20px] text-grey-400">
-            <p className="w-[90px] font-medium">To:</p>
+            <p className="w-[90px] font-medium">
+              To{toAddresses.length === 1 ? ` address` : ""}:
+            </p>
             {toAddresses.length === 1 ? (
               <p>{shortAddress(transaction.to_address, 14)}</p>
             ) : (
-              <Link
+              <div
                 className="text-success-200 underline cursor-pointer"
-                href={`${config.explorer}/transaction/0x${transaction.transaction_id}`}
-                target="_blank"
+                onClick={() => {
+                  setOpenModal(true);
+                  setModalContext(toAddresses);
+                }}
               >
-                {toAddresses.length} Addresses
-              </Link>
+                {toAddresses.length} Recipients
+              </div>
             )}
           </div>
           <div className="flex gap-8 text-[16px] leading-[20px] text-grey-400">
@@ -594,11 +601,63 @@ const Transaction = ({
           ) : null}
         </div>
       </div>
+      <AddressPopup
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        addresses={modalContext}
+      />
     </div>
   );
 };
 
 export default Transaction;
+
+const AddressPopup = ({
+  addresses,
+  open,
+  onClose,
+}: {
+  addresses: { address: string; amount: number; symbol: string }[];
+  open: boolean;
+  onClose: () => void;
+}) => {
+  return (
+    <Modal
+      title="Recipient Information"
+      open={open}
+      onClose={onClose}
+      className="bg-white p-4 rounded-lg"
+      closeIcon={false}
+      footer={
+        <div className="border-t border-t-dark-100">
+          <Button
+            onClick={onClose}
+            size="small"
+            kind="secondary"
+            className="mt-4"
+          >
+            Close
+          </Button>
+        </div>
+      }
+    >
+      <div className="bg-white flex flex-col gap-2">
+        <div className="flex justify-between items-center">
+          <p className="font-bold">Address</p>
+          <p className="font-bold">Amount</p>
+        </div>
+        {addresses.map((to) => (
+          <div className="flex justify-between items-center">
+            <p>{shortAddress(to.address, 20)}</p>
+            <p className="font-bold">
+              {to.amount} {to.symbol}
+            </p>
+          </div>
+        ))}
+      </div>
+    </Modal>
+  );
+};
 
 const IcnCreated = () => {
   return (
