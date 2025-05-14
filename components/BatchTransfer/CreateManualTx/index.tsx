@@ -372,7 +372,8 @@ const CreateBatchTransferTx = ({
             txInfo.tos.length === 0 ||
             totalAmount === 0 ||
             errors.address.length > 0 ||
-            !!errors.amount
+            !!errors.amount ||
+            isTxPending
           }
         >
           Next
