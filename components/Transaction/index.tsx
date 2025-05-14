@@ -647,7 +647,10 @@ const AddressPopup = ({
           <p className="font-bold">Amount</p>
         </div>
         {addresses.map((to) => (
-          <div className="flex justify-between items-center">
+          <div
+            className="flex justify-between items-center"
+            key={`popup-${to.address}`}
+          >
             <p>{shortAddress(to.address, 20)}</p>
             <p className="font-bold">
               {to.amount} {to.symbol}
