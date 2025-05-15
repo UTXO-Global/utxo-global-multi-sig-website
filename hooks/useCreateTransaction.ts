@@ -276,8 +276,6 @@ const useCreateTransaction = () => {
       lumosConfig
     );
 
-    console.log("minRecipientCapacity => ", minRecipientCapacity.toNumber());
-
     // add input, output
     txSkeleton = txSkeleton
       .update("inputs", (inputs: List<Cell>) => inputs.push(...tokensCell))
@@ -314,7 +312,7 @@ const useCreateTransaction = () => {
     const fee =
       ccc.Transaction.fromLumosSkeleton(txSkeleton).estimateFee(FIXED_FEE_RATE);
     neededCapacity = neededCapacity.add(fee);
-    console.log("need Capacity => ", neededCapacity.toNumber(), fee);
+
     const collectedCells: Cell[] = [];
     let totalCapacity = BI.from(0);
     let capacityChangeOutput = BI.from(0);

@@ -36,8 +36,7 @@ const ConfirmTx = ({
   const { info: account } = useAppSelector(selectAccountInfo);
   const { config: appConfig } = useAppSelector(selectApp);
   const signer = ccc.useSigner();
-  const { usableCells, loading: cellLoading } = useCells();
-  const [loading, setLoading] = useState(cellLoading);
+  const [loading, setLoading] = useState(false);
 
   const { createTxSendCKB, createTxSendToken } = useCreateTransaction();
 
@@ -124,7 +123,7 @@ const ConfirmTx = ({
     setLoading(true);
     f();
     setLoading(false);
-  }, [txInfo, account, appConfig.isTestnet, usableCells]);
+  }, [txInfo, account, appConfig.isTestnet]);
 
   useEffect(() => {
     if (!!error) {
