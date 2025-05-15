@@ -349,7 +349,7 @@ const CreateTx = ({
         <Button
           fullWidth
           onClick={next}
-          disabled={!txInfo.send_to || txInfo.amount <= 0 || isTxLoading}
+          disabled={!txInfo.send_to || txInfo.amount <= 0 || isTxPending}
           loading={isTxLoading}
         >
           Next
