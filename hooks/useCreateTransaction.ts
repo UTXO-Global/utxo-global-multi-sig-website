@@ -43,7 +43,7 @@ const useCreateTransaction = () => {
   }, [appConfig.ckbRPC]);
 
   const isTxPending = useMemo(() => {
-    return false; //transactions?.length > 0;
+    return transactions?.length > 0;
   }, [transactions]);
 
   const createTxSendCKB = async (
