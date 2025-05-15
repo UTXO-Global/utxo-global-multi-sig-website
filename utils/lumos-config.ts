@@ -24,6 +24,15 @@ export const AGGRON4: Config = {
       INDEX: "0x0",
       DEP_TYPE: "code",
     },
+    USDI: {
+      CODE_HASH:
+        "0xcc9dc33ef234e14bc788c43a4848556a5fb16401a04662fc55db9bb201987037",
+      HASH_TYPE: "type",
+      TX_HASH:
+        "0xaec423c2af7fe844b476333190096b10fc5726e6d9ac58a9b71f71ffac204fee",
+      INDEX: "0x0",
+      DEP_TYPE: "code",
+    },
   },
 };
 
@@ -47,6 +56,15 @@ export const LINA: Config = {
       HASH_TYPE: "type",
       TX_HASH:
         "0x8ec1081bd03e5417bb4467e96f4cec841acdd35924538a35e7547fe320118977",
+      INDEX: "0x0",
+      DEP_TYPE: "code",
+    },
+    USDI: {
+      CODE_HASH:
+        "0xbfa35a9c38a676682b65ade8f02be164d48632281477e36f8dc2f41f79e56bfc",
+      HASH_TYPE: "type",
+      TX_HASH:
+        "0xf6a5eef65101899db9709c8de1cc28f23c1bee90d857ebe176f6647ef109e20d",
       INDEX: "0x0",
       DEP_TYPE: "code",
     },
