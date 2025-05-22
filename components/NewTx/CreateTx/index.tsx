@@ -67,7 +67,7 @@ const CreateTx = ({
       return txInfo.token?.balance || 0;
     }
 
-    return Number(ccc.fixedPointToString(assets.balance.toString()));
+    return Number(ccc.fixedPointToString(assets.balance.toBigInt()));
   }, [assets, txInfo.token]);
 
   useEffect(() => {
@@ -133,7 +133,7 @@ const CreateTx = ({
       let amount = txInfo.amount;
       const fee = BI.from(txInfo.fee || FIXED_FEE);
       if (txInfo.is_include_fee) {
-        amount -= Number(ccc.fixedPointToString(fee.toNumber()));
+        amount -= Number(ccc.fixedPointToString(fee.toBigInt()));
       }
       return amount >= ckbMinTransfer;
     },

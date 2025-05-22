@@ -55,7 +55,7 @@ const CreateBatchTransferTx = ({
       return txInfo.token?.balance || 0;
     }
 
-    return Number(ccc.fixedPointToString(assets.balance.toString()));
+    return Number(ccc.fixedPointToString(assets.balance.toBigInt()));
   }, [assets, txInfo.token]);
 
   const totalAmount = useMemo(() => {
@@ -91,7 +91,8 @@ const CreateBatchTransferTx = ({
     (ckbMinTransfer: number) => {
       let amount = totalAmount;
       if (txInfo.is_include_fee) {
-        amount -= Number(ccc.fixedPointToString(FIXED_FEE));
+        const fee = BI.from(txInfo.fee || FIXED_FEE);
+        amount -= Number(ccc.fixedPointToString(fee.toBigInt()));
       }
 
       return !!txInfo.token ? totalAmount > 0 : totalAmount >= ckbMinTransfer;
@@ -151,15 +152,17 @@ const CreateBatchTransferTx = ({
     });
 
     if (!txInfo.token) {
-      if (!isValidAmount(ckbMinTransfer))
+      if (!isValidAmount(ckbMinTransfer)) {
+        const fee = BI.from(txInfo.fee || FIXED_FEE);
         return toast.warning(
           `The minimum amount is ${
             ckbMinTransfer +
             (txInfo.is_include_fee
-              ? Number(ccc.fixedPointToString(FIXED_FEE))
+              ? Number(ccc.fixedPointToString(fee.toBigInt()))
               : 0)
           } CKB.`
         );
+      }
 
       if (!isValidRemainingBalance(ckbMinTransfer))
         return toast.warning(
