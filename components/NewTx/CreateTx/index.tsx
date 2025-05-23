@@ -10,7 +10,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
 import {
   FIXED_FEE,
-  FIXED_FEE_RATE,
   formatNumber,
   shortAddress,
 } from "@/utils/helpers";

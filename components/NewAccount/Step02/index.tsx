@@ -1,7 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { message, Select, Tooltip } from "antd";
-import { ccc } from "@ckb-ccc/connector-react";
+import { Select, Tooltip } from "antd";
 import { toast } from "react-toastify";
 
 import IcnInfoOutline from "@/public/icons/icn-info-outline.svg";
