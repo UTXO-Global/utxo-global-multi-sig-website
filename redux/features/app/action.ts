@@ -67,6 +67,34 @@ const updateTokenRateToCache = (typeHash: string, rate: number) => {
   return undefined;
 };
 
+export const loadCkbPriceFromCoinCap = createAsyncThunk(
+  "app/load-ckb-price-from-coincap",
+  async () => {
+    try {
+      const priceFromCache = getPriceFromCachhe();
+      if (!!priceFromCache) {
+        return priceFromCache;
+      }
+
+      const res = await fetch(
+        `https://api.coincap.io/v2/assets/nervos-network`
+      );
+      const data = await res.json();
+      localStorage.setItem(
+        "CKB_PRICE",
+        JSON.stringify({
+          expired: new Date().getTime() + 60000,
+          priceUsd: data.data.priceUsd,
+        })
+      );
+      return data.data.priceUsd;
+    } catch (e) {
+      console.error(e);
+      return 0;
+    }
+  }
+);
+
 export const loadCkbPrice = createAsyncThunk("app/load-ckb-price", async () => {
   try {
     const priceFromCache = getPriceFromCachhe();
@@ -74,16 +102,19 @@ export const loadCkbPrice = createAsyncThunk("app/load-ckb-price", async () => {
       return priceFromCache;
     }
 
-    const res = await fetch(`https://api.coincap.io/v2/assets/nervos-network`);
+    const res = await fetch(
+      `https://api.coingecko.com/api/v3/simple/price?ids=nervos-network&vs_currencies=usd`
+    );
+
     const data = await res.json();
     localStorage.setItem(
       "CKB_PRICE",
       JSON.stringify({
         expired: new Date().getTime() + 60000,
-        priceUsd: data.data.priceUsd,
+        priceUsd: data["nervos-network"]?.usd || 0,
       })
     );
-    return data.data.priceUsd;
+    return data["nervos-network"]?.usd || 0;
   } catch (e) {
     console.error(e);
     return 0;
