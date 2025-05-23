@@ -1,7 +1,6 @@
 "use client";
 
-import { Fragment, useContext, useEffect, useMemo, useState } from "react";
-import Decimal from "decimal.js";
+import { useContext, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { formatDistanceStrict, format } from "date-fns";
 

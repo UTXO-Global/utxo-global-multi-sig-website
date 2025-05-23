@@ -3,7 +3,6 @@
 import Button from "@/components/Common/Button";
 import SwitchToken from "@/components/SwitchTokens";
 import useAssets from "@/hooks/useAssets";
-import { selectApp } from "@/redux/features/app/reducer";
 import { useAppSelector } from "@/redux/hook";
 import { BatchTransferType } from "@/types/account";
 import { Switch } from "antd";

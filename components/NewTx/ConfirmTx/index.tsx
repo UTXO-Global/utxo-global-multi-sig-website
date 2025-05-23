@@ -13,7 +13,6 @@ import { cccA } from "@ckb-ccc/connector-react/advanced";
 import { useRouter } from "next/navigation";
 import { selectApp } from "@/redux/features/app/reducer";
 import { toast } from "react-toastify";
-import useCells from "@/hooks/useCell";
 import useCreateTransaction from "@/hooks/useCreateTransaction";
 import { event } from "@/utils/gtag";
 
