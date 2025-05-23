@@ -95,26 +95,57 @@ export const addMultisigCellDeps = (
 export const getxudtType = (typeScript: any, lumosConfig: Config) => {
   const { args, code_hash, hash_type } = typeScript!;
   const isRUSD = lumosConfig.SCRIPTS.RUSD?.CODE_HASH === code_hash;
+  const isUSDI = lumosConfig.SCRIPTS.USDI?.CODE_HASH === code_hash;
+  if (isRUSD) {
+    return {
+      codeHash: lumosConfig.SCRIPTS.RUSD?.CODE_HASH,
+      hashType: lumosConfig.SCRIPTS.RUSD?.HASH_TYPE,
+      args,
+    } as Script;
+  }
+
+  if (isUSDI) {
+    return {
+      codeHash: lumosConfig.SCRIPTS.USDI?.CODE_HASH,
+      hashType: lumosConfig.SCRIPTS.USDI?.HASH_TYPE,
+      args,
+    } as Script;
+  }
   return {
-    codeHash: isRUSD ? lumosConfig.SCRIPTS.RUSD?.CODE_HASH : code_hash,
-    hashType: isRUSD ? lumosConfig.SCRIPTS.RUSD?.HASH_TYPE : hash_type,
+    codeHash: code_hash,
+    hashType: hash_type,
     args,
   } as Script;
 };
 
 export const getxudtCellDeps = (codeHash: string, lumosConfig: Config) => {
   const isRUSD = lumosConfig.SCRIPTS.RUSD?.CODE_HASH === codeHash;
+  const isUSDI = lumosConfig.SCRIPTS.USDI?.CODE_HASH === codeHash;
+  if (isRUSD) {
+    return {
+      outPoint: {
+        txHash: lumosConfig.SCRIPTS.RUSD!.TX_HASH,
+        index: lumosConfig.SCRIPTS.RUSD!.INDEX,
+      },
+      depType: lumosConfig.SCRIPTS.RUSD!.DEP_TYPE,
+    };
+  }
+
+  if (isUSDI) {
+    return {
+      outPoint: {
+        txHash: lumosConfig.SCRIPTS.USDI!.TX_HASH,
+        index: lumosConfig.SCRIPTS.USDI!.INDEX,
+      },
+      depType: lumosConfig.SCRIPTS.USDI!.DEP_TYPE,
+    };
+  }
+
   return {
     outPoint: {
-      txHash: isRUSD
-        ? lumosConfig.SCRIPTS.RUSD!.TX_HASH
-        : lumosConfig.SCRIPTS.XUDT!.TX_HASH,
-      index: isRUSD
-        ? lumosConfig.SCRIPTS.RUSD!.INDEX
-        : lumosConfig.SCRIPTS.XUDT!.INDEX,
+      txHash: lumosConfig.SCRIPTS.XUDT!.TX_HASH,
+      index: lumosConfig.SCRIPTS.XUDT!.INDEX,
     },
-    depType: isRUSD
-      ? lumosConfig.SCRIPTS.RUSD!.DEP_TYPE
-      : lumosConfig.SCRIPTS.XUDT!.DEP_TYPE,
+    depType: lumosConfig.SCRIPTS.XUDT!.DEP_TYPE,
   };
 };

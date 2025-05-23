@@ -8,7 +8,11 @@ import Button from "@/components/Common/Button";
 import { SendTokenType } from "@/types/account";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
-import { FIXED_FEE, formatNumber, shortAddress } from "@/utils/helpers";
+import {
+  FIXED_FEE,
+  formatNumber,
+  shortAddress,
+} from "@/utils/helpers";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
 import { BI, helpers } from "@ckb-lumos/lumos";
@@ -22,6 +26,7 @@ import SwitchToken from "@/components/SwitchTokens";
 import useAssets from "@/hooks/useAssets";
 import { createInstance } from "dotbit";
 import { useSearchParams } from "next/navigation";
+import useCreateTransaction from "@/hooks/useCreateTransaction";
 
 const dotbit = createInstance();
 
@@ -40,11 +45,12 @@ const CreateTx = ({
 
   const [requesting, setRequesting] = useState(false);
   const [filtered, setFiltered] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(txInfo.send_to || "");
   const searchParams = useSearchParams();
   const tokenParam = searchParams.get("token");
 
   const { assets } = useAssets();
+  const { isTxLoading, isTxPending } = useCreateTransaction();
 
   const tokens = useMemo(() => {
     if (Object.values(assets.udtBalances).length > 0) {
@@ -60,7 +66,7 @@ const CreateTx = ({
       return txInfo.token?.balance || 0;
     }
 
-    return Number(assets.balance) / 10 ** 8;
+    return Number(ccc.fixedPointToString(assets.balance.toBigInt()));
   }, [assets, txInfo.token]);
 
   useEffect(() => {
@@ -79,25 +85,29 @@ const CreateTx = ({
   }, [tokenParam, tokens]);
 
   useEffect(() => {
-    if (inputValue.endsWith(".bit")) {
-      if (!requesting) {
-        dotbit.records(inputValue).then((records) => {
-          setFiltered(
-            records.filter((z) => z.key === "address.ckb").map((j) => j.value)
-          );
-          setTimeout(() => {
-            setRequesting(false);
-          }, 3000);
+    try {
+      if (inputValue.endsWith(".bit")) {
+        if (!requesting) {
+          dotbit.records(inputValue).then((records) => {
+            setFiltered(
+              records.filter((z) => z.key === "address.ckb").map((j) => j.value)
+            );
+            setTimeout(() => {
+              setRequesting(false);
+            }, 3000);
+          });
+        }
+        setRequesting(true);
+      } else {
+        setFiltered([]);
+        setTxInfo({
+          ...txInfo,
+          send_to: inputValue,
+          isUseDID: filtered.includes(inputValue),
         });
       }
-      setRequesting(true);
-    } else {
-      setFiltered([]);
-      setTxInfo({
-        ...txInfo,
-        send_to: inputValue,
-        isUseDID: filtered.includes(inputValue),
-      });
+    } catch (e) {
+      console.log(e);
     }
   }, [inputValue, requesting]);
 
@@ -111,20 +121,22 @@ const CreateTx = ({
   const isValidBalance = useCallback(() => {
     const _amount = BI.from(ccc.fixedPointFrom(txInfo.amount.toString()));
     const _balance = BI.from(ccc.fixedPointFrom(tokenBalance.toString()));
+    const fee = BI.from(txInfo.fee || FIXED_FEE);
     return txInfo.is_include_fee
       ? _amount.lte(_balance)
-      : _amount.add(FIXED_FEE).lte(_balance);
-  }, [tokenBalance, txInfo.amount, txInfo.is_include_fee]);
+      : _amount.add(fee).lte(_balance);
+  }, [tokenBalance, txInfo.amount, txInfo.is_include_fee, txInfo.fee]);
 
   const isValidAmount = useCallback(
     (ckbMinTransfer: number) => {
       let amount = txInfo.amount;
+      const fee = BI.from(txInfo.fee || FIXED_FEE);
       if (txInfo.is_include_fee) {
-        amount -= FIXED_FEE / 10 ** 8;
+        amount -= Number(ccc.fixedPointToString(fee.toBigInt()));
       }
       return amount >= ckbMinTransfer;
     },
-    [txInfo.amount, txInfo.is_include_fee]
+    [txInfo.amount, txInfo.is_include_fee, txInfo.fee]
   );
 
   const isValidSendTo = useCallback(() => {
@@ -166,8 +178,17 @@ const CreateTx = ({
       return toast.warning("Recipient's address is invalid.");
     }
 
-    const isAddressTypeJoy = ccc.bytesFrom(toScript.args).length > 20;
-    const ckbMinTransfer = isAddressTypeJoy ? 63 : 61;
+    const ckbMinTransfer = BI.from(
+      helpers.minimalCellCapacity({
+        cellOutput: {
+          capacity: "0x0",
+          lock: toScript,
+        },
+        data: "0x",
+      })
+    )
+      .div(10 ** 8)
+      .toNumber();
 
     if (!txInfo.token) {
       if (!isValidAmount(ckbMinTransfer))
@@ -238,7 +259,7 @@ const CreateTx = ({
               />
             </div>
             {filtered.length > 0 && (
-              <div className="absolute w-full rounded-lg border border-grey-200 h-[100px] shadow-sm left-0 mt-2 bg-light-100 py-2">
+              <div className="absolute w-full rounded-lg border border-grey-200 min-h-[100px] max-h-[200px] overflow-auto shadow-sm left-0 mt-2 bg-light-100 py-2 z-10">
                 {filtered.map((z, i) => (
                   <div
                     key={i}
@@ -318,10 +339,17 @@ const CreateTx = ({
         )}
       </div>
       <div className="px-6 mt-6">
+        {isTxPending && (
+          <div className="text-sm text-[#FF3333] mb-1">
+            * You have a pending transaction. Please complete or cancel it
+            before creating a new one.
+          </div>
+        )}
         <Button
           fullWidth
           onClick={next}
-          disabled={!txInfo.send_to || txInfo.amount <= 0}
+          disabled={!txInfo.send_to || txInfo.amount <= 0 || isTxPending}
+          loading={isTxLoading}
         >
           Next
         </Button>

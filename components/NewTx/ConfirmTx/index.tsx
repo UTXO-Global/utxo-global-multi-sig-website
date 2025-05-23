@@ -13,7 +13,6 @@ import { cccA } from "@ckb-ccc/connector-react/advanced";
 import { useRouter } from "next/navigation";
 import { selectApp } from "@/redux/features/app/reducer";
 import { toast } from "react-toastify";
-import useCells from "@/hooks/useCell";
 import useCreateTransaction from "@/hooks/useCreateTransaction";
 import { event } from "@/utils/gtag";
 
@@ -36,8 +35,7 @@ const ConfirmTx = ({
   const { info: account } = useAppSelector(selectAccountInfo);
   const { config: appConfig } = useAppSelector(selectApp);
   const signer = ccc.useSigner();
-  const { usableCells, loading: cellLoading } = useCells();
-  const [loading, setLoading] = useState(cellLoading);
+  const [loading, setLoading] = useState(false);
 
   const { createTxSendCKB, createTxSendToken } = useCreateTransaction();
 
@@ -124,7 +122,7 @@ const ConfirmTx = ({
     setLoading(true);
     f();
     setLoading(false);
-  }, [txInfo, account, appConfig.isTestnet, usableCells]);
+  }, [txInfo, account, appConfig.isTestnet]);
 
   useEffect(() => {
     if (!!error) {
@@ -167,7 +165,7 @@ const ConfirmTx = ({
             Fee:
           </div>
           <div className="flex-1 text-[16px] leading-[20px] font-medium text-dark-100">
-            {formatNumber(txFee.toNumber() / 10 ** 8, 2, 8)} CKB
+            {Number(ccc.fixedPointToString(txFee.toBigInt()))} CKB
             {!txInfo.token && txInfo.is_include_fee && (
               <span className="text-grey-500"> (Included Fee)</span>
             )}

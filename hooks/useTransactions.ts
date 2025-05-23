@@ -9,7 +9,10 @@ import { LIMIT_PER_PAGE } from "@/configs/common";
 import { selectApp } from "@/redux/features/app/reducer";
 import { AppContext } from "@/providers/app";
 
-const useTransactions = (status: TransactionStatus[]) => {
+const useTransactions = (
+  status: TransactionStatus[],
+  autoLoad: boolean = true
+) => {
   const [syncStatus, setSyncStatus] = useState(false);
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -51,7 +54,7 @@ const useTransactions = (status: TransactionStatus[]) => {
 
     try {
       const { data } = await api.put(
-        `/multi-sig/transactions/${address}/commited`,
+        `/multi-sig/transactions/${address}/committed`,
         {
           tx_hashes: txHashes,
         }
@@ -104,8 +107,10 @@ const useTransactions = (status: TransactionStatus[]) => {
   };
 
   useEffect(() => {
-    load(false);
-  }, [load]);
+    if (autoLoad) {
+      load(false);
+    }
+  }, [load, autoLoad]);
 
   useEffect(() => {
     if (!syncStatus && transactions && transactions.length > 0) {

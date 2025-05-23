@@ -65,6 +65,7 @@ export type BatchTransferType = {
   fee?: number;
   feeRate: number;
   token?: UdtBalanceType & { typeHash: string };
+  isCustomAmount: boolean;
 };
 
 export type TransactionType = {

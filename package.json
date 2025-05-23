@@ -1,11 +1,11 @@
 {
   "name": "utxo-global-multi-sig",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build:staging": "dotenv -e .env.staging next build",
-    "build:prod": "dotenv -e .env.prod next build",
+    "build:staging": "dotenv -e .env.staging next build && node append-js-version.mjs",
+    "build:prod": "dotenv -e .env.prod next build  && node append-js-version.mjs",
     "start": "next start",
     "lint": "next lint"
   },

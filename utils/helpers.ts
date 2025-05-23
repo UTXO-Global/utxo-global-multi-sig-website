@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import Decimal from "decimal.js";
 import { AddressPrefix } from "@nervosnetwork/ckb-sdk-utils";
-import { BI, helpers, Script } from "@ckb-lumos/lumos";
+import { BI, helpers as lumosHelpers, Script } from "@ckb-lumos/lumos";
 
 import { InviteStatus } from "@/types/account";
 import { AddressBookType } from "@/types/address-book";
@@ -46,7 +46,7 @@ export const isValidCKBAddress = (address: string, network: string) => {
   try {
     if (!address) return false;
     const lumosConfig = network === "nervos" ? LINA : AGGRON4;
-    const toScript = helpers.parseAddress(address, {
+    const toScript = lumosHelpers.parseAddress(address, {
       config: lumosConfig,
     });
 
@@ -116,7 +116,7 @@ export const camelToSnakeCase = (str: string) => {
 
 // https://explorer.nervos.org/fee-rate-tracker
 export const FIXED_FEE_RATE = 3600; // shannons/kB
-export const FIXED_FEE = 100000; // 0.001 CKB
+export const FIXED_FEE = 10000; // 0.0001 CKB
 export const INOUT_SIZE_BYTE = 500; // Bytes
 
 export function getOutputsCapacity(tx: LumosTransactionSkeletonType): BI {
@@ -137,10 +137,30 @@ export function getInputsCapacity(tx: LumosTransactionSkeletonType): BI {
     );
 }
 
-export const MIN_CAPACITY = (script: Script) => {
-  if (ccc.bytesFrom(script.args).length === 22) {
-    return BI.from(63_0000_0000);
-  }
+export const calcMinCapacity = (script: Script, data: string = "0x"): BI => {
+  const minCap = lumosHelpers.minimalCellCapacity({
+    cellOutput: {
+      capacity: "0x0",
+      lock: script,
+    },
+    data,
+  });
 
-  return BI.from(61_0000_0000);
+  return BI.from(minCap);
 };
+
+export function parseRecipientInput(
+  input: string,
+  isCustom: boolean,
+  defaultAmount: number
+) {
+  return input
+    .trim()
+    .split("\n")
+    .filter((line) => !!line.trim())
+    .map((line) => {
+      const [addr, amtStr] = line.trim().split(",");
+      const amount = isCustom ? Number(amtStr?.trim()) || 0 : defaultAmount;
+      return { address: addr.trim(), amount };
+    });
+}
