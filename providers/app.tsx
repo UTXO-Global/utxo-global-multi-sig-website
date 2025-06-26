@@ -46,24 +46,8 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
         return address || "";
       } catch (e) {
         console.warn("Failed to get address from signer:", e);
-        try {
-          if (
-            typeof window !== "undefined" &&
-            (window as any).utxoGlobal?.ckbSigner
-          ) {
-            const [address] = await (
-              window as any
-            ).utxoGlobal.ckbSigner.getAccount();
-            return address || "";
-          }
-        } catch (fallbackError) {
-          console.warn(
-            "Failed to get address from window.utxoGlobal:",
-            fallbackError
-          );
-        }
-        return "";
       }
+      return "";
     };
     const _address = await _getAddress();
     setAddress(_address);
