@@ -21,6 +21,7 @@ import { reset, setNetwork } from "@/redux/features/storage/action";
 import { setNetworkConfig } from "@/redux/features/app/action";
 import { DEFAULT_NETWORK } from "@/configs/common";
 import { CkbNetwork } from "@/types/common";
+import useSyncDisconnect from "@/hooks/useSyncDisconnect";
 
 const defaultValue = {
   address: "",
@@ -41,13 +42,12 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const checkIsLoggedIn = useCallback(async () => {
     const _getAddress = async () => {
       try {
-        const [address] = await (
-          window as any
-        ).utxoGlobal.ckbSigner.getAccount();
-        return address;
+        const address = await signer?.getInternalAddress?.();
+        return address || "";
       } catch (e) {
-        return "";
+        console.warn("Failed to get address from signer:", e);
       }
+      return "";
     };
     const _address = await _getAddress();
     setAddress(_address);
@@ -113,6 +113,8 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
         : new ccc.ClientPublicTestnet()
     );
   }, [network, setClient]);
+
+  useSyncDisconnect();
 
   if (!isSupported) return <NotSupportedScreen />;
 

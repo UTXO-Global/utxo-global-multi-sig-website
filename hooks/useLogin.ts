@@ -23,16 +23,20 @@ const useLogin = () => {
 
   const dispatch = useAppDispatch();
 
-  const _getNonce = useCallback(async (address: string) => {
-    try {
-      const { data } = await api.get(`/users/nonce/${address}`);
-      return data.nonce as string;
-    } catch (e) {
-      disconnect();
-      toast.error("Unable to connect to the wallet. Please try again");
-    }
-    return undefined;
-  }, []);
+  const _getNonce = useCallback(
+    async (address: string) => {
+      try {
+        const { data } = await api.get(`/users/nonce/${address}`);
+        return data.nonce as string;
+      } catch (e) {
+        await signer?.disconnect()
+        disconnect();
+        toast.error("Unable to connect to the wallet. Please try again");
+      }
+      return undefined;
+    },
+    [disconnect]
+  );
 
   const _signMessage = useCallback(
     async (nonce: string) => {
@@ -64,36 +68,36 @@ const useLogin = () => {
   );
 
   const login = useCallback(async () => {
-    const currentNetwork = await (
-      window as any
-    ).utxoGlobal.ckbSigner.getNetwork();
-    const isNetworkEqual = currentNetwork === config.network;
-    if (!isNetworkEqual) {
-      await (window as any).utxoGlobal.ckbSigner.switchNetwork(config.network);
-      return login();
-    }
-    const address = (await signer?.getInternalAddress()) as string;
-    if (isLoggedIn) return;
+    try {
+      if (await signer?.isConnected()) {
+        const address = (await signer?.getInternalAddress()) as string;
+        if (isLoggedIn) return;
 
-    const nonce = await _getNonce(address);
-    if (!nonce) return;
+        const nonce = await _getNonce(address);
+        if (!nonce) return;
 
-    const signature = (await _signMessage(nonce)) as string;
-    if (signature) {
-      await _login(signature, address);
+        const signature = (await _signMessage(nonce)) as string;
+        if (signature) {
+          await _login(signature, address);
+        }
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Login failed. Please try again.");
     }
 
     return;
-  }, [signer, isLoggedIn, _getNonce, _signMessage, _login]);
+  }, [signer, isLoggedIn, _getNonce, _signMessage, _login, config.network]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
   useEffect(() => {
-    if (signer && !!signer.getInternalAddress() && mounted) {
+    if (signer && !!signer.getInternalAddress() && mounted && !isLoggedIn) {
       login();
     }
-  }, [login, signer, signer?.getInternalAddress, mounted]);
+  }, [login, signer, signer?.getInternalAddress, mounted, isLoggedIn]);
 };
 
 export default useLogin;
