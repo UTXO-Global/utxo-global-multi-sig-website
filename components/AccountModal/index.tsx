@@ -35,11 +35,16 @@ const AccountModal = () => {
     setOpen(newOpen);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+      const channel = new BroadcastChannel("UTXO_GLOBAL_MULTISIG");
+      channel.postMessage({ event: "disconnect" });
+      channel.close();
+    }
     disconnect();
-    router.push("/");
     dispatch(reset());
     dispatch(restAccountInfo());
+    router.push("/");
     hide();
   };
 
