@@ -18,9 +18,8 @@ const useMultisigBalance = () => {
           account.multi_sig_address,
           signer.client
         );
-        const _balance = await signer.client.getBalance([mulAddress.script]);
 
-        setBalance(_balance);
+        setBalance(await signer.client.getBalance([mulAddress.script]));
       }
     } catch (_e) {
       console.log(_e);
