@@ -30,6 +30,10 @@ export const loadCkbAddressInfo = createAsyncThunk<
     );
 
     const { data } = await res.json();
+    if (!data || (data && data.length) === 0) {
+      return defaultAssetsReducer.assets;
+    }
+
     const addressInfo = data[0] as CKBAddressInfo;
     const udtBalances: {
       [typeHash: string]: UdtBalanceType;
@@ -57,7 +61,6 @@ export const loadCkbAddressInfo = createAsyncThunk<
       udtBalances,
     };
   } catch (e) {
-    console.error(e);
     return defaultAssetsReducer.assets;
   }
 });
