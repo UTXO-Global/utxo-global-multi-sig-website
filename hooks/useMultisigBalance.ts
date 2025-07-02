@@ -10,7 +10,6 @@ const useMultisigBalance = () => {
   const signer = ccc.useSigner();
 
   const fetchBalance = async () => {
-    console.log(signer, account);
     try {
       if (!signer || !account) {
         setBalance(ccc.Zero);
