@@ -10,6 +10,7 @@ const useMultisigBalance = () => {
   const signer = ccc.useSigner();
 
   const fetchBalance = async () => {
+    console.log(signer, account);
     try {
       if (!signer || !account) {
         setBalance(ccc.Zero);
@@ -18,7 +19,9 @@ const useMultisigBalance = () => {
           account.multi_sig_address,
           signer.client
         );
-        setBalance(await signer.client.getBalance([mulAddress.script]));
+        const _balance = await signer.client.getBalance([mulAddress.script]);
+
+        setBalance(_balance);
       }
     } catch (_e) {
       console.log(_e);
