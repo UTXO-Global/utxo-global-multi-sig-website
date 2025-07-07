@@ -29,7 +29,7 @@ const defaultValue = {
 
 const AppContext = createContext(defaultValue);
 
-const AppProvider = ({ children }: { children: React.ReactNode }) => {
+const _AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [isShowIntro, setIsShowIntro] = useState<boolean>(true);
   const [address, setAddress] = useState<string>("");
   const { isSupported } = useSupportedScreen();
@@ -72,6 +72,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
       setAddress(addressLogged);
       return;
     }
+
     if (isAddressEqual(address, addressLogged)) return;
     dispatch(reset());
   }, [address, addressLogged, dispatch]);
@@ -129,6 +130,18 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
       <Footer />
     </AppContext.Provider>
   );
+};
+
+const AppProvider = ({ children }: { children: React.ReactNode }) => {
+  const [isShow, setIsShow] = useState<boolean>(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsShow(true);
+    }, 500);
+  }, []);
+
+  return isShow ? <_AppProvider>{children}</_AppProvider> : null;
 };
 
 export { AppContext, AppProvider };
