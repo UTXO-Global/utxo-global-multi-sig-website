@@ -29,7 +29,7 @@ const useLogin = () => {
         const { data } = await api.get(`/users/nonce/${address}`);
         return data.nonce as string;
       } catch (e) {
-        await signer?.disconnect()
+        await signer?.disconnect();
         disconnect();
         toast.error("Unable to connect to the wallet. Please try again");
       }
@@ -94,9 +94,14 @@ const useLogin = () => {
   }, []);
 
   useEffect(() => {
-    if (signer && !!signer.getInternalAddress() && mounted && !isLoggedIn) {
-      login();
-    }
+    const handler = setTimeout(() => {
+      if (signer && !!signer.getInternalAddress() && mounted && !isLoggedIn) {
+        login();
+      }
+    }, 500);
+    return () => {
+      clearTimeout(handler);
+    };
   }, [login, signer, signer?.getInternalAddress, mounted, isLoggedIn]);
 };
 
