@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { formatNumber } from "@/utils/helpers";
 import { ccc } from "@ckb-ccc/connector-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
 const Assets = () => {
@@ -23,8 +23,8 @@ const Assets = () => {
   const multisigBalance = useMemo(() => {
     return Number(ccc.fixedPointToString(balance));
   }, [balance]);
-  const searchParams = useSearchParams();
-  const address = searchParams.get("address");
+  const params = useParams();
+  const address = params.address;
 
   const tokens = useMemo(() => {
     if (Object.values(assets.udtBalances).length > 0) {
