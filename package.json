@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "build": "next build && node append-js-version.mjs",
     "build:staging": "dotenv -e .env.staging next build && node append-js-version.mjs",
     "build:prod": "dotenv -e .env.prod next build  && node append-js-version.mjs",
     "build:ssr": "dotenv -e .env.ssr next build && node append-js-version.mjs",
