@@ -4,10 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node append-js-version.mjs",
-    "build:staging": "dotenv -e .env.staging next build && node append-js-version.mjs",
-    "build:prod": "dotenv -e .env.prod next build  && node append-js-version.mjs",
-    "build:ssr": "dotenv -e .env.ssr next build && node append-js-version.mjs",
+    "build": "next build",
+    "build:staging": "dotenv -e .env.staging next build",
+    "build:prod": "dotenv -e .env.prod next build",
+    "build:ssr": "dotenv -e .env.ssr next build",
+    "build:static": "next build && node append-js-version.mjs",
+    "build:staic:staging": "dotenv -e .env.staging next build && node append-js-version.mjs",
+    "build:static:prod": "dotenv -e .env.prod next build  && node append-js-version.mjs",
+    "build:static:ssr": "dotenv -e .env.ssr next build && node append-js-version.mjs",
     "start": "next start",
     "lint": "next lint"
   },
