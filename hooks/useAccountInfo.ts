@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 
 import useAuthenticate from "./useAuthenticate";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
@@ -7,8 +7,8 @@ import { loadInfo } from "@/redux/features/account-info/action";
 import { selectApp } from "@/redux/features/app/reducer";
 
 const useAccountInfo = () => {
-  const searchParams = useSearchParams();
-  const address = searchParams.get("address");
+  const params = useParams();
+  const address = params.address as string;
 
   const { config } = useAppSelector(selectApp);
   const dispatch = useAppDispatch();

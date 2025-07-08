@@ -23,7 +23,7 @@ import api from "@/utils/api";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { loadInfo } from "@/redux/features/account-info/action";
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { selectApp } from "@/redux/features/app/reducer";
 import { BI, helpers } from "@ckb-lumos/lumos";
 import useTokens from "@/hooks/useToken";
@@ -59,8 +59,8 @@ const Transaction = ({
   const { config } = useAppSelector(selectApp);
   const { address } = useContext(AppContext);
   const dispatch = useAppDispatch();
-  const searchParams = useSearchParams();
-  const multisigAddress = searchParams.get("address");
+  const params = useParams();
+  const multisigAddress = params.address as string;
   const signer = ccc.useSigner();
   const { getToken } = useTokens();
   const [tokenInfo, setTokenInfo] = useState<
