@@ -34,14 +34,14 @@ RUN cp .env.${BUILD_ENV} .env
 
 RUN yarn build
 
-# If using npm comment out above and use below instead
+    # If using npm comment out above and use below instead
 # RUN npm run build
 
 # Production image, copy all the files and run next
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 # Uncomment the following line in case you want to disable telemetry during runtime.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
@@ -59,6 +59,6 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
+ENV PORT=3000
 
 CMD ["/app/node_modules/.bin/next", "start"]
