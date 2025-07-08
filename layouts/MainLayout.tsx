@@ -11,16 +11,15 @@ import useCkbPrice from "@/hooks/useCkbPrice";
 import { reset } from "@/redux/features/storage/action";
 import ConnectedRequired from "@/components/ConnectedRequired";
 
-
 const _MainLayout = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
-  const router = useRouter()
+  const router = useRouter();
 
   const { isLoggedIn } = useAuthenticate();
-  
+
   useLogin();
   useLoadAddressBooks();
   useCkbPrice();
@@ -29,11 +28,10 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      router.push("/")
+      router.push("/");
       dispatch(reset());
     }
   }, [dispatch, isLoggedIn]);
-
 
   if (!isLoggedIn) return <ConnectedRequired />;
   return <_MainLayout>{children}</_MainLayout>;

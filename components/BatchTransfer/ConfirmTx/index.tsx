@@ -85,9 +85,7 @@ const ConfirmBatchTransferTx = ({
           console.log(e);
         }
 
-        router.push(
-          `/account/transactions/?address=${account?.multi_sig_address}`
-        );
+        router.push(`/account/${account?.multi_sig_address}/transactions`);
       } else if (!!data.message) {
         toast.error(data.message);
       }
