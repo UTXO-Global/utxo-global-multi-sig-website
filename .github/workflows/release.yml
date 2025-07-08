@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [ssr]
+    branches: [staging]
 
 env:
   CURRENT_SERVICE: utxo-global-multi-sig-website
