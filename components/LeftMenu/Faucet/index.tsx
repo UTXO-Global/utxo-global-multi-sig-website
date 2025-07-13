@@ -7,7 +7,7 @@ import { CkbNetwork } from "@/types/common";
 
 const Faucet = () => {
   const { config } = useAppSelector(selectApp);
-  if (config.network === CkbNetwork.MiranaMainnet) return null;
+  if (config.network === CkbNetwork.MeepoMainnet) return null;
 
   return (
     <Link

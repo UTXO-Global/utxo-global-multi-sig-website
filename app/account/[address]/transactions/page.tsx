@@ -119,7 +119,7 @@ const Transactions = () => {
         <div className="flex justify-start">
           {[
             TransactionTab.Queue,
-            TransactionTab.InProgressing,
+            TransactionTab.InProgress,
             TransactionTab.Cancelled,
             TransactionTab.History,
           ].map((z, i) => (
@@ -133,7 +133,7 @@ const Transactions = () => {
               )}
               onClick={() => setTab(z)}
             >
-              {z}
+              {z.replaceAll("-", "")}
             </div>
           ))}
         </div>
@@ -142,8 +142,8 @@ const Transactions = () => {
         <TransactionHistory status={[TransactionStatus.WaitingSigned]} />
       )}
 
-      {tab === TransactionTab.InProgressing && (
-        <TransactionHistory status={[TransactionStatus.InProgressing]} />
+      {tab === TransactionTab.InProgress && (
+        <TransactionHistory status={[TransactionStatus.InProgress]} />
       )}
 
       {tab === TransactionTab.Cancelled && (

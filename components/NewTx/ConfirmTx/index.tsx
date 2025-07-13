@@ -47,13 +47,12 @@ const ConfirmTx = ({
     if (!transaction) return;
     setLoading(true);
     try {
-      const signature = await signer.signOnlyTransaction(transaction);
-      const witnesses = signature.witnesses.toString();
+      const txSigned = await signer.signTransaction(transaction);
+      const witnesses = txSigned.witnesses.toString();
       const payload = {
         ...cccA.JsonRpcTransformers.transactionFrom(transaction),
         hash: transaction.hash(),
       };
-
       const { data } = await api.post("/multi-sig/new-transfer", {
         payload: JSON.stringify(payload, (_, value) => {
           if (typeof value === "bigint") {

@@ -124,8 +124,8 @@ const Transaction = ({
         rawTx.inputs[i].cellOutput = cellInput?.cellOutput;
       }
 
-      const signature = await signer.signOnlyTransaction(rawTx);
-      const witnesses = signature.witnesses.toString();
+      const txSigned = await signer.signOnlyTransaction(rawTx);
+      const witnesses = txSigned.witnesses.toString();
       const { data } = await api.post("/multi-sig/signature", {
         txid: transaction.transaction_id,
         signature: witnesses.slice(42, 172),

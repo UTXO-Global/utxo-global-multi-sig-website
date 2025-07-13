@@ -4,8 +4,8 @@ export const NETWORK_NAME: { [key: string]: string } = {
 };
 
 export const SHORT_NETWORK_NAME: { [key: string]: string } = {
-  nervos_testnet: "Mee",
-  nervos: "Mir",
+  nervos_testnet: "Meepo",
+  nervos: "Meepo",
 };
 
 export interface INetworkConfig {

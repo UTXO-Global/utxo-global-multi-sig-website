@@ -1,13 +1,13 @@
 export enum TransactionTab {
   Queue = "queue",
-  InProgressing = "in-progressing",
+  InProgress = "in-progress",
   Cancelled = "cancelled",
   History = "history",
 }
 
 export enum TransactionStatus {
   WaitingSigned = 0,
-  InProgressing = 1,
+  InProgress = 1,
   Commited = 2,
   Rejected = 3,
   Failed = 4,

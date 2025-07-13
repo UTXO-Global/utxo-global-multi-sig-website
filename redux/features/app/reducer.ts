@@ -16,7 +16,7 @@ const appReducer = createReducer(defaultAppReducer, (builder) => {
     })
     .addCase(setNetworkConfig, (state, action) => {
       const cnf =
-        action.payload === CkbNetwork.MiranaMainnet
+        action.payload === CkbNetwork.MeepoMainnet
           ? MAINNET_CONFIG
           : TESTNET_CONFIG;
       state.config = cnf;

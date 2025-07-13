@@ -17,7 +17,6 @@ const _MainLayout = ({ children }: { children: React.ReactNode }) => {
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-
   const { isLoggedIn } = useAuthenticate();
 
   useLogin();

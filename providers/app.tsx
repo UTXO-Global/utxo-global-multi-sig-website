@@ -81,8 +81,8 @@ const _AppProvider = ({ children }: { children: React.ReactNode }) => {
     let _network = network;
     if (!network) {
       _network =
-        DEFAULT_NETWORK === CkbNetwork.MiranaMainnet
-          ? CkbNetwork.MiranaMainnet
+        DEFAULT_NETWORK === CkbNetwork.MeepoMainnet
+          ? CkbNetwork.MeepoMainnet
           : CkbNetwork.MeepoTestnet;
     }
 
@@ -90,7 +90,7 @@ const _AppProvider = ({ children }: { children: React.ReactNode }) => {
     dispatch(setNetworkConfig(_network));
 
     setClient(
-      _network === CkbNetwork.MiranaMainnet
+      _network === CkbNetwork.MeepoMainnet
         ? new ccc.ClientPublicMainnet()
         : new ccc.ClientPublicTestnet()
     );
@@ -100,8 +100,8 @@ const _AppProvider = ({ children }: { children: React.ReactNode }) => {
     let _network = network;
     if (!_network) {
       _network =
-        DEFAULT_NETWORK === CkbNetwork.MiranaMainnet
-          ? CkbNetwork.MiranaMainnet
+        DEFAULT_NETWORK === CkbNetwork.MeepoMainnet
+          ? CkbNetwork.MeepoMainnet
           : CkbNetwork.MeepoTestnet;
     }
 
@@ -109,7 +109,7 @@ const _AppProvider = ({ children }: { children: React.ReactNode }) => {
     dispatch(setNetworkConfig(_network));
 
     setClient(
-      _network === CkbNetwork.MiranaMainnet
+      _network === CkbNetwork.MeepoMainnet
         ? new ccc.ClientPublicMainnet()
         : new ccc.ClientPublicTestnet()
     );

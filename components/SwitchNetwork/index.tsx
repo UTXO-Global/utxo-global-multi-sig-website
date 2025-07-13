@@ -20,8 +20,8 @@ import { useRouter } from "next/navigation";
 const NETWORK = [
   {
     icon: "/images/nervos.png",
-    name: "Mirana Mainnet",
-    network: CkbNetwork.MiranaMainnet,
+    name: "Meepo Mainnet",
+    network: CkbNetwork.MeepoMainnet,
   },
   {
     icon: "/images/nervos.png",
