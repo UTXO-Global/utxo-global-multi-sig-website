@@ -133,7 +133,7 @@ const Transactions = () => {
               )}
               onClick={() => setTab(z)}
             >
-              {z.replaceAll("-", "")}
+              {z.replaceAll("-", " ")}
             </div>
           ))}
         </div>
