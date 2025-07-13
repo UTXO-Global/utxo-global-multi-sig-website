@@ -62,7 +62,7 @@ export default function TermAndConditionsPage() {
               4. Disclaimer of Warranties
             </h2>
             <p>
-              Safe is provided "as is" without warranties. We do not guarantee
+              Safe is provided 'as is' without warranties. We do not guarantee
               uptime or error-free service.
             </p>
           </section>
