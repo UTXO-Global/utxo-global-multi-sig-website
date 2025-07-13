@@ -34,7 +34,7 @@ const useCreateTransaction = () => {
     transactions,
     load: LoadPendingTransaction,
   } = useTransactions(
-    [TransactionStatus.WaitingSigned, TransactionStatus.InProgressing],
+    [TransactionStatus.WaitingSigned, TransactionStatus.InProgress],
     false
   );
 

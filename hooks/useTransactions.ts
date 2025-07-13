@@ -92,7 +92,7 @@ const useTransactions = (
 
   const updateCommited = async () => {
     const pendingTxes = transactions.filter(
-      (tx) => tx.status === TransactionStatus.InProgressing
+      (tx) => tx.status === TransactionStatus.InProgress
     );
     const dataUpdate: string[] = [];
     for (let i = 0; i < pendingTxes.length; i++) {
