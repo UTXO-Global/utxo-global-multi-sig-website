@@ -49,7 +49,7 @@ const EditName = ({
         multi_sig_address: account.multi_sig_address,
       });
       toast.success("Updated!");
-      await refresh();
+
       if (
         currentAccount &&
         isAddressEqual(
@@ -59,6 +59,7 @@ const EditName = ({
       ) {
         dispatch(updateAccountName(nameVal));
       }
+      refresh();
       handleOk();
     } catch (e) {
       console.error(e);
@@ -83,7 +84,7 @@ const EditName = ({
   };
 
   const handleReset = () => {
-    setNameVal(account.name);
+    setNameVal("");
   };
 
   useEffect(() => {
@@ -115,7 +116,7 @@ const EditName = ({
             <input
               type="text"
               className="border-none outline-none bg-transparent flex-1 text-base placeholder:text-grey-400 text-dark-100"
-              placeholder={account.name}
+              placeholder="Enter the name"
               onChange={onChaneNameVal}
               value={nameVal}
             />
@@ -182,13 +183,8 @@ const Account = ({
             "bg-grey-300": isActive,
           }
         )}
-        onClick={
-          () =>
-            window.open(
-              `/account/?address=${account.multi_sig_address}`,
-              "_blank"
-            )
-          // router.push(`/account/?address=${account.multi_sig_address}`)
+        onClick={() =>
+          window.open(`/account/${account.multi_sig_address}`, "_blank")
         }
       >
         <div
@@ -237,9 +233,7 @@ const Account = ({
         </div>
         <div className="gap-4 flex items-center">
           {isSmall ? null : (
-            <div
-              className="bg-grey-200 rounded-lg px-2 py-1 group-hover:flex transition-all items-center gap-2 text-[12px] leading-[18px] text-grey-400 mr-[70px] hidden"
-            >
+            <div className="bg-grey-200 rounded-lg px-2 py-1 group-hover:flex transition-all items-center gap-2 text-[12px] leading-[18px] text-grey-400 mr-[70px] hidden">
               <span>Go to Dashboard</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"

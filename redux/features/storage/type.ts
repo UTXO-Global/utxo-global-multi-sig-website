@@ -16,7 +16,7 @@ export const defaultStorageReducer: StorageReducerType = {
   tokenExpired: 0,
   network:
     DEFAULT_NETWORK === "nervos"
-      ? CkbNetwork.MiranaMainnet
+      ? CkbNetwork.MeepoMainnet
       : CkbNetwork.MeepoTestnet,
   isDontShowAgainTestnetPopup: false,
   tokens: {},

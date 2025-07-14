@@ -48,32 +48,6 @@ export const setBaseAPIURL = (baseURL: string) => {
 api.interceptors.request.use(
   async (config) => {
     const token = store.getState().storage.token;
-    const addressLogged = store.getState().storage.addressLogged;
-    const currentAddresses = await (
-      window as any
-    ).utxoGlobal.ckbSigner.getAccount();
-    const currentAddress = currentAddresses ? currentAddresses[0] : "";
-    if (!!addressLogged && !currentAddress) {
-      store.dispatch(reset());
-      return Promise.reject({
-        response: {
-          data: "Your account has been changed. Please reconnect your wallet.",
-        },
-      });
-    }
-    if (!!addressLogged && !!currentAddress) {
-      if (isAddressEqual(addressLogged, currentAddress)) {
-        if (token) config.headers.Authorization = `Bearer ${token}`;
-        return config;
-      } else {
-        store.dispatch(reset());
-        return Promise.reject({
-          response: {
-            data: "Your account has been changed. Please reconnect your wallet.",
-          },
-        });
-      }
-    }
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },

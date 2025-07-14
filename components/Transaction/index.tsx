@@ -23,7 +23,7 @@ import api from "@/utils/api";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { loadInfo } from "@/redux/features/account-info/action";
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { selectApp } from "@/redux/features/app/reducer";
 import { BI, helpers } from "@ckb-lumos/lumos";
 import useTokens from "@/hooks/useToken";
@@ -32,7 +32,7 @@ import { Modal } from "antd";
 
 const STATUS_TEXT = {
   [TransactionStatus.WaitingSigned]: "Pending",
-  [TransactionStatus.InProgressing]: "In-Progress",
+  [TransactionStatus.InProgress]: "In-Progress",
   [TransactionStatus.Commited]: "Commited",
   [TransactionStatus.Rejected]: "Rejected",
   [TransactionStatus.Failed]: "Unsuccess",
@@ -59,8 +59,8 @@ const Transaction = ({
   const { config } = useAppSelector(selectApp);
   const { address } = useContext(AppContext);
   const dispatch = useAppDispatch();
-  const searchParams = useSearchParams();
-  const multisigAddress = searchParams.get("address");
+  const params = useParams();
+  const multisigAddress = params.address as string;
   const signer = ccc.useSigner();
   const { getToken } = useTokens();
   const [tokenInfo, setTokenInfo] = useState<
@@ -124,8 +124,8 @@ const Transaction = ({
         rawTx.inputs[i].cellOutput = cellInput?.cellOutput;
       }
 
-      const signature = await signer.signOnlyTransaction(rawTx);
-      const witnesses = signature.witnesses.toString();
+      const txSigned = await signer.signOnlyTransaction(rawTx);
+      const witnesses = txSigned.witnesses.toString();
       const { data } = await api.post("/multi-sig/signature", {
         txid: transaction.transaction_id,
         signature: witnesses.slice(42, 172),
@@ -256,7 +256,7 @@ const Transaction = ({
         <div className="w-[40%] flex items-center gap-3 pl-4">
           <div className="flex justify-between flex-1">
             <div className="flex gap-1 items-center">
-              {transaction.status === TransactionStatus.InProgressing && (
+              {transaction.status === TransactionStatus.InProgress && (
                 <div className="w-6 aspect-square p-[2px]">
                   <IcnInProgress className="fill-[#00b0ff] w-full" />
                 </div>
@@ -278,7 +278,7 @@ const Transaction = ({
                   `text-[16px] leading-[20px] font-medium text-orange-100`,
                   {
                     "text-[#00b0ff]":
-                      transaction.status === TransactionStatus.InProgressing,
+                      transaction.status === TransactionStatus.InProgress,
                     "text-success-200":
                       transaction.status === TransactionStatus.Commited,
                     "text-error-100":
@@ -319,7 +319,7 @@ const Transaction = ({
                     `text-[16px] leading-[20px] font-medium text-orange-100 capitalize`,
                     {
                       "text-[#00b0ff]":
-                        transaction.status === TransactionStatus.InProgressing,
+                        transaction.status === TransactionStatus.InProgress,
                       "text-success-200":
                         transaction.status === TransactionStatus.Commited,
                       "text-error-100":
@@ -402,10 +402,9 @@ const Transaction = ({
               Number of confirmations required: {accountInfo.threshold}
             </p>
           ) : null}
-          {[
-            TransactionStatus.InProgressing,
-            TransactionStatus.Commited,
-          ].includes(transaction.status) ? (
+          {[TransactionStatus.InProgress, TransactionStatus.Commited].includes(
+            transaction.status
+          ) ? (
             <div className="flex gap-8 text-[16px] leading-[20px] text-grey-400">
               <p className="w-[90px] font-medium">Explorer:</p>
               <Link
@@ -435,7 +434,7 @@ const Transaction = ({
             <div className="relative">
               <div className="flex gap-2 items-center bg-light-100">
                 {[
-                  TransactionStatus.InProgressing,
+                  TransactionStatus.InProgress,
                   TransactionStatus.Commited,
                 ].includes(transaction.status) ? (
                   <IcnConfirmed />
@@ -513,7 +512,7 @@ const Transaction = ({
                 </div>
               </div>
             )}
-            {transaction.status === TransactionStatus.InProgressing && (
+            {transaction.status === TransactionStatus.InProgress && (
               <div className="flex gap-2 items-center bg-light-100 relative">
                 <IcnInProgress className="fill-[#0D0D0D] w-4 h-4" />
                 <p className="font-medium text-dark-100">In-Progress</p>

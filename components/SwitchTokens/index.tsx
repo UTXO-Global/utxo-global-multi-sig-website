@@ -32,7 +32,9 @@ const SwitchToken = ({
 
   const tokens = useMemo(() => {
     if (Object.values(assets.udtBalances).length > 0) {
-      return Object.fromEntries(Object.entries(assets.udtBalances).filter(([_, udt]) => udt.balance > 0));
+      return Object.fromEntries(
+        Object.entries(assets.udtBalances).filter(([_, udt]) => udt.balance > 0)
+      );
     }
     return {};
   }, [assets]);
@@ -62,24 +64,34 @@ const SwitchToken = ({
     <div className="py-1 bg-light-100 text-[14px] leading-[20px] rounded-lg overflow-hidden font-medium text-dark-100">
       {/* CKB token */}
       <div
-        className={cn("px-4 py-[10px] flex gap-2 cursor-pointer transition-colors items-center", {
-          "bg-grey-300 cursor-not-allowed": selToken === undefined,
-        })}
+        className={cn(
+          "px-4 py-[10px] flex gap-2 cursor-pointer transition-colors items-center",
+          {
+            "bg-grey-300 cursor-not-allowed": selToken === undefined,
+          }
+        )}
         onClick={() => {
           onChange();
           hide();
         }}
       >
-        <img src="/images/nervos.png" alt="nervos" className="w-6 rounded-full" />
+        <img
+          src="/images/nervos.png"
+          alt="nervos"
+          className="w-6 rounded-full"
+        />
         <p>CKB</p>
       </div>
 
       {Object.entries(tokens).map(([typeHash, udtBalance]) => (
         <div
           key={`token-${typeHash}`}
-          className={cn("px-4 py-[10px] flex gap-2 cursor-pointer transition-colors items-center", {
-            "bg-grey-300 cursor-not-allowed": selToken?.typeHash === typeHash,
-          })}
+          className={cn(
+            "px-4 py-[10px] flex gap-2 cursor-pointer transition-colors items-center",
+            {
+              "bg-grey-300 cursor-not-allowed": selToken?.typeHash === typeHash,
+            }
+          )}
           onClick={() => {
             onChange({
               typeHash,
@@ -89,9 +101,16 @@ const SwitchToken = ({
           }}
         >
           {udtBalance.icon ? (
-            <img src={udtBalance.icon} alt="nervos" className="w-6 rounded-full" />
+            <img
+              src={udtBalance.icon}
+              alt="nervos"
+              className="w-6 rounded-full"
+            />
           ) : (
-            <TextAvatar text={udtBalance.symbol} className="!w-6 !h-6 rounded-full" />
+            <TextAvatar
+              text={udtBalance.symbol}
+              className="!w-6 !h-6 rounded-full"
+            />
           )}
 
           <p>{udtBalance.symbol}</p>
@@ -101,16 +120,40 @@ const SwitchToken = ({
   );
 
   return (
-    <Popover content={content} placement="bottomRight" trigger="click" open={open} onOpenChange={handleOpenChange} arrow={false}>
+    <Popover
+      content={content}
+      placement="bottomRight"
+      trigger="click"
+      open={open}
+      onOpenChange={handleOpenChange}
+      arrow={false}
+    >
       <div className="flex gap-6 items-center cursor-pointer">
         <div className="flex gap-2 items-center">
           {selToken ? (
-            <TextAvatar text={selToken.symbol} />
+            selToken.icon ? (
+              <img
+                src={selToken.icon}
+                alt="nervos"
+                className={cn(`w-6 h-6 rounded-full`, iconClassname)}
+              />
+            ) : (
+              <TextAvatar
+                text={selToken.symbol}
+                className={cn(`w-6 h-6`, iconClassname)}
+              />
+            )
           ) : (
-            <img src="/images/nervos.png" alt="nervos" className={cn(`w-6 h-6`, iconClassname)} />
+            <img
+              src="/images/nervos.png"
+              alt="nervos"
+              className={cn(`w-6 h-6`, iconClassname)}
+            />
           )}
           <div>
-            <p className="text-[14px] leading-[24px] font-medium text-dark-100">{symbol}</p>
+            <p className="text-[14px] leading-[24px] font-medium text-dark-100">
+              {symbol}
+            </p>
             <span className="text-[14px] leading-[18px]">
               {formatNumber(balance)} {symbol}
             </span>

@@ -75,7 +75,7 @@ const Step01 = ({
           <p className="text-[16px] leading-[20px] text-dark-100">
             By continuing, you agree to our{" "}
             <Link
-              href={`${SITE_URL}/terms-and-conditions`}
+              href="https://utxo.global/terms-and-conditions/"
               target="_blank"
               className="text-orange-100 underline"
             >
@@ -83,7 +83,7 @@ const Step01 = ({
             </Link>{" "}
             and{" "}
             <Link
-              href={`${SITE_URL}/privacy-policy`}
+              href="https://utxo.global/privacy-policy/"
               target="_blank"
               className="text-orange-100 underline"
             >

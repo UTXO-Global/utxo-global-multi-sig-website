@@ -21,6 +21,7 @@ import { reset, setNetwork } from "@/redux/features/storage/action";
 import { setNetworkConfig } from "@/redux/features/app/action";
 import { DEFAULT_NETWORK } from "@/configs/common";
 import { CkbNetwork } from "@/types/common";
+import useSyncDisconnect from "@/hooks/useSyncDisconnect";
 
 const defaultValue = {
   address: "",
@@ -28,7 +29,7 @@ const defaultValue = {
 
 const AppContext = createContext(defaultValue);
 
-const AppProvider = ({ children }: { children: React.ReactNode }) => {
+const _AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [isShowIntro, setIsShowIntro] = useState<boolean>(true);
   const [address, setAddress] = useState<string>("");
   const { isSupported } = useSupportedScreen();
@@ -41,13 +42,12 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const checkIsLoggedIn = useCallback(async () => {
     const _getAddress = async () => {
       try {
-        const [address] = await (
-          window as any
-        ).utxoGlobal.ckbSigner.getAccount();
-        return address;
+        const address = await signer?.getInternalAddress?.();
+        return address || "";
       } catch (e) {
-        return "";
+        console.warn("Failed to get address from signer:", e);
       }
+      return "";
     };
     const _address = await _getAddress();
     setAddress(_address);
@@ -72,6 +72,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
       setAddress(addressLogged);
       return;
     }
+
     if (isAddressEqual(address, addressLogged)) return;
     dispatch(reset());
   }, [address, addressLogged, dispatch]);
@@ -80,8 +81,8 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     let _network = network;
     if (!network) {
       _network =
-        DEFAULT_NETWORK === CkbNetwork.MiranaMainnet
-          ? CkbNetwork.MiranaMainnet
+        DEFAULT_NETWORK === CkbNetwork.MeepoMainnet
+          ? CkbNetwork.MeepoMainnet
           : CkbNetwork.MeepoTestnet;
     }
 
@@ -89,7 +90,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     dispatch(setNetworkConfig(_network));
 
     setClient(
-      _network === CkbNetwork.MiranaMainnet
+      _network === CkbNetwork.MeepoMainnet
         ? new ccc.ClientPublicMainnet()
         : new ccc.ClientPublicTestnet()
     );
@@ -99,8 +100,8 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     let _network = network;
     if (!_network) {
       _network =
-        DEFAULT_NETWORK === CkbNetwork.MiranaMainnet
-          ? CkbNetwork.MiranaMainnet
+        DEFAULT_NETWORK === CkbNetwork.MeepoMainnet
+          ? CkbNetwork.MeepoMainnet
           : CkbNetwork.MeepoTestnet;
     }
 
@@ -108,11 +109,13 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     dispatch(setNetworkConfig(_network));
 
     setClient(
-      _network === CkbNetwork.MiranaMainnet
+      _network === CkbNetwork.MeepoMainnet
         ? new ccc.ClientPublicMainnet()
         : new ccc.ClientPublicTestnet()
     );
   }, [network, setClient]);
+
+  useSyncDisconnect();
 
   if (!isSupported) return <NotSupportedScreen />;
 
@@ -127,6 +130,18 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
       <Footer />
     </AppContext.Provider>
   );
+};
+
+const AppProvider = ({ children }: { children: React.ReactNode }) => {
+  const [isShow, setIsShow] = useState<boolean>(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsShow(true);
+    }, 500);
+  }, []);
+
+  return isShow ? <_AppProvider>{children}</_AppProvider> : null;
 };
 
 export { AppContext, AppProvider };

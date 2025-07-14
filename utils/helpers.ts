@@ -6,9 +6,14 @@ import { BI, helpers as lumosHelpers, Script } from "@ckb-lumos/lumos";
 import { InviteStatus } from "@/types/account";
 import { AddressBookType } from "@/types/address-book";
 
-import { ccc, LumosTransactionSkeletonType } from "@ckb-ccc/connector-react";
+import {
+  ccc,
+  fixedPointFrom,
+  LumosTransactionSkeletonType,
+} from "@ckb-ccc/connector-react";
 import { AGGRON4, LINA } from "./lumos-config";
 import { INetworkConfig } from "@/configs/network";
+import { BasicEvaluatedExpression } from "next/dist/compiled/webpack/webpack";
 
 export const comingSoonMsg = () => {
   toast.info("Coming Soon!");
@@ -99,13 +104,17 @@ export const getBalance = async (address: string, config: INetworkConfig) => {
       }
     );
     const data = await res.json();
+    if (!data || !data?.data || data?.data?.length === 0) {
+      return 0;
+    }
+
     const balance = new Decimal(data.data[0].attributes.balance)
       .div(10 ** 8)
       .sub(new Decimal(data.data[0].attributes.balance_occupied).div(10 ** 8));
 
     return balance.toNumber();
   } catch (e) {
-    console.error(e);
+    console.log(e);
     return 0;
   }
 };
