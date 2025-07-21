@@ -1,6 +1,6 @@
 export const NETWORK_NAME: { [key: string]: string } = {
   nervos_testnet: "Meepo Testnet",
-  nervos: "Mirana Mainnet",
+  nervos: "Meepo Mainnet",
 };
 
 export const SHORT_NETWORK_NAME: { [key: string]: string } = {
