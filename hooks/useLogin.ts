@@ -44,6 +44,7 @@ const useLogin = () => {
         const sig = await signer?.signMessage(`utxo.global login ${nonce}`);
         return sig?.signature;
       } catch (e) {
+        disconnect()
         console.error(e);
       }
     },
@@ -61,6 +62,7 @@ const useLogin = () => {
         dispatch(setTokenExpired(data.expired));
         dispatch(setAddressLogged(address));
       } catch (e) {
+        disconnect()
         console.error(e);
       }
     },
