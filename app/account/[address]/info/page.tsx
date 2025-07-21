@@ -9,30 +9,20 @@ import IcnExternalLink from "@/public/icons/icn-external-link.svg";
 import IcnPencil from "@/public/icons/icn-pencil.svg";
 import IcnSpinner from "@/public/icons/icn-spinner.svg";
 
-import {
-  shortAddress,
-  copy,
-  inviteStatus,
-  getAddressBookName,
-} from "@/utils/helpers";
+import { shortAddress, copy, inviteStatus } from "@/utils/helpers";
 
 import cn from "@/utils/cn";
 
 import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { InviteStatus } from "@/types/account";
-import { selectAddressBook } from "@/redux/features/address-book/reducer";
-import { AppContext } from "@/providers/app";
 import { selectApp } from "@/redux/features/app/reducer";
 
 const Info = () => {
-  const { address: currentAddress } = useContext(AppContext);
   const { info: account, isInfoLoading: isLoading } =
     useAppSelector(selectAccountInfo);
 
   const { config } = useAppSelector(selectApp);
-
-  const { data: addressBooks } = useAppSelector(selectAddressBook);
 
   const invites = useMemo(() => {
     return account?.invites?.filter((k) => k.status !== InviteStatus.Accepted);
@@ -74,13 +64,7 @@ const Info = () => {
                       />
                       <div>
                         <p className="text-[16px] leading-[20px] font-medium">
-                          {i === 0
-                            ? "Owner"
-                            : getAddressBookName(
-                                z.signer_address,
-                                addressBooks,
-                                currentAddress
-                              )}
+                          {z.signer_name}
                         </p>
                         <div className="flex items-center">
                           <p className="text-[14px] leading-[18px] text-grey-400">
@@ -127,11 +111,7 @@ const Info = () => {
                       />
                       <div>
                         <p className="text-[16px] leading-[20px] font-medium">
-                          {getAddressBookName(
-                            z.signer_address,
-                            addressBooks,
-                            currentAddress
-                          )}
+                          {z.signer_name}
                         </p>
                         <div className="flex items-center">
                           <p className="text-[14px] leading-[18px] text-grey-400">
