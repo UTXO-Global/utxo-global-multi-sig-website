@@ -29,8 +29,6 @@ const useTransactions = (
     async (isLoading: boolean) => {
       if (isLoading) setIsLoading(isLoading);
       try {
-        // Load transaction summary
-        dispatch(loadTransactionSummary({ address }));
         const { data } = await api.get(
           `/multi-sig/transactions/${account?.multi_sig_address}`,
           {
@@ -121,6 +119,17 @@ const useTransactions = (
       updateCommited();
     }
   }, [transactions, syncStatus]);
+
+  useEffect(() => {
+    if (
+      transactions &&
+      transactions?.length > 0 &&
+      account?.multi_sig_address
+    ) {
+      // Load transaction summary
+      dispatch(loadTransactionSummary({ address: account.multi_sig_address }));
+    }
+  }, [transactions]);
 
   return {
     page,

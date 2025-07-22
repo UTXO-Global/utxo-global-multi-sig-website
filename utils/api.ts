@@ -1,7 +1,6 @@
 import Axios, { AxiosRequestConfig, AxiosRequestHeaders } from "axios";
 import { toast } from "react-toastify";
 import { reset } from "@/redux/features/storage/action";
-import { isAddressEqual } from "./helpers";
 import { MAINNET_CONFIG, TESTNET_CONFIG } from "@/configs/network";
 import { DEFAULT_NETWORK } from "@/configs/common";
 

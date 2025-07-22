@@ -96,8 +96,8 @@ const AccountManagement = ({
                     isActive={
                       account
                         ? isAddressEqual(
-                            account?.multi_sig_address as any,
-                            z.multi_sig_address
+                            account?.multi_sig_address || "",
+                            z.multi_sig_address || ""
                           )
                         : false
                     }

@@ -17,10 +17,13 @@ import { useAppSelector } from "@/redux/hook";
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
 import { InviteStatus } from "@/types/account";
 import { selectApp } from "@/redux/features/app/reducer";
+import { AppContext } from "@/providers/app";
 
 const Info = () => {
   const { info: account, isInfoLoading: isLoading } =
     useAppSelector(selectAccountInfo);
+
+  const { address } = useContext(AppContext);
 
   const { config } = useAppSelector(selectApp);
 
@@ -64,7 +67,9 @@ const Info = () => {
                       />
                       <div>
                         <p className="text-[16px] leading-[20px] font-medium">
-                          {z.signer_name}
+                          {!z.signer_name && z.signer_address === address
+                            ? "Owner"
+                            : z.signer_name}
                         </p>
                         <div className="flex items-center">
                           <p className="text-[14px] leading-[18px] text-grey-400">
