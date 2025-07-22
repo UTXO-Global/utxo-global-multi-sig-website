@@ -10,6 +10,7 @@ export type SignerType = {
 export type SignerDetailType = {
   multi_sig_address: string;
   signer_address: string;
+  signer_name: string;
 };
 
 export enum InviteStatus {
@@ -28,6 +29,7 @@ export type InviterType = {
 
 export type InviteType = {
   signer_address: string;
+  signer_name: string;
   multi_sig_address: string;
   status: InviteStatus;
 };
