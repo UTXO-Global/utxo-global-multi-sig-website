@@ -19,8 +19,8 @@ export interface INetworkConfig {
 
 export const TESTNET_CONFIG: INetworkConfig = {
   network: "nervos_testnet",
-  //apiURL: "https://staging-api-720a.utxo.global", // "http://localhost:9001"
-  apiURL: "http://localhost:9001",
+  apiURL: "https://staging-api-720a.utxo.global",
+  // apiURL: "http://localhost:9001",
   explorer: "https://testnet.explorer.nervos.org/en",
   explorerAPI: "https://testnet-api.explorer.nervos.org",
   ckbRPC: "https://testnet.ckb.dev/rpc",
