@@ -4,10 +4,11 @@ import api from "@/utils/api";
 import { TransactionStatus, TransactionType } from "@/types/transaction";
 
 import { selectAccountInfo } from "@/redux/features/account-info/reducer";
-import { useAppSelector } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { LIMIT_PER_PAGE } from "@/configs/common";
 import { selectApp } from "@/redux/features/app/reducer";
 import { AppContext } from "@/providers/app";
+import { loadTransactionSummary } from "@/redux/features/account-info/action";
 
 const useTransactions = (
   status: TransactionStatus[],
@@ -22,11 +23,14 @@ const useTransactions = (
 
   const { info: account } = useAppSelector(selectAccountInfo);
   const { address } = useContext(AppContext);
+  const dispatch = useAppDispatch();
 
   const load = useCallback(
     async (isLoading: boolean) => {
       if (isLoading) setIsLoading(isLoading);
       try {
+        // Load transaction summary
+        dispatch(loadTransactionSummary({ address }));
         const { data } = await api.get(
           `/multi-sig/transactions/${account?.multi_sig_address}`,
           {
