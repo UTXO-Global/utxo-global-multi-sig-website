@@ -97,7 +97,7 @@ const Assets = () => {
             <div className="w-[20%]">Balance</div>
             <div className="w-[20%] text-right">Value</div>
           </div>
-          <Link href={`/account/new-transaction/?address=${address}`}>
+          <Link href={`/account/${address}/new-transaction`}>
             <div className="px-6 py-3">
               <div className="flex items-center">
                 <div className="flex items-center w-[60%] justify-start">
@@ -124,7 +124,7 @@ const Assets = () => {
             tokens.map((udtBalance, index) => (
               <Link
                 key={index}
-                href={`/account/new-transaction/?address=${address}&token=${udtBalance.symbol}`}
+                href={`/account/${address}/new-transaction/?token=${udtBalance.symbol}`}
               >
                 <div className="px-6 py-3">
                   <div className="flex items-center">

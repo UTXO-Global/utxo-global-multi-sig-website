@@ -47,7 +47,9 @@ const CreateBatchTransferTx = ({
     amount: "",
   });
 
-  const { isTxLoading, isTxPending } = useCreateTransaction();
+  const { isTxLoading, isTxPending } = useCreateTransaction({
+    isLoadTxPending: true,
+  });
 
   const assetBalance = useMemo(() => {
     if (txInfo.token) {

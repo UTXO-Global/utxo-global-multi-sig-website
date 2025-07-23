@@ -33,7 +33,7 @@ const Skeleton = () => {
 
 const TransactionHistory = ({ status }: { status: TransactionStatus[] }) => {
   const { isLoading, setPage, page, transactions, totalRecords, load } =
-    useTransactions(status);
+    useTransactions(status, true, true);
 
   const { info: account, isInfoLoading } = useAppSelector(selectAccountInfo);
 
