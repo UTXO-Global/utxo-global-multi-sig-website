@@ -156,9 +156,7 @@ const CreateTx = ({
       });
 
       return !!toScript;
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
     return false;
   }, [txInfo.send_to, lumosConfig]);
 
