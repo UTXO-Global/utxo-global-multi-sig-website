@@ -49,6 +49,10 @@ const LeftMenu = () => {
   };
 
   useEffect(() => {
+    console.log(account);
+  }, [account]);
+
+  useEffect(() => {
     try {
       event({
         action: "wallet_tvl",

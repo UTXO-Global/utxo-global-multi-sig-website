@@ -2,7 +2,7 @@ import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
 
 import api from "@/utils/api";
 import { getBalance } from "@/utils/helpers";
-import { INetworkConfig, MAINNET_CONFIG } from "@/configs/network";
+import { INetworkConfig } from "@/configs/network";
 
 export const loadInfo = createAsyncThunk(
   "account-info/load-info",
@@ -30,6 +30,24 @@ export const loadInfo = createAsyncThunk(
         signers_detail: signersData.signers,
         invites: signersData.invites,
         balance,
+        totalTxPending: summary.total_tx_pending,
+      };
+    } catch (e) {
+      console.error(e);
+      return undefined;
+    }
+  }
+);
+
+export const loadTransactionSummary = createAsyncThunk(
+  "account-info/load-transaction-summary",
+  async ({ address }: { address: string }, _) => {
+    try {
+      const { data: summary } = await api.get(
+        `/multi-sig/transactions/${address}/summary`
+      );
+
+      return {
         totalTxPending: summary.total_tx_pending,
       };
     } catch (e) {

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/redux/hook";
 import useAuthenticate from "@/hooks/useAuthenticate";
 import useLogin from "@/hooks/useLogin";
-import useLoadAddressBooks from "@/hooks/useLoadAddressBooks";
 import useCkbPrice from "@/hooks/useCkbPrice";
 
 import { reset } from "@/redux/features/storage/action";
@@ -20,7 +19,6 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const { isLoggedIn } = useAuthenticate();
 
   useLogin();
-  useLoadAddressBooks();
   useCkbPrice();
 
   const dispatch = useAppDispatch();
