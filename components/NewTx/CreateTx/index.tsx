@@ -38,17 +38,28 @@ const CreateTx = ({
   const { config } = useAppSelector(selectApp);
   const { network } = useAppSelector(selectStorage);
   const { balance, address } = useMultisigBalance();
-
-  const [requesting, setRequesting] = useState(false);
+  const [fieldFocus, setFieldFocus] = useState({
+    sendTo: false,
+    amount: false,
+  });
   const [filtered, setFiltered] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState(txInfo.send_to || "");
   const searchParams = useSearchParams();
   const tokenParam = searchParams.get("token");
 
   const { assets } = useAssets();
+  const [errors, setErrors] = useState<{
+    amount?: string[];
+    sendTo?: string[];
+  }>({});
+
   const { isTxLoading, isTxPending } = useCreateTransaction({
     isLoadTxPending: true,
   });
+
+  const lumosConfig = useMemo(() => {
+    return network === CkbNetwork.MeepoTestnet ? AGGRON4 : LINA;
+  }, [network]);
 
   const tokens = useMemo(() => {
     if (Object.values(assets.udtBalances).length > 0) {
@@ -83,19 +94,16 @@ const CreateTx = ({
   }, [tokenParam, tokens]);
 
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
     try {
       if (inputValue.endsWith(".bit")) {
-        if (!requesting) {
+        timeout = setTimeout(() => {
           dotbit.records(inputValue).then((records) => {
             setFiltered(
               records.filter((z) => z.key === "address.ckb").map((j) => j.value)
             );
-            setTimeout(() => {
-              setRequesting(false);
-            }, 3000);
           });
-        }
-        setRequesting(true);
+        }, 500);
       } else {
         setFiltered([]);
         setTxInfo({
@@ -107,7 +115,9 @@ const CreateTx = ({
     } catch (e) {
       console.log(e);
     }
-  }, [inputValue, requesting]);
+
+    return () => clearTimeout(timeout);
+  }, [inputValue]);
 
   useEffect(() => {
     if (txInfo.amount === 0 || tokenBalance === 0) return;
@@ -138,8 +148,59 @@ const CreateTx = ({
   );
 
   const isValidSendTo = useCallback(() => {
-    return txInfo.send_to !== "";
-  }, [txInfo.send_to]);
+    try {
+      if (!txInfo.send_to) return false;
+
+      const toScript = helpers.parseAddress(txInfo.send_to, {
+        config: lumosConfig,
+      });
+
+      return !!toScript;
+    } catch (e) {
+      console.log(e);
+    }
+    return false;
+  }, [txInfo.send_to, lumosConfig]);
+
+  const toScript = useMemo(() => {
+    if (isValidSendTo()) {
+      return helpers.parseAddress(txInfo.send_to, {
+        config: lumosConfig,
+      });
+    }
+    return undefined;
+  }, [txInfo.send_to, lumosConfig]);
+
+  const ckbMinTransfer = useMemo(() => {
+    if (toScript) {
+      return BI.from(
+        helpers.minimalCellCapacity({
+          cellOutput: {
+            capacity: "0x0",
+            lock: toScript,
+          },
+          data: "0x",
+        })
+      )
+        .div(10 ** 8)
+        .toNumber();
+    }
+
+    return 0;
+  }, [toScript]);
+
+  const isDisableNext = useMemo(() => {
+    if (isTxPending) return true;
+
+    if (!txInfo.send_to) return true;
+
+    if (txInfo.amount <= 0) return true;
+
+    if (errors.amount && errors.amount.length > 0) return true;
+    if (errors.sendTo && errors.sendTo.length > 0) return true;
+
+    return false;
+  }, [isTxPending, errors]);
 
   const isValidRemainingBalance = useCallback(
     (ckbMinTransfer: number) => {
@@ -157,74 +218,80 @@ const CreateTx = ({
   );
 
   const next = useCallback(() => {
-    if (!isValidSendTo())
-      return toast.warning("Please enter the recipient's address.");
-
-    if (txInfo.amount <= 0) {
-      return toast.error(
-        "The transfer amount must be greater than 0. Please enter a valid amount."
-      );
-    }
-
-    let toScript: any;
-    try {
-      const lumosConfig = network === CkbNetwork.MeepoTestnet ? AGGRON4 : LINA;
-      toScript = helpers.parseAddress(txInfo.send_to, {
-        config: lumosConfig,
-      });
-    } catch (e) {
-      return toast.warning("Recipient's address is invalid.");
-    }
-
-    const ckbMinTransfer = BI.from(
-      helpers.minimalCellCapacity({
-        cellOutput: {
-          capacity: "0x0",
-          lock: toScript,
-        },
-        data: "0x",
-      })
-    )
-      .div(10 ** 8)
-      .toNumber();
-
-    if (!txInfo.token) {
-      if (!isValidAmount(ckbMinTransfer))
-        return toast.warning(
-          `The minimum amount is ${
-            ckbMinTransfer + (txInfo.is_include_fee ? FIXED_FEE / 10 ** 8 : 0)
-          } CKB.`
-        );
-
-      if (!isValidRemainingBalance(ckbMinTransfer))
-        return toast.warning(
-          `The remaining balance in the ${shortAddress(
-            address,
-            5
-          )} wallet must be at least ${ckbMinTransfer} CKB after sending the amount plus fee.`
-        );
-    }
-
-    if (!isValidBalance())
-      return toast.warning(
-        `Insufficient balance: Total amount plus fee exceeds ${formatNumber(
-          tokenBalance
-        )} ${txInfo.token ? txInfo.token.symbol : "CKB"} in the ${shortAddress(
-          address,
-          5
-        )} wallet.`
-      );
     onNext();
+  }, [onNext]);
+
+  useEffect(() => {
+    const errs = {
+      sendTo: [] as string[],
+      amount: [] as string[],
+    };
+
+    setErrors({});
+
+    if (fieldFocus.sendTo) {
+      if (inputValue.endsWith(".bit") && filtered.length === 0) {
+        errs.sendTo.push(`No CKB address found for this '${inputValue}'.`);
+      }
+
+      if (!txInfo.send_to.startsWith(lumosConfig.PREFIX)) {
+        errs.sendTo.push(
+          `Invalid recipient's address: must start with ${lumosConfig.PREFIX}`
+        );
+      }
+
+      if (!isValidSendTo()) {
+        errs.sendTo.push("Please enter the recipient's address.");
+      }
+    }
+
+    if (fieldFocus.amount) {
+      if (txInfo.amount <= 0) {
+        errs.amount.push(
+          "The transfer amount must be greater than 0. Please enter a valid amount."
+        );
+      }
+
+      if (!txInfo.token) {
+        if (!isValidAmount(ckbMinTransfer))
+          errs.amount.push(
+            `The minimum amount is ${
+              ckbMinTransfer + (txInfo.is_include_fee ? FIXED_FEE / 10 ** 8 : 0)
+            } CKB.`
+          );
+
+        if (!isValidRemainingBalance(ckbMinTransfer)) {
+          errs.amount.push(
+            `The remaining balance in the ${shortAddress(
+              address,
+              5
+            )} wallet must be at least ${ckbMinTransfer} CKB after sending the amount plus fee.`
+          );
+        }
+      }
+
+      if (!isValidBalance()) {
+        errs.amount.push(
+          `Insufficient balance: Total amount plus fee exceeds ${formatNumber(
+            tokenBalance
+          )} ${
+            txInfo.token ? txInfo.token.symbol : "CKB"
+          } in the ${shortAddress(address, 5)} wallet.`
+        );
+      }
+    }
+
+    setErrors({ ...errs });
   }, [
-    address,
-    balance,
-    isValidAmount,
+    txInfo,
+    lumosConfig,
+    ckbMinTransfer,
+    toScript,
+    inputValue,
+    fieldFocus,
+    filtered,
     isValidBalance,
-    isValidRemainingBalance,
-    isValidSendTo,
-    network,
-    onNext,
-    txInfo.send_to,
+    isValidAmount,
   ]);
 
   return (
@@ -253,9 +320,17 @@ const CreateTx = ({
                 className="border-none outline-none flex-1 placeholder:text-grey-400 text-dark-100"
                 value={inputValue}
                 placeholder="Address/.bit"
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={(e) => {
+                  setInputValue(e.target.value);
+                  setFieldFocus({ ...fieldFocus, sendTo: true });
+                }}
               />
             </div>
+            {errors.sendTo && errors.sendTo.length > 0 && (
+              <div className="text-sm text-[#FF3333] mb-1">
+                * {errors.sendTo[0]}
+              </div>
+            )}
             {filtered.length > 0 && (
               <div className="absolute w-full rounded-lg border border-grey-200 min-h-[100px] max-h-[200px] overflow-auto shadow-sm left-0 mt-2 bg-light-100 py-2 z-10">
                 {filtered.map((z, i) => (
@@ -297,6 +372,7 @@ const CreateTx = ({
                 }}
                 placeholder="Enter amount"
                 thousandSeparator=","
+                onFocus={() => setFieldFocus({ ...fieldFocus, amount: true })}
               />
               <p
                 className="text-base text-dark-100 cursor-pointer font-medium"
@@ -323,6 +399,11 @@ const CreateTx = ({
               />
             </div>
           </div>
+          {errors.amount && errors.amount.length > 0 && (
+            <div className="text-sm text-[#FF3333] mb-1">
+              * {errors.amount[0]}
+            </div>
+          )}
         </div>
         {!txInfo.token && (
           <div className="flex gap-2 items-center">
@@ -346,7 +427,7 @@ const CreateTx = ({
         <Button
           fullWidth
           onClick={next}
-          disabled={!txInfo.send_to || txInfo.amount <= 0 || isTxPending}
+          disabled={isDisableNext}
           loading={isTxLoading}
         >
           Next
