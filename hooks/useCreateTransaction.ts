@@ -25,7 +25,10 @@ import useTransactions from "./useTransactions";
 import { TransactionStatus } from "@/types/transaction";
 import { toast } from "react-toastify";
 
-const useCreateTransaction = () => {
+type Props = {
+  isLoadTxPending?: boolean;
+};
+const useCreateTransaction = (props?: Props) => {
   const { info: account } = useAppSelector(selectAccountInfo);
   const { config: appConfig } = useAppSelector(selectApp);
 
@@ -777,8 +780,11 @@ const useCreateTransaction = () => {
   };
 
   useEffect(() => {
-    LoadPendingTransaction(true);
-  }, [account]);
+    if (account?.multi_sig_address && props?.isLoadTxPending) {
+      console.log("load pending transaction");
+      LoadPendingTransaction(true);
+    }
+  }, [account?.multi_sig_address, props?.isLoadTxPending]);
 
   return {
     createTxSendCKB,

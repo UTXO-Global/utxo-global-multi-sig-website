@@ -8,11 +8,7 @@ import Button from "@/components/Common/Button";
 import { SendTokenType } from "@/types/account";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
-import {
-  FIXED_FEE,
-  formatNumber,
-  shortAddress,
-} from "@/utils/helpers";
+import { FIXED_FEE, formatNumber, shortAddress } from "@/utils/helpers";
 import useMultisigBalance from "@/hooks/useMultisigBalance";
 import { SHORT_NETWORK_NAME } from "@/configs/network";
 import { BI, helpers } from "@ckb-lumos/lumos";
@@ -50,7 +46,9 @@ const CreateTx = ({
   const tokenParam = searchParams.get("token");
 
   const { assets } = useAssets();
-  const { isTxLoading, isTxPending } = useCreateTransaction();
+  const { isTxLoading, isTxPending } = useCreateTransaction({
+    isLoadTxPending: true,
+  });
 
   const tokens = useMemo(() => {
     if (Object.values(assets.udtBalances).length > 0) {

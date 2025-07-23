@@ -12,9 +12,9 @@ import { loadTransactionSummary } from "@/redux/features/account-info/action";
 
 const useTransactions = (
   status: TransactionStatus[],
-  autoLoad: boolean = true
+  autoLoad: boolean = true,
+  isRefeshSummary: boolean = false
 ) => {
-  const [syncStatus, setSyncStatus] = useState(false);
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
@@ -22,11 +22,12 @@ const useTransactions = (
   const { config: appConfig } = useAppSelector(selectApp);
 
   const { info: account } = useAppSelector(selectAccountInfo);
-  const { address } = useContext(AppContext);
   const dispatch = useAppDispatch();
 
   const load = useCallback(
     async (isLoading: boolean) => {
+      if (!account?.multi_sig_address) return;
+
       if (isLoading) setIsLoading(isLoading);
       try {
         const { data } = await api.get(
@@ -41,7 +42,6 @@ const useTransactions = (
         );
         setTransactions(data.transactions);
         setTotalRecords(data.pagination.total_records);
-        setSyncStatus(false);
       } catch (e) {
         console.error(e);
       } finally {
@@ -51,63 +51,6 @@ const useTransactions = (
     [account?.multi_sig_address, page, status]
   );
 
-  const updateTxCommited = async (txHashes: string[]) => {
-    if (txHashes.length === 0) return;
-
-    try {
-      const { data } = await api.put(
-        `/multi-sig/transactions/${address}/committed`,
-        {
-          tx_hashes: txHashes,
-        }
-      );
-
-      const results = data.results || {};
-      const newTxes: TransactionType[] = [];
-      transactions.forEach((tx) => {
-        if (!results[tx.transaction_id]) {
-          newTxes.push(tx);
-        }
-      });
-
-      setTransactions(newTxes);
-      await load(false);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const isCommited = async (txHash: string) => {
-    try {
-      const res = await fetch(
-        `${appConfig.apiURL}/ckb/${
-          appConfig.network === "nervos" ? "mainnet" : "testnet"
-        }/v1/transactions/0x${txHash}`
-      );
-
-      const data = await res.json();
-      return data?.data?.attributes?.tx_status === "committed";
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const updateCommited = async () => {
-    const pendingTxes = transactions.filter(
-      (tx) => tx.status === TransactionStatus.InProgress
-    );
-    const dataUpdate: string[] = [];
-    for (let i = 0; i < pendingTxes.length; i++) {
-      const ok = await isCommited(pendingTxes[i].transaction_id);
-      if (!!ok) {
-        dataUpdate.push(pendingTxes[i].transaction_id);
-      }
-    }
-
-    await updateTxCommited(dataUpdate);
-    setSyncStatus(true);
-  };
-
   useEffect(() => {
     if (autoLoad) {
       load(false);
@@ -115,21 +58,11 @@ const useTransactions = (
   }, [load, autoLoad]);
 
   useEffect(() => {
-    if (!syncStatus && transactions && transactions.length > 0) {
-      updateCommited();
-    }
-  }, [transactions, syncStatus]);
-
-  useEffect(() => {
-    if (
-      transactions &&
-      transactions?.length > 0 &&
-      account?.multi_sig_address
-    ) {
+    if (account?.multi_sig_address && isRefeshSummary) {
       // Load transaction summary
       dispatch(loadTransactionSummary({ address: account.multi_sig_address }));
     }
-  }, [transactions]);
+  }, [transactions, account?.multi_sig_address, isRefeshSummary]);
 
   return {
     page,
