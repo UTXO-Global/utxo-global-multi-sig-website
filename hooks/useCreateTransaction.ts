@@ -781,7 +781,6 @@ const useCreateTransaction = (props?: Props) => {
 
   useEffect(() => {
     if (account?.multi_sig_address && props?.isLoadTxPending) {
-      console.log("load pending transaction");
       LoadPendingTransaction(true);
     }
   }, [account?.multi_sig_address, props?.isLoadTxPending]);
