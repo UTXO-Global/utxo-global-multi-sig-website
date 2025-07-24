@@ -3,7 +3,7 @@
 import Button from "@/components/Common/Button";
 import { SendTokenType } from "@/types/account";
 import api from "@/utils/api";
-import { FIXED_FEE, formatNumber, shortAddress } from "@/utils/helpers";
+import { formatNumber, shortAddress } from "@/utils/helpers";
 import { ccc } from "@ckb-ccc/connector-react";
 import { BI } from "@ckb-lumos/lumos";
 import { useEffect, useState } from "react";
@@ -15,6 +15,7 @@ import { selectApp } from "@/redux/features/app/reducer";
 import { toast } from "react-toastify";
 import useCreateTransaction from "@/hooks/useCreateTransaction";
 import { event } from "@/utils/gtag";
+import IcnSpinner from "@/public/icons/icn-spinner.svg";
 
 const ConfirmTx = ({
   txInfo,
@@ -28,7 +29,7 @@ const ConfirmTx = ({
   );
 
   const [txFee, setTxFee] = useState(
-    txInfo.fee ? BI.from(txInfo.fee) : BI.from(FIXED_FEE)
+    txInfo.fee ? BI.from(txInfo.fee) : BI.from(0)
   );
   const router = useRouter();
   const [error, setError] = useState("");
@@ -161,8 +162,13 @@ const ConfirmTx = ({
           <div className="w-[30%] text-[18px] leading-[24px] font-medium text-grey-400">
             Fee:
           </div>
-          <div className="flex-1 text-[16px] leading-[20px] font-medium text-dark-100">
-            {Number(ccc.fixedPointToString(txFee.toBigInt()))} CKB
+          <div className="flex-1 text-[16px] leading-[20px] font-medium text-dark-100 flex gap-2">
+            {txFee.gt(BI.from(0)) ? (
+              Number(ccc.fixedPointToString(txFee.toBigInt()))
+            ) : (
+              <IcnSpinner className="w-[20px] animate-spin fill-dark-100" />
+            )}
+            <span>CKB</span>
             {!txInfo.token && txInfo.is_include_fee && (
               <span className="text-grey-500"> (Included Fee)</span>
             )}
@@ -176,7 +182,7 @@ const ConfirmTx = ({
         <Button
           fullWidth
           onClick={onSign}
-          disabled={!signer || !!error || loading}
+          disabled={!signer || !!error || loading || txFee.lte(BI.from(0))}
         >
           {loading ? "Signing" : "Sign"}
         </Button>

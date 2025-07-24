@@ -156,7 +156,7 @@ const CreateTx = ({
       });
 
       return !!toScript;
-    } catch (e) {}
+    } catch (e) { }
     return false;
   }, [txInfo.send_to, lumosConfig]);
 
@@ -228,19 +228,20 @@ const CreateTx = ({
     setErrors({});
 
     if (fieldFocus.sendTo) {
-      if (inputValue.endsWith(".bit") && filtered.length === 0) {
-        errs.sendTo.push(`No CKB address found for this '${inputValue}'.`);
+      if (inputValue.trim() === "") {
+        errs.sendTo.push("Please enter a CKB address or .bit alias.");
+      } else if (inputValue.endsWith(".bit")) {
+        if (filtered.length === 0) {
+          errs.sendTo.push("No CKB address found for this .bit alias.");
+        }
+      } else {
+        if (!isValidSendTo()) {
+          errs.sendTo.push("Invalid CKB address format");
+        } else if (!txInfo.send_to.startsWith(lumosConfig.PREFIX)) {
+          errs.sendTo.push("This address belongs to a different network.");
+        }
       }
 
-      if (!txInfo.send_to.startsWith(lumosConfig.PREFIX)) {
-        errs.sendTo.push(
-          `Invalid recipient's address: must start with ${lumosConfig.PREFIX}`
-        );
-      }
-
-      if (!isValidSendTo()) {
-        errs.sendTo.push("Please enter the recipient's address.");
-      }
     }
 
     if (fieldFocus.amount) {
@@ -253,8 +254,7 @@ const CreateTx = ({
       if (!txInfo.token) {
         if (!isValidAmount(ckbMinTransfer))
           errs.amount.push(
-            `The minimum amount is ${
-              ckbMinTransfer + (txInfo.is_include_fee ? FIXED_FEE / 10 ** 8 : 0)
+            `The minimum amount is ${ckbMinTransfer + (txInfo.is_include_fee ? FIXED_FEE / 10 ** 8 : 0)
             } CKB.`
           );
 
@@ -272,8 +272,7 @@ const CreateTx = ({
         errs.amount.push(
           `Insufficient balance: Total amount plus fee exceeds ${formatNumber(
             tokenBalance
-          )} ${
-            txInfo.token ? txInfo.token.symbol : "CKB"
+          )} ${txInfo.token ? txInfo.token.symbol : "CKB"
           } in the ${shortAddress(address, 5)} wallet.`
         );
       }
